@@ -2,7 +2,6 @@
 #include <myl/defines.hpp>
 
 /// Algorithm
-/// - sign
 /// - round
 
 namespace myl {
