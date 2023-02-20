@@ -34,8 +34,8 @@ namespace myl {
 		MYL_NO_DISCARD constexpr auto operator*() const -> const_reference { return *m_ptr; }
 		MYL_NO_DISCARD constexpr auto operator->() -> pointer { return m_ptr; }
 
-		constexpr auto operator++() -> circulator& { increment(); return (*this); }
-		constexpr auto operator--() -> circulator& { decrement(); return (*this); }
+		constexpr auto operator++() -> circulator& { increment(); return *this; }
+		constexpr auto operator--() -> circulator& { decrement(); return *this; }
 		constexpr auto operator++(int) -> circulator& { circulator temp(*this); increment(); return temp; }
 		constexpr auto operator--(int) -> circulator& { circulator temp(*this); decrement(); return temp; }
 
@@ -94,8 +94,8 @@ namespace myl {
 		MYL_NO_DISCARD constexpr auto operator*() const -> const_reference { return m_rci.operator*(); }
 		MYL_NO_DISCARD constexpr auto operator->() -> pointer { return m_rci.operator->(); }
 
-		constexpr auto operator++() -> reverse_circulator& { --m_rci; return (*this); }
-		constexpr auto operator--() -> reverse_circulator& { ++m_rci; return (*this); }
+		constexpr auto operator++() -> reverse_circulator& { --m_rci; return *this; }
+		constexpr auto operator--() -> reverse_circulator& { ++m_rci; return *this; }
 		constexpr auto operator++(int) -> reverse_circulator& { reverse_circulator temp(*this); --m_rci(); return temp; }
 		constexpr auto operator--(int) -> reverse_circulator& { reverse_circulator temp(*this); ++m_rci(); return temp; }
 

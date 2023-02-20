@@ -9,4 +9,4 @@ My Library is a collection of files I've created that I find are useful.
 Currently documentation is very light. Most functions that need some explaining have a comment above them.
 
 # Configuration
-MYL has a configuration file (config.hpp) to help change the function of some of the library's code.
+MYL has a [configuration file](https://github.com/WarEagle451/myl/blob/main/include/myl/config.hpp) to change how some of the library's code is compiled or functions.

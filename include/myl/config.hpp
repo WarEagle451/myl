@@ -1,5 +1,7 @@
 #pragma once
 // This file contains macros that can be defined or undefined (commented out) that will change some behaviour of My Library.
+// Additionally, if one of these macros should only be defined for a portion of code,
+// one can define the macro before including the file and undef it at the end of that code
 
 /* MYL_DEFINE_TYPES:
 * Allows for certain types to be defined in the global namespace, they are the following;

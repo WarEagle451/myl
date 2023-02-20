@@ -5,6 +5,16 @@
 #define MYL_STRINGIFY(x) #x
 #define MYL_STRINGIFY_ARG(arg) MYL_STRINGIFY(arg)
 
+#define MYL_MAKE_VERSION(major, minor, patch) (major * 10000 + minor * 100 + patch)
+#define MYL_MAKE_VERSION_STRING(major, minor, patch) (MYL_STRINGIFY_ARG(major) "." MYL_STRINGIFY_ARG(minor) "." MYL_STRINGIFY_ARG(patch))
+
+#define MYL_VERSION_MAJOR 1
+#define MYL_VERSION_MINOR 0
+#define MYL_VERSION_PATCH 0
+
+#define MYL_VERSION MYL_MAKE_VERSION(MYL_VERSION_MAJOR, MYL_VERSION_MINOR, MYL_VERSION_PATCH)
+#define MYL_VERSION_STRING MYL_MAKE_VERSION_STRING(MYL_VERSION_MAJOR, MYL_VERSION_MINOR, MYL_VERSION_PATCH)
+
 #if __has_cpp_attribute(assume)
 #	define MYL_ASSUME(condition) [[assume(condition)]]
 #else

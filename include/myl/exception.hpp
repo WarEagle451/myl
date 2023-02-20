@@ -5,7 +5,7 @@
 #include <string>
 
 namespace myl {
-	struct exception {
+	class exception {
 	protected:
 		std::string m_message = "";
 	public:
