@@ -6,7 +6,6 @@
 ///		- heros_formula (math book page 67)
 ///		- perimeter and circumference
 /// - common.hpp
-///		- round
 ///		- signficant digits
 ///		- accuracy and percision
 ///		- exp = exponent function

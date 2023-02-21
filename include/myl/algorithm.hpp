@@ -3,6 +3,7 @@
 
 /// Algorithm
 /// - round
+/// - trunc, basically cuts off the decimals
 
 namespace myl {
 	template<typename T>

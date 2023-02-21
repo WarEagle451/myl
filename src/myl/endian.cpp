@@ -1,5 +1,4 @@
 #include <myl/endian.hpp>
-#include <myl/platform.hpp>
 
 #include <bit>
 
@@ -11,29 +10,18 @@ namespace myl {
 	constexpr auto system_little_endian() -> const bool {
 		return std::endian::native == std::endian::little;
 	}
+
+	constexpr auto hton(u16 v) -> u16 { return std::byteswap(v); }
+	constexpr auto hton(u32 v) -> u32 { return std::byteswap(v); }
+	constexpr auto hton(u64 v) -> u64 { return std::byteswap(v); }
+
+	constexpr auto htonf(f32 v) -> u32 { return std::byteswap(std::bit_cast<u32, f32>(v)); }
+	constexpr auto htonf(f64 v) -> u64 { return std::byteswap(std::bit_cast<u64, f64>(v)); }
+
+	constexpr auto ntoh(u16 v) -> u16 { return std::byteswap(v); }
+	constexpr auto ntoh(u32 v) -> u32 { return std::byteswap(v); }
+	constexpr auto ntoh(u64 v) -> u64 { return std::byteswap(v); }
+
+	constexpr auto ntohf(u32 v) -> f32 { return std::bit_cast<f32, u32>(std::byteswap(v)); }
+	constexpr auto ntohf(u64 v) -> f64 { return std::bit_cast<f64, u64>(std::byteswap(v)); }
 }
-
-/// MYTodo: Just write hton and ntoh exotic platforms will throw a preprocessor error
-
-#ifdef MYL_PLATFORM_WINDOWS
-#	include <WinSock2.h>
-
-inline auto htonfloat(myl::f32 v) -> myl::u32 { return htonf(v); } /// MYTemp:
-inline auto ntohfloat(myl::u32 v) -> myl::f32 { return ntohf(v); }
-
-namespace myl {
-	auto hton(u16 value) -> u16 { return htons(value); }
-	auto hton(u32 value) -> u32 { return htonl(value); }
-	auto hton(u64 value) -> u64 { return htonll(value); }
-	auto htonf(f32 value) -> u32 { return htonfloat(value); }
-	auto htonf(f64 value) -> u64 { return htond(value); }
-
-	auto ntoh(u16 value) -> u16 { return ntohs(value); }
-	auto ntoh(u32 value) -> u32 { return ntohl(value); }
-	auto ntoh(u64 value) -> u64 { return ntohll(value); }
-	auto ntohf(u32 value) -> f32 { return ntohfloat(value); }
-	auto ntohf(u64 value) -> f64 { return ntohd(value); }
-}
-#else
-#	error Unknown platform
-#endif

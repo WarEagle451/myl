@@ -12,8 +12,8 @@ namespace myl {
 	template<> MYL_NO_DISCARD constexpr auto abs<u32>(const u32 s) -> u32 { return s; }
 	template<> MYL_NO_DISCARD constexpr auto abs<u64>(const u64 s) -> u64 { return s; }
 
-	MYL_API MYL_NO_DISCARD auto approx(f32, f32) -> bool; /// MYTodo: Constexpr
-	MYL_API MYL_NO_DISCARD auto approx(f64, f64) -> bool; /// MYTodo: Constexpr
+	MYL_API MYL_NO_DISCARD constexpr auto approx(f32, f32) -> bool;
+	MYL_API MYL_NO_DISCARD constexpr auto approx(f64, f64) -> bool;
 
 	template<typename T>
 	MYL_NO_DISCARD constexpr auto sign(const T s) -> T {

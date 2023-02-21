@@ -92,7 +92,7 @@ namespace myl {
 	private:
 		void loop() {
 			while (m_running) {
-				/// MYTodo: If a deadlock occurs, it will be here, test with 2000 threads
+				/// If a deadlock occurs, it will be here, test with 2000 threads
 				std::unique_lock<std::mutex> l(m_job_mutex);
 				m_job_available.wait(l, [this] { return !m_jobs.empty() || !m_running; });
 				if (!m_running && m_jobs.empty()) // Will exit if the thread pool is destroyed and no jobs are left

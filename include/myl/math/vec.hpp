@@ -21,4 +21,18 @@ namespace myl {
 	MYL_NO_DISCARD constexpr auto normalize(const vec<S, T>& v) -> vec<S, T> {
 		return v / length(v);
 	}
+
+	template<usize S, typename T>
+	MYL_NO_DISCARD constexpr auto reflect(const vec<S, T>& incident, const vec<S, T>& normal) -> vec<S, T> {
+		return incident - normal * (dot(normal, incident) * static_cast<T>(2));
+	}
+
+	template<usize S, typename T>
+	MYL_NO_DISCARD constexpr auto reflect(const vec<S, T>& incident, const vec<S, T>& normal, T eta) -> vec<S, T> {
+		const T d = dot(normal, incident);
+		const T k = static_cast<T>(1) - eta * eta * (static_cast<T>(1) - d * d);
+		return k < 0 ?
+			vec<S, T>(0) :
+			(incident * eta) - (normal * (eta * d + sqrt(k)));
+	}
 }

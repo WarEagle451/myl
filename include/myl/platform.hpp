@@ -12,7 +12,7 @@
 #elif defined(__GNUC__)
 #	define MYL_COMPILER_GCC (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #else
-/// MYTodo: Have a #warning here when C++23 is better implemented
+/// MYTodo: Have a #warning here when C++23 is better implemented: "Unknown compiler!"
 #	define MYL_COMPILER_UNKNOWN
 #endif
 
@@ -143,7 +143,7 @@
 #	elif TARGET_OS_MAC
 #		define MYL_PLATFORM_MAC_OS
 #	else
-/// MYTodo: Have a #warning here when C++23 is better implemented
+/// MYTodo: Have a #warning here when C++23 is better implemented: "Unknown Apple platform!"
 #		define MYL_PLATFORM_APPLE_UNKNOWN
 #	endif
 #elif defined(__ANDROID__)
@@ -155,6 +155,6 @@
 #elif defined(_POSIX_VERSION)
 #	define MYL_PLATFORM_POSIX
 #else
-/// MYTodo: Have a #warning here when C++23 is better implemented
+/// MYTodo: Have a #warning here when C++23 is better implemented: "Unknown platform!"
 #	define MYL_PLATFORM_UNKNOWN
 #endif

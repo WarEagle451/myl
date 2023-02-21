@@ -104,7 +104,7 @@
 #			define MYL_DEBUG
 #		endif
 #	else
-/// MYTodo: Emit warning here: Unknown compiler! Define MYL_DEBUG if compiling a debug build!
+/// MYTodo: Have a #warning here when C++23 is better implemented: Unknown compiler! Define MYL_DEBUG if compiling a debug build!
 #	endif
 #endif
 
