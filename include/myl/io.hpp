@@ -20,7 +20,7 @@ namespace myl {
 	}
 
 	template<typename Int = u8>
-	MYL_NO_DISCARD auto load_into_memory_binary(const std::filesystem::path& file) -> std::vector<Int> {
+	MYL_NO_DISCARD auto load_binary_into_memory(const std::filesystem::path& file) -> std::vector<Int> {
 		if (std::ifstream in(file, std::ios::binary); in) {
 			std::vector<Int> binary{};
 			auto size = std::filesystem::file_size(file);

@@ -14,7 +14,7 @@ namespace myl {
 	}
 
 	template<typename It, typename T = f32>
-	MYL_NO_DISCARD constexpr auto median(It first, It last) -> T { /// MYTodo: Must be a better way then to do this
+	MYL_NO_DISCARD constexpr auto median(It first, It last) -> T { /// Must be a better way then to do this
 		std::list<It::value_type&> sorted(first, last);
 		sorted.sort();
 
