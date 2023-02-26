@@ -109,53 +109,93 @@ namespace myl {
 			0, 0, -1, 0);
 	}
 
-	///template<typename T>
-	///MYL_NO_DISCARD constexpr auto look_at_lh(const vec3<T>& target, const vec3<T>& eye, const vec3<T>& up) -> mat4x4<T> {
-	///
-	///}
-	
-	///template<typename T>
-	///MYL_NO_DISCARD constexpr auto look_at_rh(const vec3<T>& target, const vec3<T>& eye, const vec3<T>& up) -> mat4x4<T> {
-	///
-	///}
-
+	template<typename T>
+	MYL_NO_DISCARD constexpr auto orthographic_lh(T left, T right, T bottom, T top, T near, T far) -> mat4x4<T> {
 #ifdef MYL_FORCE_DEPTH_ZERO_TO_ONE
-	template<typename T> MYL_NO_DISCARD constexpr auto orthographic_lh(T left, T right, T bottom, T top, T near, T far) -> mat4x4<T>	{ return orthographic_lh_01(left, right, bottom, top, near, far); }
-	template<typename T> MYL_NO_DISCARD constexpr auto perspective_lh(T fovy, T aspect, T near, T far) -> mat4x4<T>						{ return perspective_lh_01(fovy, aspect, near, far); }
-	///template<typename T> MYL_NO_DISCARD constexpr auto look_at_lh(const vec3<T>& target, const vec3<T>& eye, const vec3<T>& up) -> mat4x4<T>	{ return look_at_lh_01(target, eye, up); }
-
-	template<typename T> MYL_NO_DISCARD constexpr auto orthographic_rh(T left, T right, T bottom, T top, T near, T far) -> mat4x4<T>	{ return orthographic_rh_01(left, right, bottom, top, near, far); }
-	template<typename T> MYL_NO_DISCARD constexpr auto perspective_rh(T fovy, T aspect, T near, T far) -> mat4x4<T>						{ return perspective_rh_01(fovy, aspect, near, far); }
-	///template<typename T> MYL_NO_DISCARD constexpr auto look_at_rh(const vec3<T>& target, const vec3<T>& eye, const vec3<T>& up) -> mat4x4<T>	{ return look_at_rh_01(target, eye, up); }
+		return orthographic_lh_01(left, right, bottom, top, near, far);
 #else
-	template<typename T> MYL_NO_DISCARD constexpr auto orthographic_lh(T left, T right, T bottom, T top, T near, T far) -> mat4x4<T>	{ return orthographic_lh_11(left, right, bottom, top, near, far); }
-	template<typename T> MYL_NO_DISCARD constexpr auto perspective_lh(T fovy, T aspect, T near, T far) -> mat4x4<T>						{ return perspective_lh_11(fovy, aspect, near, far); }
-	///template<typename T> MYL_NO_DISCARD constexpr auto look_at_lh(const vec3<T>& target, const vec3<T>& eye, const vec3<T>& up) -> mat4x4<T>	{ return look_at_lh_11(target, eye, up); }
-
-	template<typename T> MYL_NO_DISCARD constexpr auto orthographic_rh(T left, T right, T bottom, T top, T near, T far) -> mat4x4<T>	{ return orthographic_rh_11(left, right, bottom, top, near, far); }
-	template<typename T> MYL_NO_DISCARD constexpr auto perspective_rh(T fovy, T aspect, T near, T far) -> mat4x4<T>						{ return perspective_rh_11(fovy, aspect, near, far); }
-	///template<typename T> MYL_NO_DISCARD constexpr auto look_at_rh(const vec3<T>& target, const vec3<T>& eye, const vec3<T>& up) -> mat4x4<T>	{ return look_at_rh_11(target, eye, up); }
+		return orthographic_lh_11(left, right, bottom, top, near, far);
 #endif
+	}
 
+	template<typename T>
+	MYL_NO_DISCARD constexpr auto orthographic_rh(T left, T right, T bottom, T top, T near, T far) -> mat4x4<T> {
+#ifdef MYL_FORCE_DEPTH_ZERO_TO_ONE
+		return orthographic_rh_01(left, right, bottom, top, near, far);
+#else
+		return orthographic_rh_11(left, right, bottom, top, near, far);
+#endif
+	}
+
+	template<typename T>
+	MYL_NO_DISCARD constexpr auto perspective_lh(T fovy, T aspect, T near, T far) -> mat4x4<T> {
+#ifdef MYL_FORCE_DEPTH_ZERO_TO_ONE
+		return perspective_lh_01(fovy, aspect, near, far);
+#else
+		return perspective_lh_11(fovy, aspect, near, far);
+#endif
+	}
+
+	template<typename T>
+	MYL_NO_DISCARD constexpr auto perspective_rh(T fovy, T aspect, T near, T far) -> mat4x4<T> {
+#ifdef MYL_FORCE_DEPTH_ZERO_TO_ONE
+		return perspective_rh_01(fovy, aspect, near, far);
+#else
+		return perspective_rh_11(fovy, aspect, near, far);
+#endif
+	}
+
+	template<typename T>
+	MYL_NO_DISCARD constexpr auto orthographic_01(T left, T right, T bottom, T top, T near, T far) -> mat4x4<T> {
 #ifdef MYL_FORCE_RIGHT_HANDED
-	template<typename T> MYL_NO_DISCARD constexpr auto orthographic_01(T left, T right, T bottom, T top, T near, T far) -> mat4x4<T>	{ return orthographic_rh_01(left, right, bottom, top, near, far); }
-	template<typename T> MYL_NO_DISCARD constexpr auto orthographic_11(T left, T right, T bottom, T top, T near, T far) -> mat4x4<T>	{ return orthographic_rh_11(left, right, bottom, top, near, far); }
-
-	template<typename T> MYL_NO_DISCARD constexpr auto perspective_01(T fovy, T aspect, T near, T far) -> mat4x4<T>	{ return perspective_rh_01(fovy, aspect, near, far); }
-	template<typename T> MYL_NO_DISCARD constexpr auto perspective_11(T fovy, T aspect, T near, T far) -> mat4x4<T>	{ return perspective_rh_11(fovy, aspect, near, far); }
-
-	template<typename T> MYL_NO_DISCARD constexpr auto orthographic(T left, T right, T bottom, T top, T near, T far) -> mat4x4<T> 	{ return orthographic_rh(left, right, bottom, top, near, far); }
-	template<typename T> MYL_NO_DISCARD constexpr auto perspective(T fovy, T aspect, T near, T far) -> mat4x4<T> 					{ return perspective_rh(fovy, aspect, near, far); }
-	///template<typename T> MYL_NO_DISCARD constexpr auto look_at(const vec3<T>& target, const vec3<T>& eye, const vec3<T>& up) -> mat4x4<T> 	{ return look_at_rh(target, eye, up); }
+		return orthographic_rh_01(left, right, bottom, top, near, far);
 #else
-	template<typename T> MYL_NO_DISCARD constexpr auto orthographic_01(T left, T right, T bottom, T top, T near, T far) -> mat4x4<T>	{ return orthographic_lh_01(left, right, bottom, top, near, far); }
-	template<typename T> MYL_NO_DISCARD constexpr auto orthographic_11(T left, T right, T bottom, T top, T near, T far) -> mat4x4<T>	{ return orthographic_lh_11(left, right, bottom, top, near, far); }
-
-	template<typename T> MYL_NO_DISCARD constexpr auto perspective_01(T fovy, T aspect, T near, T far) -> mat4x4<T>	{ return perspective_lh_01(fovy, aspect, near, far); }
-	template<typename T> MYL_NO_DISCARD constexpr auto perspective_11(T fovy, T aspect, T near, T far) -> mat4x4<T>	{ return perspective_lh_11(fovy, aspect, near, far); }
-
-	template<typename T> MYL_NO_DISCARD constexpr auto orthographic(T left, T right, T bottom, T top, T near, T far) -> mat4x4<T> 	{ return orthographic_lh(left, right, bottom, top, near, far); }
-	template<typename T> MYL_NO_DISCARD constexpr auto perspective(T fovy, T aspect, T near, T far) -> mat4x4<T> 					{ return perspective_lh(fovy, aspect, near, far); }
-	///template<typename T> MYL_NO_DISCARD constexpr auto look_at(const vec3<T>& target, const vec3<T>& eye, const vec3<T>& up) -> mat4x4<T> 	{ return look_at_lh(target, eye, up); }
+		return orthographic_lh_01(left, right, bottom, top, near, far);
 #endif
+	}
+
+	template<typename T>
+	MYL_NO_DISCARD constexpr auto orthographic_11(T left, T right, T bottom, T top, T near, T far) -> mat4x4<T> {
+#ifdef MYL_FORCE_RIGHT_HANDED
+		return orthographic_rh_11(left, right, bottom, top, near, far);
+#else
+		return orthographic_lh_11(left, right, bottom, top, near, far);
+#endif
+	}
+
+	template<typename T>
+	MYL_NO_DISCARD constexpr auto perspective_01(T fovy, T aspect, T near, T far) -> mat4x4<T> {
+#ifdef MYL_FORCE_RIGHT_HANDED
+		return perspective_rh_01(fovy, aspect, near, far);
+#else
+		return perspective_lh_01(fovy, aspect, near, far);
+#endif
+	}
+
+	template<typename T>
+	MYL_NO_DISCARD constexpr auto perspective_11(T fovy, T aspect, T near, T far) -> mat4x4<T> {
+#ifdef MYL_FORCE_RIGHT_HANDED
+		return perspective_rh_11(fovy, aspect, near, far);
+#else
+		return perspective_lh_11(fovy, aspect, near, far);
+#endif
+	}
+
+	template<typename T>
+	MYL_NO_DISCARD constexpr auto orthographic(T left, T right, T bottom, T top, T near, T far) -> mat4x4<T> {
+#ifdef MYL_FORCE_RIGHT_HANDED
+		return orthographic_rh(left, right, bottom, top, near, far);
+#else
+		return orthographic_lh(left, right, bottom, top, near, far);
+#endif
+	}
+
+	template<typename T>
+	MYL_NO_DISCARD constexpr auto perspective(T fovy, T aspect, T near, T far) -> mat4x4<T> {
+#ifdef MYL_FORCE_RIGHT_HANDED
+		return perspective_rh(fovy, aspect, near, far);
+#else
+		return perspective_lh(fovy, aspect, near, far);
+#endif
+	}
 }

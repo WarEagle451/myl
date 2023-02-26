@@ -1,4 +1,5 @@
 #pragma once
+#include <myl/math/exponential.hpp>
 #include <myl/math/mat3x3.hpp>
 #include <myl/math/mat4x4.hpp>
 #include <myl/math/trigonometry.hpp>
@@ -9,7 +10,7 @@
 /// - Normal
 /// - Normalize
 /// - Slerp
-/// - Inverse
+/// - cross
 /// - Operators
 
 namespace myl {
@@ -127,13 +128,23 @@ namespace myl {
 	};
 
 	template<typename T>
-	MYL_NO_DISCARD constexpr quat<T> conjugate(const quat<T>& q) {
+	MYL_NO_DISCARD constexpr auto conjugate(const quat<T>& q) -> quat<T> {
 		return quat<T>{ q.w, -q.x, -q.y, -q.z };
 	}
 
 	template<typename T>
 	MYL_NO_DISCARD constexpr auto dot(const quat<T>& a, const quat<T>& b) -> T {
 		return a.w * b.w + a.x * b.x + a.y * b.y + a.z * b.z;
+	}
+
+	template<typename T>
+	MYL_NO_DISCARD constexpr auto length(const quat<T>& q) -> T {
+		return sqrt(dot(q, q));
+	}
+
+	template<typename T>
+	MYL_NO_DISCARD constexpr auto inverse(const quat<T>& q) -> quat<T> {
+		return conjugate(q) * (static_cast<T>(1) / dot(q, q));
 	}
 
 	template<typename T>

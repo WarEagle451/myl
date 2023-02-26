@@ -3,8 +3,28 @@
 // Additionally, if one of these macros should only be defined for a portion of code,
 // one can define the macro before including the file and undef it at the end of that code
 
+//////////////////////////////////////// General Macros////////////////////////////////////////
+
+/* MYL_TYPE_SIZE_CHECK:
+* Checks using a static_assert that a type/class/struct is of a certain size in bytes.
+*/
+//#define MYL_TYPE_SIZE_CHECK
+
+/* MYL_EXPERIMENTAL:
+* Enables code in the myl/ex directory.
+* [NOTE]: Much of this code may be unfinished, buggy or may not compile at all.
+*/
+//#define MYL_EXPERIMENTAL
+
+/* MYL_ROUND_CONSTANTS
+* Rounds the 32nd digit of constants if applicable.
+*/
+#define MYL_ROUND_CONSTANTS
+
+//////////////////////////////////////// Math Related Macros ////////////////////////////////////////
+
 /* MYL_DEFINE_TYPES:
-* Allows for certain types to be defined in the global namespace, they are the following;
+* Defines the following types in the global namespace;
 *	- i8, i16, i32, i64
 *	- u8, u16, u32, u64
 *	- f32, f64
@@ -14,11 +34,6 @@
 *	- quat
 */
 //#define MYL_DEFINE_TYPES
-
-/* MYL_TYPE_SIZE_CHECK:
-* Checks using a static_assert that a type/class/struct is of a certain size in bytes.
-*/
-#define MYL_TYPE_SIZE_CHECK
 
 /* MYL_FORCE_RIGHT_HANDED:
 * Forces MYL to use right handed math when applicable.
@@ -32,8 +47,7 @@
 */
 #define MYL_FORCE_DEPTH_ZERO_TO_ONE
 
-/* MYL_EXPERIMENTAL:
-* Enables code in the myl/ex directory.
-* [NOTE]: Much of this code may be unfinished, buggy or may not compile at all.
+/* MYL_COMPONENT_WISE
+* Enables functions that involve component wise math on vectors.
 */
-#define MYL_EXPERIMENTAL
+//#define MYL_ENABLE_COMPONENT_WISE

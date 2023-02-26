@@ -94,6 +94,28 @@ namespace myl {
 	template<typename T> MYL_NO_DISCARD constexpr auto operator<=(const vec<2, T>& lhs, const vec<2, T>& rhs) -> bool { return dot(lhs, lhs) <= dot(rhs, rhs); }
 	template<typename T> MYL_NO_DISCARD constexpr auto operator>=(const vec<2, T>& lhs, const vec<2, T>& rhs) -> bool { return dot(lhs, lhs) >= dot(rhs, rhs); }
 
+#ifdef MYL_ENABLE_COMPONENT_WISE
+	template<typename T>
+	MYL_NO_DISCARD constexpr auto min(const vec<2, T>& v) -> T {
+		return min(v.x, v.y);
+	}
+
+	template<typename T>
+	MYL_NO_DISCARD constexpr auto max(const vec<2, T>& v) -> T {
+		return max(v.x, v.y);
+	}
+
+	template<typename T>
+	MYL_NO_DISCARD constexpr auto component_add(const vec<2, T>& v) -> T {
+		return v.x + v.y;
+	}
+
+	template<typename T>
+	MYL_NO_DISCARD constexpr auto component_multiply(const vec<2, T>& v) -> T {
+		return v.x * v.y;
+	}
+#endif
+
 	template<typename T> using vec2 = vec<2, T>;
 
 	using i8vec2 = vec2<i8>;

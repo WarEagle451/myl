@@ -134,6 +134,28 @@ namespace myl {
 	template<typename T> MYL_NO_DISCARD constexpr auto operator<=(const vec<4, T>& lhs, const vec<4, T>& rhs) -> bool { return dot(lhs, lhs) <= dot(rhs, rhs); }
 	template<typename T> MYL_NO_DISCARD constexpr auto operator>=(const vec<4, T>& lhs, const vec<4, T>& rhs) -> bool { return dot(lhs, lhs) >= dot(rhs, rhs); }
 
+#ifdef MYL_ENABLE_COMPONENT_WISE
+	template<typename T>
+	MYL_NO_DISCARD constexpr auto min(const vec<4, T>& v) -> T {
+		return min(v.x, v.y, v.z, v.w);
+	}
+
+	template<typename T>
+	MYL_NO_DISCARD constexpr auto max(const vec<4, T>& v) -> T {
+		return max(v.x, v.y, v.z, v.w);
+	}
+
+	template<typename T>
+	MYL_NO_DISCARD constexpr auto component_add(const vec<4, T>& v) -> T {
+		return v.x + v.y + v.z + v.w;
+	}
+
+	template<typename T>
+	MYL_NO_DISCARD constexpr auto component_multiply(const vec<4, T>& v) -> T {
+		return v.x * v.y * v.z * v.w;
+	}
+#endif
+
 	template<typename T> using vec4 = vec<4, T>;
 
 	using i8vec4 = vec4<i8>;

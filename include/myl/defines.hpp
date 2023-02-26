@@ -99,16 +99,18 @@
 #		ifdef _DEBUG
 #			define MYL_DEBUG
 #		endif
-#	elif defined(MYL_COMPILER_CLANG) || defined(MYL_COMPILER_GCC
+#	elif defined(MYL_COMPILER_CLANG) || defined(MYL_COMPILER_GCC)
 #		ifdef _GLIBCXX_DEBUG
 #			define MYL_DEBUG
 #		endif
 #	else
-/// MYTodo: Have a #warning here when C++23 is better implemented: Unknown compiler! Define MYL_DEBUG if compiling a debug build!
+#		warning "Unknown compiler! Define 'MYL_DEBUG' if compiling a debug build!"
 #	endif
 #endif
 
 namespace myl {
+	// Fundamental Types
+
 	using u8 = unsigned char;
 	using u16 = unsigned short;
 	using u32 = unsigned int;
@@ -139,6 +141,69 @@ namespace myl {
 	static_assert(sizeof(f32) == 4, "Expected myl::f32 to be 4 bytes");
 	static_assert(sizeof(f64) == 8, "Expected myl::f64 to be 8 bytes");
 #endif
+
+	// Useful Meta Programming
+
+	namespace details {
+		template<typename A> struct signed_type;
+		template<> struct signed_type<i8> { using type = i8; };
+		template<> struct signed_type<i16> { using type = i16; };
+		template<> struct signed_type<i32> { using type = i32; };
+		template<> struct signed_type<i64> { using type = i64; };
+
+		template<> struct signed_type<u8> { using type = i8; };
+		template<> struct signed_type<u16> { using type = i16; };
+		template<> struct signed_type<u32> { using type = i32; };
+		template<> struct signed_type<u64> { using type = i64; };
+
+		template<typename A> struct unsigned_type;
+		template<> struct unsigned_type<i8> { using type = u8; };
+		template<> struct unsigned_type<i16> { using type = u16; };
+		template<> struct unsigned_type<i32> { using type = u32; };
+		template<> struct unsigned_type<i64> { using type = u64; };
+
+		template<> struct unsigned_type<u8> { using type = u8; };
+		template<> struct unsigned_type<u16> { using type = u16; };
+		template<> struct unsigned_type<u32> { using type = u32; };
+		template<> struct unsigned_type<u64> { using type = u64; };
+	}
+
+	template<typename T> using signed_type		= details::signed_type<T>::type;
+	template<typename T> using unsigned_type	= details::unsigned_type<T>::type;
+
+	// Common Concepts
+
+	namespace details {
+		template<class, class> inline constexpr bool same_impl = false;
+		template<class T> inline constexpr bool same_impl<T, T> = true;
+	}
+
+	template<typename A, typename B> concept same_as = details::same_impl<A, B> && details::same_impl<B, A>;
+	template<typename A, typename B> concept is_not = !same_as<A, B>;
+
+	template<typename T, typename... Args> concept any_of	= (same_as<T, Args> || ...);
+	template<typename T, typename... Args> concept none_of	= (is_not<T, Args> || ...);
+
+	template<typename T> concept character			= any_of<T, char, signed char, unsigned char, wchar_t, char8_t, char16_t, char32_t>;
+	template<typename T> concept floating_point		= any_of<T, f32, f64, long double>;
+	template<typename T> concept signed_integer		= any_of<T, i8, i16, i32, i64>;
+	template<typename T> concept unsigned_integer	= any_of<T, u8, u16, u32, u64>;
+
+	template<typename T> concept integer		= signed_integer<T> || unsigned_integer<T>;
+	template<typename T> concept number			= integer<T> || floating_point<T>;
+	template<typename T> concept signed_number	= signed_integer<T> || floating_point<T>;
+
+	template<typename T> concept fundamental_type = number<T> || character<T> || any_of<T, void, bool>;
+
+	template<typename T> concept comparable_less_than	= requires(T a, T b) { a < b; };
+	template<typename T> concept comparable_more_than	= requires(T a, T b) { a > b; };
+	template<typename T> concept comparable_equality	= requires(T a, T b) { a == b; };
+	template<typename T> concept comparable = comparable_less_than<T> && comparable_more_than<T> && comparable_equality<T>;
+
+	template<typename A, typename B> concept comparable_less_than_with	= requires(A a, B b) { a < b; };
+	template<typename A, typename B> concept comparable_more_than_with	= requires(A a, B b) { a > b; };
+	template<typename A, typename B> concept comparable_equality_with	= requires(A a, B b) { a == b; };
+	template<typename A, typename B> concept comparable_with = comparable_less_than_with<A, B> && comparable_more_than_with<A, B> && comparable_equality_with<A, B>;
 }
 
 #ifdef MYL_DEFINE_TYPES

@@ -73,6 +73,12 @@ namespace myl {
 		constexpr auto operator-=(const mat& rhs) -> mat& { m_data[0] -= rhs[0]; m_data[1] -= rhs[1]; return *this; }
 	};
 
+	template<typename T>
+	constexpr auto set_row(mat<3, 2, T>& m, usize i, const typename mat<3, 2, T>::row_type& row) -> void {
+		m[0][i] = row[0];
+		m[1][i] = row[1];
+	}
+
 	template<typename T> using mat3x2 = mat<3, 2, T>;
 
 	using i8mat3x2 = mat3x2<i8>;

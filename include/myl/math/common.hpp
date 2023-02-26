@@ -1,33 +1,102 @@
 #pragma once
-#include <myl/defines.hpp>
+#include <myl/numbers.hpp>
+
+#include <cmath>
+#include <limits>
+#include <type_traits> /// MYTodo imple custom common type to remove
 
 namespace myl {
-	template<typename T>
-	MYL_NO_DISCARD constexpr auto abs(const T s) -> T {
-		return s > static_cast<T>(0) ? s : -s;
+	//@return Absolute value of v
+	template<signed_number T>
+	MYL_NO_DISCARD constexpr auto abs(T v) -> T {
+		return v > static_cast<T>(0) ? v : -v;
 	}
 
-	template<> MYL_NO_DISCARD constexpr auto abs<u8>(const u8 s) -> u8 { return s; }
-	template<> MYL_NO_DISCARD constexpr auto abs<u16>(const u16 s) -> u16 { return s; }
-	template<> MYL_NO_DISCARD constexpr auto abs<u32>(const u32 s) -> u32 { return s; }
-	template<> MYL_NO_DISCARD constexpr auto abs<u64>(const u64 s) -> u64 { return s; }
-
-	MYL_API MYL_NO_DISCARD constexpr auto approx(f32, f32) -> bool;
-	MYL_API MYL_NO_DISCARD constexpr auto approx(f64, f64) -> bool;
-
-	template<typename T>
-	MYL_NO_DISCARD constexpr auto sign(const T s) -> T {
-		return s == static_cast<T>(0) ? static_cast<T>(0) : s > static_cast<T>(0) ? static_cast<T>(1) : static_cast<T>(-1);
+	//@return Absolute value of v
+	template<unsigned_integer T>
+	MYL_NO_DISCARD constexpr auto abs(T v) -> T {
+		return v;
 	}
 
-	template<> MYL_NO_DISCARD constexpr auto sign<u8>(const u8 s) -> u8 { return static_cast<u8>(s != 0); }
-	template<> MYL_NO_DISCARD constexpr auto sign<u16>(const u16 s) -> u16 { return static_cast<u16>(s != 0); }
-	template<> MYL_NO_DISCARD constexpr auto sign<u32>(const u32 s) -> u32 { return static_cast<u32>(s != 0); }
-	template<> MYL_NO_DISCARD constexpr auto sign<u64>(const u64 s) -> u64 { return static_cast<u64>(s != 0); }
-	template<> MYL_NO_DISCARD constexpr auto sign<f32>(const f32 s) -> f32 { return static_cast<f32>((0.f < s) - (s < 0.f)); } /// MYTodo: How to handle the i0, +0, -nan, +nan cases? plus approx?
-	template<> MYL_NO_DISCARD constexpr auto sign<f64>(const f64 s) -> f64 { return static_cast<f64>((0.0 < s) - (s < 0.0)); }
+	//@return Sign value as a integer
+	template<signed_integer T>
+	MYL_NO_DISCARD constexpr auto sign(const T v) -> T {
+		return v == static_cast<T>(0) ? static_cast<T>(0) : v > static_cast<T>(0) ? static_cast<T>(1) : static_cast<T>(-1);
+	}
 
-	/// MYTodo: Constexpr
-	MYL_API MYL_NO_DISCARD inline auto sqrt(f32) -> f32; /// MYTodo: Imple all types
-	MYL_API MYL_NO_DISCARD inline auto sqrt(f64) -> f64;
+	//@return Sign value as a integer
+	template<unsigned_integer T>
+	MYL_NO_DISCARD constexpr auto sign(const T v) -> T {
+		return static_cast<T>(v != 0);
+	}
+
+	//@return Sign value as a floating pointer number
+	template<floating_point T>
+	MYL_NO_DISCARD constexpr auto sign(const T v) -> T { /// MYTodo: How to handle the i0, +0, -nan, +nan cases? plus approx?
+		return static_cast<T>((0 < v) - (v < 0));
+	}
+	
+	//@return If v is infinity
+	template<floating_point T>
+	MYL_NO_DISCARD constexpr auto is_infinity(T v) -> bool {
+		return v == numbers::infinity<T> || v == numbers::negative_infinity<T>;
+	}
+
+	//@return If a is approximately b
+	template<floating_point T>
+	MYL_NO_DISCARD constexpr auto approx(T a, T b) -> bool {
+		return abs(a - b) <= ((abs(a) < abs(b) ? abs(b) : abs(a)) * std::numeric_limits<T>::epsilon());
+	}
+
+	//@return If v is not a number
+	template<floating_point T>
+	MYL_NO_DISCARD constexpr auto is_nan(T v) -> bool {
+		return std::isnan(v);
+	}
+
+	//@brief Calculates the greatest common divisor
+	template<integer A, integer B>
+	MYL_NO_DISCARD constexpr auto gcd(const A a, const B b) -> std::common_type_t<A, B> {
+		using common = std::common_type_t<A, B>;
+		using ucommon = unsigned_type<common>;
+
+		ucommon ma = static_cast<ucommon>(abs(a));
+		ucommon mb = static_cast<ucommon>(abs(b));
+
+		if (ma == 0) return static_cast<common>(mb);
+		if (mb == 0) return static_cast<common>(ma);
+
+		while (mb != 0) {
+			ucommon t = ma % mb;
+			ma = mb;
+			mb = t;
+		}
+
+		return ma;
+	}
+
+	//@brief Calculates the greatest common divisor
+	template<integer A, integer B, integer... Args>
+	MYL_NO_DISCARD constexpr auto gcd(const A a, const B b, const Args... args) -> std::common_type_t<A, B, Args...> {
+		return gcd(gcd(a, b), args...);
+	}
+
+	//@brief Calculates the least common multible
+	template<integer A, integer B>
+	MYL_NO_DISCARD constexpr auto lcm(const A a, const B b) -> std::common_type_t<A, B> {
+		using common = std::common_type_t<A, B>;
+		using ucommon = unsigned_type<common>;
+
+		const ucommon ma = static_cast<ucommon>(abs(a));
+		const ucommon mb = static_cast<ucommon>(abs(b));
+		if (ma == 0 || mb == 0)
+			return 0;
+		return static_cast<common>((ma / gcd(ma, mb)) * mb);
+	}
+
+	//@brief Calculates the least common multible
+	template<integer A, integer B, integer... Args>
+	MYL_NO_DISCARD constexpr auto lcm(const A a, const B b, const Args... args) -> std::common_type_t<A, B, Args...> {
+		return lcm(lcm(a, b), args...);
+	}
 }

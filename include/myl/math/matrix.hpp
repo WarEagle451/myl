@@ -1,7 +1,7 @@
 #pragma once
 #include <myl/defines.hpp>
 
-/// MYTodo: Matrix conversion constructors
+/// MYTodo: replace to get columns then rows
 
 namespace myl {
 	//@brief Column major to follow mathmatical conventions
@@ -18,4 +18,11 @@ namespace myl {
 				transposed[r][c] = m[c][r];
 		return transposed;
 	}
+
+	template<usize R, usize C, typename T>
+	constexpr auto set_column(const mat<R, C, T>& m, usize i, typename mat<R, C, T>::col_type column) -> void {
+		m[i] = column;
+	}
+
+	template<usize R, usize C, typename T> constexpr auto set_row(mat<R, C, T>&, usize, const typename mat<4, 4, T>::row_type&) -> void;
 }

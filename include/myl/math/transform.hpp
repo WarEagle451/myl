@@ -1,6 +1,7 @@
 #pragma once
 #include <myl/math/mat4x4.hpp>
 #include <myl/math/trigonometry.hpp>
+#include <myl/math/quaternion.hpp>
 #include <myl/math/vec3.hpp>
 
 /// MYTodo: Transform.hpp
@@ -12,11 +13,19 @@
 /// decompose with quaternions
 
 namespace myl {
+	//@brief Extracts the translation from a transform matrix
+	//@param transform: Matrix to extract the translation from 
+	//@return The translation vector
 	template<typename T>
-	constexpr auto translation(const mat4x4<T>& transform) -> vec3<T> {
+	MYL_NO_DISCARD constexpr auto translation(const mat4x4<T>& transform) -> vec3<T> {
 		return vec3<T>(transform[3]) / transform[3][3];
 	}
 
+	//@brief Decomposes a matrix into it's translation, rotation and scale vectors
+	//@param transform: Transform to decompose
+	//@param translation: Vector to assign the translation vector
+	//@param rotation: Vector to assign the rotation vector
+	//@param scale: Vector to assign the scale vector
 	template<typename T>
 	constexpr auto decompose(const mat4x4<T>& transform, vec3<T>* translation, vec3<T>* rotation, vec3<T>* scale) -> void {
 		auto m = transform / transform[3][3]; // Normalize the matrix
@@ -49,6 +58,11 @@ namespace myl {
 			vec3<T>{ atan2(cb.z, cc.z), cy, atan2(ca.y, ca.x) };
 	}
 	
+	
+	//@brief Translates a matrix by a vector
+	//@param translation: The amount to translate by
+	//@param m: The matrix to be translated
+	//@return A translated matrix
 	template<typename T>
 	MYL_NO_DISCARD constexpr auto translate(const vec3<T>& translation, const mat4x4<T>& m = mat4x4<T>::identity()) -> mat4x4<T> {
 		return mat4x4<T>{
@@ -58,6 +72,10 @@ namespace myl {
 				m[0] * translation[0] + m[1] * translation[1] + m[2] * translation[2] + m[3] };
 	}
 
+	//@brief Rotates a matrix by a vector in a left hand coordinate system
+	//@param rotation: The amount to rotates by in radian euler angles
+	//@param m: The matrix to be rotated
+	//@return A rotated matrix
 	template<typename T>
 	MYL_NO_DISCARD constexpr auto rotate_lh(const vec3<T>& rotation, const mat4x4<T>& m = mat4x4<T>::identity()) -> mat4x4<T> {
 		T cx = cos(rotation.x);
@@ -74,6 +92,10 @@ namespace myl {
 			0, 0, 0, 1);
 	}
 
+	//@brief Rotates a matrix by a vector in a right hand coordinate system
+	//@param rotation: The amount to rotates by in radian euler angles
+	//@param m: The matrix to be rotated
+	//@return A rotated matrix
 	template<typename T>
 	MYL_NO_DISCARD constexpr auto rotate_rh(const vec3<T>& rotation, const mat4x4<T>& m = mat4x4<T>::identity()) -> mat4x4<T> {
 		T cx = cos(rotation.x);
@@ -90,12 +112,23 @@ namespace myl {
 			0, 0, 0, 1);
 	}
 
+	//@brief Rotates a matrix by a vector
+	//@param rotation: The amount to rotates by in radian euler angles
+	//@param m: The matrix to be rotated
+	//@return A rotated matrix
+	template<typename T>
+	MYL_NO_DISCARD inline constexpr auto rotate(const vec3<T>& rotation, const mat4x4<T>& m = mat4x4<T>::identity()) -> mat4x4<T> {
 #ifdef MYL_FORCE_RIGHT_HANDED
-	template<typename T> MYL_NO_DISCARD inline constexpr auto rotate(const vec3<T>& rotation, const mat4x4<T>& m = mat4x4<T>::identity()) -> mat4x4<T> { return rotate_rh(rotation, m); }
+		return rotate_rh(rotation, m);
 #else
-	template<typename T> MYL_NO_DISCARD inline constexpr auto rotate(const vec3<T>& rotation, const mat4x4<T>& m = mat4x4<T>::identity()) -> mat4x4<T> { return rotate_lh(rotation, m); }
+		return rotate_lh(rotation, m);
 #endif
+	}
 
+	//@brief Scales a matrix by a vector
+	//@param scale: The amount to scale by
+	//@param m: The matrix to be scaled
+	//@return A scaled matrix
 	template<typename T>
 	MYL_NO_DISCARD constexpr auto scale(const vec3<T>& scale, const mat4x4<T>& m = mat4x4<T>::identity()) -> mat4x4<T> {
 		return mat4x4<T>{
@@ -105,8 +138,13 @@ namespace myl {
 			m[3] };
 	}
 
+	//@brief Construct a tranform matrix
+	//@param translation: Matrix translation
+	//@param rotation: Matrix rotation in radian euler angles
+	//@param scale: Matrix scale
+	//@return A tranform matrix
 	template<typename T>
-	MYL_NO_DISCARD constexpr auto transform(const vec3<T>& translation, const vec3<T>& rotation, const vec3<T>& scale) -> mat4x4<T> {
+	MYL_NO_DISCARD constexpr auto transform(const vec3<T>& translation, const vec3<T>& rotation, const vec3<T>& scale) -> mat4x4<T> { /// MYTodo: There's probably a better way to do this
 		return translate(translation) * rotate(rotation) * myl::scale(scale);
 	}
 }

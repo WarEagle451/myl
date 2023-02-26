@@ -118,6 +118,28 @@ namespace myl {
 	template<typename T> MYL_NO_DISCARD constexpr auto operator<=(const vec<3, T>& lhs, const vec<3, T>& rhs) -> bool { return dot(lhs, lhs) <= dot(rhs, rhs); }
 	template<typename T> MYL_NO_DISCARD constexpr auto operator>=(const vec<3, T>& lhs, const vec<3, T>& rhs) -> bool { return dot(lhs, lhs) >= dot(rhs, rhs); }
 
+#ifdef MYL_ENABLE_COMPONENT_WISE
+	template<typename T>
+	MYL_NO_DISCARD constexpr auto min(const vec<3, T>& v) -> T {
+		return min(v.x, v.y, v.z);
+	}
+
+	template<typename T>
+	MYL_NO_DISCARD constexpr auto max(const vec<3, T>& v) -> T {
+		return max(v.x, v.y, v.z);
+	}
+
+	template<typename T>
+	MYL_NO_DISCARD constexpr auto component_add(const vec<3, T>& v) -> T {
+		return v.x + v.y + v.z;
+	}
+
+	template<typename T>
+	MYL_NO_DISCARD constexpr auto component_multiply(const vec<3, T>& v) -> T {
+		return v.x * v.y * v.z;
+	}
+#endif
+
 	template<typename T> using vec3 = vec<3, T>;
 
 	using i8vec3 = vec3<i8>;

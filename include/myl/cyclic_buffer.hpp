@@ -1,5 +1,5 @@
 #pragma once
-#include <myl/circulator.hpp>
+#include <myl/iterative.hpp>
 
 #include <initializer_list>
 #include <memory>
@@ -17,9 +17,9 @@ namespace myl {
 		using const_reference			= const value_type&;
 		using pointer					= typename std::allocator_traits<allocator_type>::pointer;
 		using const_pointer				= typename std::allocator_traits<allocator_type>::const_pointer;
-		using iterator					= circulator<value_type>;
+		using iterator					= circulator<cyclic_buffer>;
 		using const_iterator			= const iterator;
-		using reverse_iterator			= reverse_circulator<iterator>;
+		using reverse_iterator			= std::reverse_iterator<iterator>;
 		using const_reverse_iterator	= const reverse_iterator;
 	private:
 		pointer m_begin = nullptr;
@@ -137,7 +137,7 @@ namespace myl {
 		MYL_NO_DISCARD constexpr auto cend() const noexcept -> const_iterator { return end(); }
 
 		//@return The head as a reverse iterator
-		MYL_NO_DISCARD constexpr auto rbegin() noexcept -> reverse_iterator { return reverse_iterator(m_head, m_begin, m_end, m_head, m_tail, empty()); } // Must check if empty, will run if passed false
+		MYL_NO_DISCARD constexpr auto rbegin() noexcept -> reverse_iterator { return reverse_iterator(iterator(m_head, m_begin, m_end, m_head, m_tail, empty())); } // Must check if empty, will run if passed false
 
 		//@return The head as a const reverse iterator
 		MYL_NO_DISCARD constexpr auto rbegin() const noexcept -> const_reverse_iterator { return rbegin(); }
@@ -146,7 +146,7 @@ namespace myl {
 		MYL_NO_DISCARD constexpr auto crbegin() const noexcept -> const_reverse_iterator { return rbegin(); }
 		
 		//@return The tail as a reverse iterator
-		MYL_NO_DISCARD constexpr auto rend() noexcept -> reverse_iterator { return reverse_iterator(m_head, m_begin, m_end, m_head, m_tail, true); }
+		MYL_NO_DISCARD constexpr auto rend() noexcept -> reverse_iterator { return reverse_iterator(iterator(m_head, m_begin, m_end, m_head, m_tail, true)); }
 
 		//@return The tail as a const reverse iterator
 		MYL_NO_DISCARD constexpr auto rend() const noexcept -> const_reverse_iterator { return rend(); }

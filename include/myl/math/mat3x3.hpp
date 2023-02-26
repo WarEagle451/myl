@@ -92,6 +92,13 @@ namespace myl {
 	};
 
 	template<typename T>
+	constexpr auto set_row(mat<3, 3, T>& m, usize i, const typename mat<3, 3, T>::row_type& row) -> void {
+		m[0][i] = row[0];
+		m[1][i] = row[1];
+		m[2][i] = row[2];
+	}
+
+	template<typename T>
 	MYL_NO_DISCARD constexpr auto determinant(const mat<3, 3, T>& m) -> T {
 		//     | a b c |       | e f |       | d f |       | d e |
 		// det | d e f | = a * | h i | - b * | g i | + c * | g h |
