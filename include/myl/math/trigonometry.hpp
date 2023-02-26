@@ -28,4 +28,11 @@ namespace myl {
 	MYL_NO_DISCARD constexpr auto hypotenuse(const T a, const T b) -> T {
 		return sqrt(a * a + b * b);
 	}
+
+	//@return The area of a triangle
+	template<number T>
+	MYL_NO_DISCARD constexpr auto herons_formula(T a, T b, T c) -> T {
+		const T s = (a + b + c) / 2;
+		return sqrt(s * (s - a) * (s - b) * (s - c));
+	}
 }

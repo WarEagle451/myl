@@ -1,8 +1,5 @@
 #pragma once
 /// MYTodo: math.hpp
-/// - common.hpp
-///		- signficant digits
-///		- accuracy and percision
 /// - vec.hpp
 ///		- swizzling
 /// 
