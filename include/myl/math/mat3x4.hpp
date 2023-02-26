@@ -8,29 +8,29 @@ namespace myl {
 	struct mat<3, 4, T> {
 		using value_type = T;
 		using transpose_type = mat<4, 3, value_type>;
-		using col_type = vec<3, value_type>;
-		using row_type = vec<4, value_type>;
+		using col_type = vec<4, value_type>;
+		using row_type = vec<3, value_type>;
 	private:
-		col_type m_data[4];
+		col_type m_data[3];
 	public:
 		// Constructors
 
 		MYL_NO_DISCARD constexpr mat() : mat(0) {}
 
 		MYL_NO_DISCARD constexpr explicit mat(const value_type& scalar)
-			: m_data{ col_type(scalar), col_type(scalar), col_type(scalar), col_type(scalar) } {}
+			: m_data{ col_type(scalar), col_type(scalar), col_type(scalar) } {}
 
-		MYL_NO_DISCARD constexpr mat(const value_type& x0, const value_type& x1, const value_type& x2, const value_type& x3, const value_type& y0, const value_type& y1, const value_type& y2, const value_type& y3, const value_type& z0, const value_type& z1, const value_type& z2, const value_type& z3)
-			: m_data{ col_type{ x0, y0, z0 }, col_type{ x1, y1, z1 }, col_type{ x2, y2, z2 }, col_type{ x3, y3, z3 } } {}
+		MYL_NO_DISCARD constexpr mat(const value_type& x0, const value_type& x1, const value_type& x2, const value_type& y0, const value_type& y1, const value_type& y2, const value_type& z0, const value_type& z1, const value_type& z2, const value_type& w0, const value_type& w1, const value_type& w2)
+			: m_data{ col_type{ x0, y0, z0, w0 }, col_type{ x1, y1, z1, w1 }, col_type{ x2, y2, z2, w2 } } {}
 
-		MYL_NO_DISCARD constexpr mat(const value_type&& x0, const value_type&& x1, const value_type&& x2, const value_type&& x3, const value_type&& y0, const value_type&& y1, const value_type&& y2, const value_type&& y3, const value_type&& z0, const value_type&& z1, const value_type&& z2, const value_type&& z3
-			: m_data{ col_type{ std::move(x0), std::move(y0), std::move(z0) }, col_type{ std::move(x1), std::move(y1), std::move(z1) }, col_type{ std::move(x2), std::move(y2), std::move(z2) }, col_type{ std::move(x3), std::move(y3), std::move(z3) } } {}
+		MYL_NO_DISCARD constexpr mat(const value_type&& x0, const value_type&& x1, const value_type&& x2, const value_type&& y0, const value_type&& y1, const value_type&& y2, const value_type&& z0, const value_type&& z1, const value_type&& z2, const value_type&& w0, const value_type&& w1, const value_type&& w2)
+			: m_data{ col_type{ std::move(x0), std::move(y0), std::move(z0), std::move(w0) }, col_type{ std::move(x1), std::move(y1), std::move(z1), std::move(w1) }, col_type{ std::move(x2), std::move(y2), std::move(z2), std::move(w2) } } {}
 
-		MYL_NO_DISCARD constexpr mat(const col_type& c0, const col_type& c1, const col_type& c2, const col_type& c3)
-			: m_data{ c0, c1, c2, c3 } {}
+		MYL_NO_DISCARD constexpr mat(const col_type& c0, const col_type& c1, const col_type& c2)
+			: m_data{ c0, c1, c2 } {}
 
-		MYL_NO_DISCARD constexpr mat(col_type&& c0, col_type&& c1, col_type&& c2, col_type&& c3)
-			: m_data{ std::move(c0), std::move(c1), std::move(c2), std::move(c3) } {}
+		MYL_NO_DISCARD constexpr mat(col_type&& c0, col_type&& c1, col_type&& c2)
+			: m_data{ std::move(c0), std::move(c1), std::move(c2) } {}
 
 		// Access operators
 
@@ -44,44 +44,43 @@ namespace myl {
 
 		// Comparison operators
 
-		MYL_NO_DISCARD constexpr auto operator==(const mat& rhs) const -> bool { return m_data[0] == rhs[0] && m_data[1] == rhs[1] && m_data[2] == rhs[2] && m_data[3] == rhs[3]; }
+		MYL_NO_DISCARD constexpr auto operator==(const mat& rhs) const -> bool { return m_data[0] == rhs[0] && m_data[1] == rhs[1] && m_data[2] == rhs[2]; }
 
 		// Unary operators
 
-		MYL_NO_DISCARD constexpr auto operator-() const -> mat { return mat{ -m_data[0], -m_data[1], -m_data[2], -m_data[3] }; }
+		MYL_NO_DISCARD constexpr auto operator-() const -> mat { return mat{ -m_data[0], -m_data[1], -m_data[2] }; }
 
 		// Scaler operators
 
-		MYL_NO_DISCARD constexpr auto operator+(const value_type& rhs) const -> mat { return mat{ m_data[0] + rhs, m_data[1] + rhs, m_data[2] + rhs, m_data[3] + rhs }; }
-		MYL_NO_DISCARD constexpr auto operator-(const value_type& rhs) const -> mat { return mat{ m_data[0] - rhs, m_data[1] - rhs, m_data[2] - rhs, m_data[3] - rhs }; }
-		MYL_NO_DISCARD constexpr auto operator*(const value_type& rhs) const -> mat { return mat{ m_data[0] * rhs, m_data[1] * rhs, m_data[2] * rhs, m_data[3] * rhs }; }
-		MYL_NO_DISCARD constexpr auto operator/(const value_type& rhs) const -> mat { return mat{ m_data[0] / rhs, m_data[1] / rhs, m_data[2] / rhs, m_data[3] / rhs }; }
-		MYL_NO_DISCARD constexpr auto operator%(const value_type& rhs) const -> mat { return mat{ m_data[0] % rhs, m_data[1] % rhs, m_data[2] % rhs, m_data[3] % rhs }; }
+		MYL_NO_DISCARD constexpr auto operator+(const value_type& rhs) const -> mat { return mat{ m_data[0] + rhs, m_data[1] + rhs, m_data[2] + rhs }; }
+		MYL_NO_DISCARD constexpr auto operator-(const value_type& rhs) const -> mat { return mat{ m_data[0] - rhs, m_data[1] - rhs, m_data[2] - rhs }; }
+		MYL_NO_DISCARD constexpr auto operator*(const value_type& rhs) const -> mat { return mat{ m_data[0] * rhs, m_data[1] * rhs, m_data[2] * rhs }; }
+		MYL_NO_DISCARD constexpr auto operator/(const value_type& rhs) const -> mat { return mat{ m_data[0] / rhs, m_data[1] / rhs, m_data[2] / rhs }; }
+		MYL_NO_DISCARD constexpr auto operator%(const value_type& rhs) const -> mat { return mat{ m_data[0] % rhs, m_data[1] % rhs, m_data[2] % rhs }; }
 
-		constexpr auto operator+=(const value_type& rhs) -> mat& { m_data[0] += rhs; m_data[1] += rhs; m_data[2] += rhs; m_data[3] += rhs; return *this; }
-		constexpr auto operator-=(const value_type& rhs) -> mat& { m_data[0] -= rhs; m_data[1] -= rhs; m_data[2] -= rhs; m_data[3] -= rhs; return *this; }
-		constexpr auto operator*=(const value_type& rhs) -> mat& { m_data[0] *= rhs; m_data[1] *= rhs; m_data[2] *= rhs; m_data[3] *= rhs; return *this; }
-		constexpr auto operator/=(const value_type& rhs) -> mat& { m_data[0] /= rhs; m_data[1] /= rhs; m_data[2] /= rhs; m_data[3] /= rhs; return *this; }
-		constexpr auto operator%=(const value_type& rhs) -> mat& { m_data[0] %= rhs; m_data[1] %= rhs; m_data[2] %= rhs; m_data[3] %= rhs; return *this; }
+		constexpr auto operator+=(const value_type& rhs) -> mat& { m_data[0] += rhs; m_data[1] += rhs; m_data[2] += rhs; return *this; }
+		constexpr auto operator-=(const value_type& rhs) -> mat& { m_data[0] -= rhs; m_data[1] -= rhs; m_data[2] -= rhs; return *this; }
+		constexpr auto operator*=(const value_type& rhs) -> mat& { m_data[0] *= rhs; m_data[1] *= rhs; m_data[2] *= rhs; return *this; }
+		constexpr auto operator/=(const value_type& rhs) -> mat& { m_data[0] /= rhs; m_data[1] /= rhs; m_data[2] /= rhs; return *this; }
+		constexpr auto operator%=(const value_type& rhs) -> mat& { m_data[0] %= rhs; m_data[1] %= rhs; m_data[2] %= rhs; return *this; }
 
 		// mat3x4 operators
 
-		MYL_NO_DISCARD constexpr auto operator+(const mat& rhs) const -> mat { return mat{ m_data[0] + rhs[0], m_data[1] + rhs[1], m_data[2] + rhs[2], m_data[3] + rhs[3] }; }
-		MYL_NO_DISCARD constexpr auto operator-(const mat& rhs) const -> mat { return mat{ m_data[0] - rhs[0], m_data[1] - rhs[1], m_data[2] - rhs[2], m_data[3] - rhs[3] }; }
+		MYL_NO_DISCARD constexpr auto operator+(const mat& rhs) const -> mat { return mat{ m_data[0] + rhs[0], m_data[1] + rhs[1], m_data[2] + rhs[2] }; }
+		MYL_NO_DISCARD constexpr auto operator-(const mat& rhs) const -> mat { return mat{ m_data[0] - rhs[0], m_data[1] - rhs[1], m_data[2] - rhs[2] }; }
 
-		constexpr auto operator+=(const mat& rhs) -> mat& { m_data[0] += rhs[0]; m_data[1] += rhs[1]; m_data[2] += rhs[2]; m_data[3] += rhs[3]; return *this; }
-		constexpr auto operator-=(const mat& rhs) -> mat& { m_data[0] -= rhs[0]; m_data[1] -= rhs[1]; m_data[2] -= rhs[2]; m_data[3] -= rhs[3]; return *this; }
+		constexpr auto operator+=(const mat& rhs) -> mat& { m_data[0] += rhs[0]; m_data[1] += rhs[1]; m_data[2] += rhs[2]; return *this; }
+		constexpr auto operator-=(const mat& rhs) -> mat& { m_data[0] -= rhs[0]; m_data[1] -= rhs[1]; m_data[2] -= rhs[2]; return *this; }
 	};
 
 	template<typename T>
-	constexpr auto set_row(mat<3, 4, T>& m, usize i, const typename mat<3, 4, T>::row_type& row) -> void {
+	constexpr auto set_row(mat<4, 3, T>& m, usize i, const typename mat<4, 3, T>::row_type& row) -> void {
 		m[0][i] = row[0];
 		m[1][i] = row[1];
 		m[2][i] = row[2];
-		m[3][i] = row[3];
 	}
 
-	template<typename T> using mat3x4 = mat<3, 4, T>;
+	template<typename T> using mat3x4 = mat<4, 3, T>;
 
 	using i8mat3x4 = mat3x4<i8>;
 	using i16mat3x4 = mat3x4<i16>;
