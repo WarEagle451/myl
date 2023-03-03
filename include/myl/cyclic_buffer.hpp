@@ -5,6 +5,8 @@
 #include <memory>
 #include <utility> // std::forward
 
+/// MYTodo: Confirm this is working with reverse iterators
+
 namespace myl {
 	template<typename T, typename Allocator = std::allocator<T>>
 	class cyclic_buffer {
@@ -68,14 +70,14 @@ namespace myl {
 			std::allocator_traits<allocator_type>::deallocate(alloc, m_begin, capacity());
 		}
 
+		//@return The maximum size of the cyclic buffer, limited by the underlying size type
+		MYL_NO_DISCARD static constexpr auto max_size() const noexcept -> size_type { return static_cast<size_type>(~0); }
+
 		//@return An instance of thr allocator type used in the cyclic buffer
 		MYL_NO_DISCARD constexpr auto get_allocator() const -> allocator_type { return allocator_type(); }
 
 		//@return The size of the cyclic buffer
 		MYL_NO_DISCARD constexpr auto size() const noexcept -> size_type { return m_size; }
-
-		//@return The maximum size of the cyclic buffer, limited by the underlying size type
-		MYL_NO_DISCARD constexpr auto max_size() const noexcept -> size_type { return static_cast<size_type>(~0); }
 
 		//@return The amount of elements the cyclic buffer can hold before having to resize
 		MYL_NO_DISCARD constexpr auto capacity() const noexcept -> size_type { return static_cast<size_type>(m_end - m_begin); }
@@ -118,40 +120,40 @@ namespace myl {
 		//@return The a const reference to the tail of the buffer. This will not always be the same as the end of the data block
 		MYL_NO_DISCARD constexpr auto back() const -> const_reference { return *m_tail; }
 
-		//@return The head of the buffer as an interator
+		//@return The head of the buffer as an circulator
 		MYL_NO_DISCARD constexpr auto begin() noexcept -> iterator { return iterator(m_head, m_begin, m_end, m_head, m_tail, empty()); } // Must check if empty, will run if passed false
 
-		//@return The head of the buffer as a const nterator
+		//@return The head of the buffer as a const circulator
 		MYL_NO_DISCARD constexpr auto begin() const noexcept -> const_iterator { return begin(); }
 
-		//@return The head of the buffer as a const nterator
+		//@return The head of the buffer as a const circulator
 		MYL_NO_DISCARD constexpr auto cbegin() const noexcept -> const_iterator { return begin(); }
 
-		//@return The tail of the buffer as an interator
+		//@return The tail of the buffer as an circulator
 		MYL_NO_DISCARD constexpr auto end() noexcept -> iterator { return iterator(m_head, m_begin, m_end, m_head, m_tail, true); }
 
-		//@return The tail of the buffer as a const interator
+		//@return The tail of the buffer as a const circulator
 		MYL_NO_DISCARD constexpr auto end() const noexcept -> const_iterator { return end(); }
 
-		//@return The tail of the buffer as a const interator
+		//@return The tail of the buffer as a const circulator
 		MYL_NO_DISCARD constexpr auto cend() const noexcept -> const_iterator { return end(); }
 
-		//@return The head as a reverse iterator
+		//@return The head as a reverse circulator
 		MYL_NO_DISCARD constexpr auto rbegin() noexcept -> reverse_iterator { return reverse_iterator(iterator(m_head, m_begin, m_end, m_head, m_tail, empty())); } // Must check if empty, will run if passed false
 
-		//@return The head as a const reverse iterator
+		//@return The head as a const reverse circulator
 		MYL_NO_DISCARD constexpr auto rbegin() const noexcept -> const_reverse_iterator { return rbegin(); }
 
-		//@return The head as a const reverse iterator
+		//@return The head as a const reverse circulator
 		MYL_NO_DISCARD constexpr auto crbegin() const noexcept -> const_reverse_iterator { return rbegin(); }
 		
-		//@return The tail as a reverse iterator
+		//@return The tail as a reverse circulator
 		MYL_NO_DISCARD constexpr auto rend() noexcept -> reverse_iterator { return reverse_iterator(iterator(m_head, m_begin, m_end, m_head, m_tail, true)); }
 
-		//@return The tail as a const reverse iterator
+		//@return The tail as a const reverse circulator
 		MYL_NO_DISCARD constexpr auto rend() const noexcept -> const_reverse_iterator { return rend(); }
 
-		//@return The tail as a const reverse iterator
+		//@return The tail as a const reverse circulator
 		MYL_NO_DISCARD constexpr auto crend() const noexcept -> const_reverse_iterator { return rend(); }
 
 		//@brief Constructs an element in the buffer from parameters at the tail of the buffer. If the buffer is full the element at the head will be overwritten
@@ -287,7 +289,7 @@ namespace myl {
 
 		//@brief Fills any unused capacity of the cyclic buffer
 		//@param a_value: The value to fill the cyclic buffer
-		constexpr auto fill_out(const_reference a_value) -> void {
+		constexpr auto fill_up(const_reference a_value) -> void {
 			while (!full())
 				push_back(a_value);
 		}
@@ -301,7 +303,7 @@ namespace myl {
 				--m_size;
 			}
 		
-			m_tail = m_head; // decrement will set m_tail to m_end - 1
+			m_tail = m_head; // Decrement will set m_tail to m_end - 1
 		}
 
 		//@brief Chanes the amount of elements

@@ -1,13 +1,15 @@
 #pragma once
 #include <myl/defines.hpp>
 
-#ifdef min // War on Microsof's min macro
+#ifdef min // War on Microsoft's min macro
 #  undef min
 #endif
 
-#ifdef max // War on Microsof's max macro
+#ifdef max // War on Microsoft's max macro
 #  undef max
 #endif
+
+/// MYTodo: Get these to be able to take multiple types
 
 namespace myl {
 	//@return The smallest number

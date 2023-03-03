@@ -3,7 +3,7 @@
 // Additionally, if one of these macros should only be defined for a portion of code,
 // one can define the macro before including the file and undef it at the end of that code
 
-//////////////////////////////////////// General Macros////////////////////////////////////////
+//////////////////////////////////////// General Macros ////////////////////////////////////////
 
 /* MYL_TYPE_SIZE_CHECK:
 * Checks using a static_assert that a type/class/struct is of a certain size in bytes.
@@ -20,6 +20,11 @@
 * Rounds the 32nd digit of constants if applicable.
 */
 #define MYL_ROUND_CONSTANTS
+
+/* MYL_ENABLE_DEPRECATED_WARNINGS
+* Enables the deprecated attribute through the MYL_DEPRECATED and MYL_DEPRECATED_M macros.
+*/
+#define MYL_ENABLE_DEPRECATED_WARNINGS
 
 //////////////////////////////////////// Math Related Macros ////////////////////////////////////////
 

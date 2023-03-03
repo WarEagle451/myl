@@ -1,5 +1,6 @@
 #pragma once
 #include <myl/defines.hpp>
+#include <myl/iterative.hpp>
 
 #include <memory>
 
@@ -9,16 +10,6 @@
 namespace myl {
 	template<typename T>
 	class small_vector_iterator {
-	public:
-
-	private:
-
-	public:
-
-	};
-
-	template<typename T>
-	class reverse_small_vector_iterator {
 	public:
 
 	private:
@@ -40,13 +31,14 @@ namespace myl {
 		using const_pointer				= typename std::allocator_traits<allocator_type>::const_pointer;
 		using iterator					= small_vector_iterator<value_type>;
 		using const_iterator			= const iterator;
-		using reverse_iterator			= reverse_small_vector_iterator<iterator>;
+		using reverse_iterator			= std::reverse_iterator<iterator>;
 		using const_reverse_iterator	= const reverse_iterator;
 	private:
 		value_type m_block[S]{};
 		pointer m_begin = nullptr;
 		pointer m_end = nullptr;
-		pointer m_insert = nullptr;
+		pointer m_last = nullptr;
+		usize m_size = 0;
 	public:
 
 	};

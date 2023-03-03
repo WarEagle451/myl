@@ -1,4 +1,11 @@
 #pragma once
+/* This file contains commonly used compile time and platform dependant features.
+*	- Macros
+*	- Concepts
+*	- Type definitions
+*	- Meta programming templates
+*/
+
 #include <myl/config.hpp>
 
 #define MYL_EXPAND_MACRO(x) x
@@ -27,7 +34,8 @@
 #	define MYL_CARRIES_DEPENDENCY
 #endif
 
-#if __has_cpp_attribute(deprecated)
+#if __has_cpp_attribute(deprecated) && defined(MYL_ENABLE_DEPRECATED_WARNINGS)
+
 #	define MYL_DEPRECATED [[deprecated]]
 #	define MYL_DEPRECATED_M(reason) [[deprecated(reason)]]
 #else
@@ -142,43 +150,43 @@ namespace myl {
 	static_assert(sizeof(f64) == 8, "Expected myl::f64 to be 8 bytes");
 #endif
 
-	// Useful Meta Programming
+	// Meta Programming
+	
+	namespace meta {
+		template<typename T> struct make_signed;
+		template<> struct make_signed<i8> { using type = i8; };
+		template<> struct make_signed<i16> { using type = i16; };
+		template<> struct make_signed<i32> { using type = i32; };
+		template<> struct make_signed<i64> { using type = i64; };
 
-	namespace details {
-		template<typename A> struct signed_type;
-		template<> struct signed_type<i8> { using type = i8; };
-		template<> struct signed_type<i16> { using type = i16; };
-		template<> struct signed_type<i32> { using type = i32; };
-		template<> struct signed_type<i64> { using type = i64; };
+		template<> struct make_signed<u8> { using type = i8; };
+		template<> struct make_signed<u16> { using type = i16; };
+		template<> struct make_signed<u32> { using type = i32; };
+		template<> struct make_signed<u64> { using type = i64; };
 
-		template<> struct signed_type<u8> { using type = i8; };
-		template<> struct signed_type<u16> { using type = i16; };
-		template<> struct signed_type<u32> { using type = i32; };
-		template<> struct signed_type<u64> { using type = i64; };
+		template<typename T> struct make_unsigned;
+		template<> struct make_unsigned<i8> { using type = u8; };
+		template<> struct make_unsigned<i16> { using type = u16; };
+		template<> struct make_unsigned<i32> { using type = u32; };
+		template<> struct make_unsigned<i64> { using type = u64; };
 
-		template<typename A> struct unsigned_type;
-		template<> struct unsigned_type<i8> { using type = u8; };
-		template<> struct unsigned_type<i16> { using type = u16; };
-		template<> struct unsigned_type<i32> { using type = u32; };
-		template<> struct unsigned_type<i64> { using type = u64; };
-
-		template<> struct unsigned_type<u8> { using type = u8; };
-		template<> struct unsigned_type<u16> { using type = u16; };
-		template<> struct unsigned_type<u32> { using type = u32; };
-		template<> struct unsigned_type<u64> { using type = u64; };
+		template<> struct make_unsigned<u8> { using type = u8; };
+		template<> struct make_unsigned<u16> { using type = u16; };
+		template<> struct make_unsigned<u32> { using type = u32; };
+		template<> struct make_unsigned<u64> { using type = u64; };
 	}
 
-	template<typename T> using signed_type		= details::signed_type<T>::type;
-	template<typename T> using unsigned_type	= details::unsigned_type<T>::type;
+	template<typename T> using make_signed		= typename meta::make_signed<T>::type;
+	template<typename T> using make_unsigned	= typename meta::make_unsigned<T>::type;
 
-	// Common Concepts
+	// Concepts
 
-	namespace details {
-		template<class, class> inline constexpr bool same_impl = false;
-		template<class T> inline constexpr bool same_impl<T, T> = true;
+	namespace meta {
+		template<typename, typename> inline constexpr bool same_as = false;
+		template<typename T> inline constexpr bool same_as<T, T> = true;
 	}
 
-	template<typename A, typename B> concept same_as = details::same_impl<A, B> && details::same_impl<B, A>;
+	template<typename A, typename B> concept same_as = meta::same_as<A, B> && meta::same_as<B, A>;
 	template<typename A, typename B> concept is_not = !same_as<A, B>;
 
 	template<typename T, typename... Args> concept any_of	= (same_as<T, Args> || ...);
@@ -193,15 +201,15 @@ namespace myl {
 	template<typename T> concept number			= integer<T> || floating_point<T>;
 	template<typename T> concept signed_number	= signed_integer<T> || floating_point<T>;
 
-	template<typename T> concept fundamental_type = number<T> || character<T> || any_of<T, void, bool>;
+	template<typename T> concept fundamental = number<T> || character<T> || any_of<T, void, bool>;
 
 	template<typename T> concept comparable_less_than	= requires(T a, T b) { a < b; };
 	template<typename T> concept comparable_more_than	= requires(T a, T b) { a > b; };
 	template<typename T> concept comparable_equality	= requires(T a, T b) { a == b; };
 	template<typename T> concept comparable = comparable_less_than<T> && comparable_more_than<T> && comparable_equality<T>;
 
-	template<typename A, typename B> concept comparable_less_than_with	= requires(A a, B b) { a < b; };
-	template<typename A, typename B> concept comparable_more_than_with	= requires(A a, B b) { a > b; };
+	template<typename A, typename B> concept comparable_less_than_with	= requires(A a, B b) { a > b; };
+	template<typename A, typename B> concept comparable_more_than_with	= requires(A a, B b) { a < b; };
 	template<typename A, typename B> concept comparable_equality_with	= requires(A a, B b) { a == b; };
 	template<typename A, typename B> concept comparable_with = comparable_less_than_with<A, B> && comparable_more_than_with<A, B> && comparable_equality_with<A, B>;
 }

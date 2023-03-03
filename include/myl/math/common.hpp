@@ -3,7 +3,7 @@
 
 #include <cmath>
 #include <limits>
-#include <type_traits> /// MYTodo imple custom common type to remove
+#include <type_traits>
 
 namespace myl {
 	//@return Absolute value of v
@@ -58,7 +58,7 @@ namespace myl {
 	template<integer A, integer B>
 	MYL_NO_DISCARD constexpr auto gcd(const A a, const B b) -> std::common_type_t<A, B> {
 		using common = std::common_type_t<A, B>;
-		using ucommon = unsigned_type<common>;
+		using ucommon = make_unsigned<common>;
 
 		ucommon ma = static_cast<ucommon>(abs(a));
 		ucommon mb = static_cast<ucommon>(abs(b));
@@ -85,7 +85,7 @@ namespace myl {
 	template<integer A, integer B>
 	MYL_NO_DISCARD constexpr auto lcm(const A a, const B b) -> std::common_type_t<A, B> {
 		using common = std::common_type_t<A, B>;
-		using ucommon = unsigned_type<common>;
+		using ucommon = make_unsigned<common>;
 
 		const ucommon ma = static_cast<ucommon>(abs(a));
 		const ucommon mb = static_cast<ucommon>(abs(b));
