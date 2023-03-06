@@ -23,16 +23,16 @@ namespace myl {
 		constexpr ~contiguous_iterator() noexcept = default;
 
 		MYL_NO_DISCARD constexpr auto operator*() -> reference { return *m_ptr; }
-		MYL_NO_DISCARD constexpr auto operator*() const -> const reference { return *m_ptr; }
-		MYL_NO_DISCARD constexpr auto operator->() -> pointer { return m_ptr; }
+		MYL_NO_DISCARD constexpr auto operator*() const noexcept -> const reference { return *m_ptr; }
+		MYL_NO_DISCARD constexpr auto operator->() const noexcept -> pointer { return m_ptr; }
 
 		constexpr auto operator++() noexcept -> contiguous_iterator& { ++m_ptr; return *this; }
 		constexpr auto operator--() noexcept -> contiguous_iterator& { --m_ptr; return *this; }
 
-		MYL_NO_DISCARD_M("Postfix++ returns the previous iterator!")
+		MYL_NO_DISCARD_M("Postfix ++ returns the previous iterator!")
 			constexpr auto operator++(int) noexcept -> contiguous_iterator& { contiguous_iterator temp(m_ptr); ++m_ptr; return temp; }
 
-		MYL_NO_DISCARD_M("Postfix-- returns the previous iterator!")
+		MYL_NO_DISCARD_M("Postfix -- returns the previous iterator!")
 			constexpr auto operator--(int) noexcept -> contiguous_iterator& { contiguous_iterator temp(m_ptr); --m_ptr; return temp; }
 
 		MYL_NO_DISCARD constexpr auto operator+(const difference_type a_offset) const noexcept -> contiguous_iterator { return contiguous_iterator(m_ptr + a_offset); }
@@ -42,6 +42,10 @@ namespace myl {
 		constexpr auto operator-=(const difference_type a_offset) noexcept -> contiguous_iterator& { m_ptr -= a_offset; return *this; }
 
 		MYL_NO_DISCARD constexpr auto operator==(const contiguous_iterator& a_rhs) const -> bool { return m_ptr == a_rhs.m_ptr; }
+
+		MYL_NO_DISCARD constexpr auto operator[](const difference_type a_offset) const noexcept -> reference {
+			return *(*this + a_offset);
+		}
 	};
 
 	template<typename Container>
@@ -79,10 +83,10 @@ namespace myl {
 		constexpr auto operator++() noexcept -> circulator& { increment(); return *this; }
 		constexpr auto operator--() noexcept -> circulator& { decrement(); return *this; }
 
-		MYL_NO_DISCARD_M("Postfix++ returns the previous circulator!")
+		MYL_NO_DISCARD_M("Postfix ++ returns the previous circulator!")
 			constexpr auto operator++(int) noexcept -> circulator& { circulator temp(*this); increment(); return temp; }
 
-		MYL_NO_DISCARD_M("Postfix-- returns the previous circulator!")
+		MYL_NO_DISCARD_M("Postfix -- returns the previous circulator!")
 			constexpr auto operator--(int) noexcept -> circulator& { circulator temp(*this); decrement(); return temp; }
 
 		MYL_NO_DISCARD constexpr auto operator==(const circulator& a_rhs) const -> bool {

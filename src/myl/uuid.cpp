@@ -58,9 +58,10 @@ namespace myl {
 			static_cast<u64>(clock_sequence) << 48 |	// 16 bits
 			node() >> 16;								// 48 bits and does not use MAC address for security reasons
 
-		if (!myl::system_big_endian()) { // Ensures data is stored as big endian
-			as_u64[0] = hton(as_u64[0]); 
-			as_u64[1] = hton(as_u64[1]);
+		// Ensures data is stored as big endian,
+		if constexpr (std::endian::native == std::endian::big) {
+			as_u64[0] = byteswap(as_u64[0]);
+			as_u64[1] = byteswap(as_u64[1]);
 		}
 
 		bytes[10] |= 0x01; // If MAC address is replaced with random number, the RFC requires that the least significant bit of the first octet of the node ID should be set to 1

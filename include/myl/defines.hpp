@@ -116,6 +116,21 @@
 #	endif
 #endif
 
+#ifdef MYL_COMPILER_MSVC
+#	define MYL_DEBUG_BREAK __debugbreak()
+#elif defined(MYL_COMPILER_CLANG) || defined(MYL_COMPILER_GCC) || defined(MYL_COMPILER_UNKNOWN)
+#	define MYL_DEBUG_BREAK __builtin_trap()
+#else
+#	error "MYL_DEBUG_BREAK not implemented on known compiler!"
+#	define MYL_DEBUG_BREAK
+#endif
+
+#if defined(MYL_DEBUG) && !defined(MYL_DISABLE_ASSERTS)
+#	define MYL_ASSERT(condition, msg) { if (!(condition)) { MYL_DEBUG_BREAK; } }
+#else
+#	define MYL_ASSERT(condition, msg)
+#endif
+
 namespace myl {
 	// Fundamental Types
 

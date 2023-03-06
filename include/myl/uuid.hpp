@@ -26,10 +26,10 @@ namespace myl {
 	class MYL_API uuid {
 		u8 m_bytes[16]{ 0 }; // 128 bits
 	public:
-		constexpr uuid() noexcept = default;
-		uuid(uuid_version);
-		constexpr uuid(u8(&)[16]);
-		constexpr uuid(std::string_view);
+		MYL_NO_DISCARD constexpr uuid() noexcept = default;
+		MYL_NO_DISCARD uuid(uuid_version);
+		MYL_NO_DISCARD constexpr uuid(u8(&)[16]);
+		MYL_NO_DISCARD constexpr uuid(std::string_view);
 
 		MYL_NO_DISCARD constexpr auto data() -> u8*;
 		MYL_NO_DISCARD constexpr auto data() const -> const u8*;

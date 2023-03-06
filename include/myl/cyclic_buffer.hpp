@@ -1,11 +1,11 @@
 #pragma once
 #include <myl/iterative.hpp>
 
+#include <stdexcept>
 #include <initializer_list>
 #include <memory>
+#include <numeric>
 #include <utility> // std::forward
-
-/// MYTodo: Confirm this is working with reverse iterators
 
 namespace myl {
 	template<typename T, typename Allocator = std::allocator<T>>
@@ -30,6 +30,8 @@ namespace myl {
 		pointer m_tail = nullptr;
 		size_type m_size = 0;
 	public:
+		// Constructors / Destructor / Copy 
+
 		//@brief Constructs a empty cyclic buffer
 		MYL_NO_DISCARD constexpr cyclic_buffer() = default;
 
@@ -70,8 +72,10 @@ namespace myl {
 			std::allocator_traits<allocator_type>::deallocate(alloc, m_begin, capacity());
 		}
 
+		// Utilities
+
 		//@return The maximum size of the cyclic buffer, limited by the underlying size type
-		MYL_NO_DISCARD static constexpr auto max_size() const noexcept -> size_type { return static_cast<size_type>(~0); }
+		MYL_NO_DISCARD static constexpr auto max_size() noexcept -> size_type { return std::numeric_limits<size_type>::max(); }
 
 		//@return An instance of thr allocator type used in the cyclic buffer
 		MYL_NO_DISCARD constexpr auto get_allocator() const -> allocator_type { return allocator_type(); }
@@ -100,25 +104,7 @@ namespace myl {
 		//@return The underlying data block used by the cyclic buffer
 		MYL_NO_DISCARD constexpr auto data() const noexcept -> const_pointer { return m_begin; }
 
-		//@param a_position: The element's position in the buffer
-		//@return A reference an element in the position relative to the head of the cyclic buffer
-		MYL_NO_DISCARD constexpr auto at(size_type a_position) -> reference { return m_begin[(offset() + a_position) % capacity()]; }
-
-		//@param a_position: The element's position in the buffer
-		//@return A const reference an element in the position relative to the head of the cyclic buffer
-		MYL_NO_DISCARD constexpr auto at(size_type a_position) const -> const_reference { return at(a_position); }
-
-		//@return The a reference to the head of the buffer. This will not always be the same as the beginning of the data block
-		MYL_NO_DISCARD constexpr auto front() -> reference { return *m_head; }
-
-		//@return The a const reference to the head of the buffer. This will not always be the same as the beginning of the data block
-		MYL_NO_DISCARD constexpr auto front() const -> const_reference { return *m_head; }
-
-		//@return The a reference to the tail of the buffer. This will not always be the same as the end of the data block
-		MYL_NO_DISCARD constexpr auto back() -> reference { return *m_tail; }
-
-		//@return The a const reference to the tail of the buffer. This will not always be the same as the end of the data block
-		MYL_NO_DISCARD constexpr auto back() const -> const_reference { return *m_tail; }
+		// Iterators
 
 		//@return The head of the buffer as an circulator
 		MYL_NO_DISCARD constexpr auto begin() noexcept -> iterator { return iterator(m_head, m_begin, m_end, m_head, m_tail, empty()); } // Must check if empty, will run if passed false
@@ -146,7 +132,7 @@ namespace myl {
 
 		//@return The head as a const reverse circulator
 		MYL_NO_DISCARD constexpr auto crbegin() const noexcept -> const_reverse_iterator { return rbegin(); }
-		
+
 		//@return The tail as a reverse circulator
 		MYL_NO_DISCARD constexpr auto rend() noexcept -> reverse_iterator { return reverse_iterator(iterator(m_head, m_begin, m_end, m_head, m_tail, true)); }
 
@@ -156,74 +142,38 @@ namespace myl {
 		//@return The tail as a const reverse circulator
 		MYL_NO_DISCARD constexpr auto crend() const noexcept -> const_reverse_iterator { return rend(); }
 
-		//@brief Constructs an element in the buffer from parameters at the tail of the buffer. If the buffer is full the element at the head will be overwritten
-		//@param a_args: Parameters used to construct the element
-		//@return A reference to the constructed element
-		template<typename... Args>
-		constexpr auto emplace_back(Args&&... a_args) -> reference {
+		// Modifiers
+
+		//@brief Removes all elements from the cyclic buffer
+		constexpr auto clear() noexcept -> void {
 			allocator_type alloc = allocator_type();
-			if (!empty())
-				increment(m_tail);
-
-			if (full()) { // Overwrite head
-				std::allocator_traits<allocator_type>::destroy(alloc, m_head);
-				increment(m_head);
-			}
-			else ++m_size;
-
-			std::allocator_traits<allocator_type>::construct(alloc, m_tail, std::forward<Args>(a_args)...);
-			return *m_tail;
-		}
-
-		//@brief Adds a element from a const reference at the tail of the buffer. If the buffer is full the element at the head will be overwritten
-		//@param a_value: The element to be added
-		constexpr auto push_back(const_reference a_value) -> void { emplace_back(a_value); }
-
-		//@brief Adds a element using move semantics at the tail of the buffer. If the buffer is full the element at the head will be overwritten
-		//@param a_value: The element to be added
-		constexpr auto push_back(value_type&& a_value) -> void { emplace_back(std::move(a_value)); }
-
-		//@brief Destroys the element as the tail of the cyclic buffer
-		constexpr auto pop_back() -> void {
-			allocator_type alloc = allocator_type();
-			std::allocator_traits<allocator_type>::destroy(alloc, m_tail);
-			if (--m_size != 0)
-				decrement(m_tail);
-		}
-
-		//@brief Constructs an element in the buffer from parameters at the head of the buffer. If the buffer is full the element at the tail will be overwritten
-		//@param a_args: Parameters used to construct the element
-		//@return A reference to the constructed element
-		template<typename... Args>
-		constexpr auto emplace_front(Args&&... a_args) -> reference {
-			allocator_type alloc = allocator_type();
-			if (!empty())
-				decrement(m_head);
-
-			if (full()) { // Overwrite tail
+			while (!empty()) {
 				std::allocator_traits<allocator_type>::destroy(alloc, m_tail);
 				decrement(m_tail);
+				--m_size;
 			}
-			else ++m_size;
 
-			std::allocator_traits<allocator_type>::construct(alloc, m_head, std::forward<Args>(a_args)...);
-			return *m_head;
+			m_tail = m_head; // Decrement will set m_tail to m_end - 1
 		}
 
-		//@brief Adds a element from a const reference at the head of the buffer. If the buffer is full the element at the tail will be overwritten
-		//@param a_value: The element to be added
-		constexpr auto push_front(const_reference a_value) -> void { emplace_front(a_value); }
-
-		//@brief Adds a element using move semantics at the head of the buffer. If the buffer is full the element at the tail will be overwritten
-		//@param a_value: The element to be added
-		constexpr auto push_front(value_type&& a_value) -> void { emplace_front(std::move(a_value)); }
-
-		//@brief Destroys the element as the head of the cyclic buffer
-		constexpr auto pop_front() -> void {
+		//@brief Replace and fill the cyclic buffer
+		//@param a_value: The value to fill the cyclic buffer
+		constexpr auto fill(const_reference a_value) -> void {
+			clear();
 			allocator_type alloc = allocator_type();
-			std::allocator_traits<allocator_type>::destroy(alloc, m_head);
-			if (--m_size != 0)
-				increment(m_head);
+			for (pointer ptr = m_begin; ptr != m_end; ++ptr)
+				std::allocator_traits<allocator_type>::construct(alloc, ptr, a_value);
+
+			m_head = m_begin;
+			m_tail = m_end - 1;
+			m_size = capacity();
+		}
+
+		//@brief Fills any unused capacity of the cyclic buffer
+		//@param a_value: The value to fill the cyclic buffer
+		constexpr auto fill_up(const_reference a_value) -> void {
+			while (!full())
+				push_back(a_value);
 		}
 
 		//@brief Assigns a range of elements to the cyclic buffer. This is will replace the current elements
@@ -271,39 +221,79 @@ namespace myl {
 		//@brief Assigns an initializer list to the cyclic buffer
 		//@param a_list: The initializer list
 		constexpr auto assign(std::initializer_list<value_type> a_list) -> void {
-			assign(a_list.begin(), a_list.end());
+			assign(a_list.begin(), a_list.end());  /// MYTodo: does this have to move the elements?
 		}
 
-		//@brief Replace and fill the cyclic buffer
-		//@param a_value: The value to fill the cyclic buffer
-		constexpr auto fill(const_reference a_value) -> void {
-			clear();
+		//@brief Constructs an element in the buffer from parameters at the tail of the buffer. If the buffer is full the element at the head will be overwritten
+		//@param a_args: Parameters used to construct the element
+		//@return A reference to the constructed element
+		template<typename... Args>
+		constexpr auto emplace_back(Args&&... a_args) -> reference {
 			allocator_type alloc = allocator_type();
-			for (pointer ptr = m_begin; ptr != m_end; ++ptr)
-				std::allocator_traits<allocator_type>::construct(alloc, ptr, a_value);
+			if (!empty())
+				increment(m_tail);
 
-			m_head = m_begin;
-			m_tail = m_end - 1;
-			m_size = capacity();
+			if (full()) { // Overwrite head
+				std::allocator_traits<allocator_type>::destroy(alloc, m_head);
+				increment(m_head);
+			}
+			else ++m_size;
+
+			std::allocator_traits<allocator_type>::construct(alloc, m_tail, std::forward<Args>(a_args)...);
+			return *m_tail;
 		}
 
-		//@brief Fills any unused capacity of the cyclic buffer
-		//@param a_value: The value to fill the cyclic buffer
-		constexpr auto fill_up(const_reference a_value) -> void {
-			while (!full())
-				push_back(a_value);
-		}
+		//@brief Adds a element from a const reference at the tail of the buffer. If the buffer is full the element at the head will be overwritten
+		//@param a_value: The element to be added
+		constexpr auto push_back(const_reference a_value) -> void { emplace_back(a_value); }
 
-		//@brief Removes all elements from the cyclic buffer
-		constexpr auto clear() noexcept -> void {
+		//@brief Adds a element using move semantics at the tail of the buffer. If the buffer is full the element at the head will be overwritten
+		//@param a_value: The element to be added
+		constexpr auto push_back(value_type&& a_value) -> void { emplace_back(std::move(a_value)); }
+
+		//@brief Destroys the element as the tail of the cyclic buffer
+		constexpr auto pop_back() -> void {
+			MYL_ASSERT(!empty(), "Calling pop back on an empty cyclic buffer is undefined behavior!");
 			allocator_type alloc = allocator_type();
-			while (!empty()) {
+			std::allocator_traits<allocator_type>::destroy(alloc, m_tail);
+			if (--m_size != 0)
+				decrement(m_tail);
+		}
+
+		//@brief Constructs an element in the buffer from parameters at the head of the buffer. If the buffer is full the element at the tail will be overwritten
+		//@param a_args: Parameters used to construct the element
+		//@return A reference to the constructed element
+		template<typename... Args>
+		constexpr auto emplace_front(Args&&... a_args) -> reference {
+			allocator_type alloc = allocator_type();
+			if (!empty())
+				decrement(m_head);
+
+			if (full()) { // Overwrite tail
 				std::allocator_traits<allocator_type>::destroy(alloc, m_tail);
 				decrement(m_tail);
-				--m_size;
 			}
-		
-			m_tail = m_head; // Decrement will set m_tail to m_end - 1
+			else ++m_size;
+
+			std::allocator_traits<allocator_type>::construct(alloc, m_head, std::forward<Args>(a_args)...);
+			return *m_head;
+		}
+
+		//@brief Adds a element from a const reference at the head of the buffer. If the buffer is full the element at the tail will be overwritten
+		//@param a_value: The element to be added
+		constexpr auto push_front(const_reference a_value) -> void { emplace_front(a_value); }
+
+		//@brief Adds a element using move semantics at the head of the buffer. If the buffer is full the element at the tail will be overwritten
+		//@param a_value: The element to be added
+		constexpr auto push_front(value_type&& a_value) -> void { emplace_front(std::move(a_value)); }
+
+		//@brief Destroys the element as the head of the cyclic buffer
+		constexpr auto pop_front() -> void {
+			MYL_ASSERT(!empty(), "Calling pop front on an empty cyclic buffer is undefined behavior!");
+			allocator_type alloc = allocator_type();
+			std::allocator_traits<allocator_type>::destroy(alloc, m_head);
+			if (--m_size != 0)
+				increment(m_head);
 		}
 
 		//@brief Chanes the amount of elements
@@ -369,8 +359,9 @@ namespace myl {
 		}
 
 		//@brief Changes the head of the buffer by rotating through the elements
-		//@param a_new_head: The new head of the buffer. The new head must be within the range of existing elements
+		//@param a_new_head: The new head must be within the range of existing elements
 		constexpr auto rotate(pointer a_new_head) -> void {
+			MYL_ASSERT(!out_of_bounds(a_new_head), "The new head must be within the range of existing elements");
 			m_head = a_new_head;
 			m_tail = m_begin + ((offset() + m_size) % m_size) - 1;
 		}
@@ -408,15 +399,56 @@ namespace myl {
 			m_tail = m_head + m_size - 1;
 		}
 
+		// Element access
+
+		//@return The a reference to the head of the buffer. This will not always be the same as the beginning of the data block
+		MYL_NO_DISCARD constexpr auto front() -> reference { return *m_head; }
+
+		//@return The a const reference to the head of the buffer. This will not always be the same as the beginning of the data block
+		MYL_NO_DISCARD constexpr auto front() const -> const_reference { return *m_head; }
+
+		//@return The a reference to the tail of the buffer. This will not always be the same as the end of the data block
+		MYL_NO_DISCARD constexpr auto back() -> reference { return *m_tail; }
+
+		//@return The a const reference to the tail of the buffer. This will not always be the same as the end of the data block
+		MYL_NO_DISCARD constexpr auto back() const -> const_reference { return *m_tail; }
+
+		//@param a_position: The element's position in the buffer
+		//@return A reference an element in the position relative to the head of the cyclic buffer
+		MYL_NO_DISCARD constexpr auto at(size_type a_position) -> reference {
+			pointer ptr = &m_begin[(offset() + a_position) % capacity()];
+			MYL_ASSERT(!out_of_bounds(ptr), "Accessing an out of bounds element is undefined behavior!");
+			if (out_of_bounds(ptr))
+				throw std::out_of_range("Accessing an out of bounds element is undefined behavior!");
+			return *ptr;
+		}
+
+		//@param a_position: The element's position in the buffer
+		//@return A const reference an element in the position relative to the head of the cyclic buffer
+		MYL_NO_DISCARD constexpr auto at(size_type a_position) const -> const_reference {
+			return at(a_position);
+		}
+
 		//@param a_index: The index of the element. This does not consider element offset
 		//@return Reference to the element
-		MYL_NO_DISCARD constexpr auto operator[](size_type a_index) -> reference { return m_begin[a_index]; }
+		MYL_NO_DISCARD constexpr auto operator[](size_type a_index) -> reference {
+			MYL_ASSERT(!out_of_bounds(&m_begin[a_index]), "Accessing an out of bounds element is undefined behavior!");
+			return m_begin[a_index];
+		}
 
 		//@param a_index: The index of the element. This does not consider element offset
 		//@return Const reference to the element
-		MYL_NO_DISCARD constexpr auto operator[](size_type a_index) const -> const_reference { return m_begin[a_index]; }
+		MYL_NO_DISCARD constexpr auto operator[](size_type a_index) const -> const_reference {
+			return (*this)[a_index];
+		}
 	private:
-		constexpr auto increment(pointer& a_ptr) const noexcept -> void { a_ptr == m_end - 1 ? a_ptr = m_begin : ++a_ptr; }
-		constexpr auto decrement(pointer& a_ptr) const noexcept -> void { a_ptr == m_begin ? a_ptr = m_end - 1 : --a_ptr; }
+		inline constexpr auto increment(pointer& a_ptr) const noexcept -> void { a_ptr == m_end - 1 ? a_ptr = m_begin : ++a_ptr; }
+		inline constexpr auto decrement(pointer& a_ptr) const noexcept -> void { a_ptr == m_begin ? a_ptr = m_end - 1 : --a_ptr; }
+
+		inline constexpr auto out_of_bounds(pointer a_ptr) const noexcept -> bool {
+			return linear() ?
+				m_head > a_ptr || a_ptr > m_tail : // Not head -> tail
+				m_begin > a_ptr || !(m_end > a_ptr) || (m_head > a_ptr && a_ptr > m_tail); // Not begin -> end - 1 and not between tail and head
+		}
 	};
 }

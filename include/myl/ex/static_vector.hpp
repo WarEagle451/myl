@@ -5,8 +5,11 @@
 
 /// Restructure other containers like this
 
+/// <=> op instead
+
 #include <myl/iterative.hpp>
 
+#include <stdexcept>
 #include <initializer_list>
 #include <memory>
 #include <numeric>
@@ -37,33 +40,33 @@ namespace myl {
 
 		pointer m_end = nullptr;
 	public:
-		// Constructors / Destructor / Copy 
+		// Constructors / Destructor / Copy
 
 		MYL_NO_DISCARD constexpr static_vector() noexcept
 			: m_end{ m_data } {}
 
 		MYL_NO_DISCARD constexpr static_vector(size_type a_count, const value_type& a_value = value_type{})
 			: m_end{ m_data } {
-			/// Assert: cant construct a sv with more elements than capacity
-
+			MYL_ASSERT(Capacity >= a_count, "Constructing a static vector with more elements than it's capacity is undefined behavior!");
 			assign(a_count, a_value);
 		}
 
 		MYL_NO_DISCARD constexpr static_vector(std::initializer_list<value_type> a_list)
 			: m_end{ m_data } {
-			/// Assert list can not be bigger than cap
+			MYL_ASSERT(Capacity >= a_list.size(), "Constructing a static vector with more elements than it's capacity is undefined behavior!");
 			assign(a_list);
+		}
+
+		template<typename Iterator>
+		MYL_NO_DISCARD constexpr static_vector(Iterator a_begin, Iterator a_end)
+			: m_end{ m_data } {
+			MYL_ASSERT(Capacity >= a_end - a_begin, "Constructing a static vector with more elements than it's capacity is undefined behavior!");
+			assign(a_begin, a_end);
 		}
 
 		///MYL_NO_DISCARD constexpr static_vector(const static_vector&);
 		///MYL_NO_DISCARD constexpr static_vector(static_vector&&);
 		///MYL_NO_DISCARD constexpr explicit static_vector(size_type);
-
-		template<typename Iterator>
-		MYL_NO_DISCARD constexpr static_vector(Iterator a_begin, Iterator a_end)
-			: m_end{ m_data } {
-			assign(a_begin, a_end);
-		}
 
 		constexpr ~static_vector() {
 			clear();
@@ -71,9 +74,9 @@ namespace myl {
 
 		// Copy / Move Assignment
 
-		///MYL_NO_DISCARD constexpr auto operator=(const static_vector&)->static_vector&;
-		///MYL_NO_DISCARD constexpr auto operator=(std::initializer_list<value_type>)->static_vector&;
-		///MYL_NO_DISCARD constexpr auto operator=(static_vector&&)->static_vector&;
+		///MYL_NO_DISCARD constexpr auto operator=(const static_vector&) -> static_vector&;
+		///MYL_NO_DISCARD constexpr auto operator=(static_vector&&) -> static_vector&;
+		///MYL_NO_DISCARD constexpr auto operator=(std::initializer_list<value_type>) -> static_vector&;
 
 		// Utilities
 
@@ -87,7 +90,7 @@ namespace myl {
 		MYL_NO_DISCARD constexpr auto data() noexcept -> pointer { return m_data; }
 		MYL_NO_DISCARD constexpr auto data() const noexcept -> const_pointer { return m_data; }
 
-		constexpr auto swap(static_vector& a_other) -> void {
+		constexpr auto swap(static_vector& a_other) noexcept -> void { /// https://en.cppreference.com/w/cpp/container/vector/swap
 			/// Do
 		}
 
@@ -109,13 +112,8 @@ namespace myl {
 		// Modifiers
 
 		constexpr auto clear() noexcept -> void {
-			// Need to call the destructors manually as the c-array within the union will not call them
-			pop_back(size());
-		}
-
-		constexpr auto fill_up(const value_type& a_value) noexcept -> void { /// MYTodo: There must be a better way
-			while (!full())
-				push_back(a_value);
+			if (!empty())
+				pop_back(size()); // Need to call the destructors manually as the c-array within the union will not call them
 		}
 
 		constexpr auto fill(const value_type& a_value) noexcept -> void {
@@ -123,25 +121,34 @@ namespace myl {
 			fill_up(a_value);
 		}
 
-		///constexpr auto resize(size_type) -> void;
-		///constexpr auto resize(size_type, const value_type & = value_type{}) -> void;
+		constexpr auto fill_up(const value_type& a_value) noexcept -> void {
+			while (!full())
+				push_back(a_value);
+		}
+
+		constexpr auto assign(size_type a_count, const value_type& a_value) -> void {
+			MYL_ASSERT(Capacity >= a_count, "Constructing a static vector with more elements than it's capacity is undefined behavior!");
+			clear();
+			for (pointer ptr = m_data; a_count != 0; ++ptr, --a_count)
+				call_constructor(ptr, a_value);
+		}
 
 		template<typename Iterator>
-		constexpr auto assign(Iterator, Iterator) -> void {
-			/// Assert: Can't assign more elements than the capacity of a static vector
+		constexpr auto assign(Iterator a_begin, Iterator a_end) -> void {
+			MYL_ASSERT(Capacity >= a_end - a_begin, "Constructing a static vector with more elements than it's capacity is undefined behavior!");
+			clear();
+			for (pointer ptr = m_data; a_begin != a_end; ++ptr, ++a_begin)
+				call_constructor(ptr, *a_begin);
 		}
 
-		constexpr auto assign(std::initializer_list<value_type>) -> void {
-			/// Assert: Can't assign more elements than the capacity of a static vector
-		}
-
-		constexpr auto assign(size_type, const value_type&) -> void {
-			/// Assert: Can't assign more elements than the capacity of a static vector
+		constexpr auto assign(std::initializer_list<value_type> a_list) -> void {
+			MYL_ASSERT(Capacity >= a_list.size(), "Constructing a static vector with more elements than it's capacity is undefined behavior!");
+			assign(a_list.begin(), a_list.end()); /// MYTodo: does this have to move the elements?
 		}
 
 		template<typename... Args>
 		constexpr auto emplace_back(Args&&... a_args) -> reference {
-			/// Assert here if full
+			MYL_ASSERT(!full(), "Adding an element to a full static vector is undefined behavior!");
 
 			call_constructor(m_end, std::forward<Args>(a_args)...);
 
@@ -154,26 +161,24 @@ namespace myl {
 		///constexpr auto emplace(const_iterator, Args&&...) -> iterator;
 
 		constexpr auto push_back(value_type&& a_value) -> void {
-			/// Assert here if full
-
+			MYL_ASSERT(!full(), "Adding an element to a full static vector is undefined behavior!");
 			*m_end = std::move(a_value);
 			++m_end;
 		}
 
 		constexpr auto push_back(const value_type& a_value) -> void {
-			push_back(a_value);
+			MYL_ASSERT(!full(), "Adding an element to a full static vector is undefined behavior!");
+			emplace_back(a_value);
 		}
 
 		constexpr auto pop_back() -> void {
-			/// Assert if empty
-
+			MYL_ASSERT(!empty(), "Calling pop back on an empty static vector is undefined behavior!");
 			--m_end;
-			call_destructor(m_end);
+			m_end->~value_type();
 		}
 
 		constexpr auto pop_back(size_type a_count) -> void {
-			/// Assert if a_count > size
-
+			MYL_ASSERT(a_count >= size(), "Popping more elements than the static vector holds is undefined behavior!");
 			while (a_count != 0) {
 				pop_back();
 				--a_count;
@@ -194,35 +199,40 @@ namespace myl {
 
 		MYL_NO_DISCARD constexpr auto front() -> reference { return *m_data; }
 		MYL_NO_DISCARD constexpr auto front() const -> const_reference { return front(); }
-		MYL_NO_DISCARD constexpr auto back() -> reference { return *m_end; }
+		MYL_NO_DISCARD constexpr auto back() -> reference { return *(m_end - 1); }
 		MYL_NO_DISCARD constexpr auto back() const -> const_reference { return back(); }
 
-		///MYL_NO_DISCARD constexpr auto at(size_type) -> reference;
-		///MYL_NO_DISCARD constexpr auto at(size_type) const->const_reference;
+		MYL_NO_DISCARD constexpr auto at(size_type a_pos) -> reference {
+			MYL_ASSERT(!out_of_bounds(m_data + a_pos), "Accessing an out of bounds element is undefined behavior!");
+			if (out_of_bounds(m_data + a_pos))
+				throw std::out_of_range("Accessing an out of bounds element is undefined behavior!"); /// MYTodo: Should this call a myl::out_of_bounds exception?
+			return (*this)[a_pos];
+		}
+
+		MYL_NO_DISCARD constexpr auto at(size_type a_pos) const-> const_reference {
+			return at(a_pos);
+		}
 
 		MYL_NO_DISCARD constexpr auto operator[](size_type a_pos) -> reference {
-			/// Assert: check for out of bounds
+			MYL_ASSERT(!out_of_bounds(m_data + a_pos), "Accessing an out of bounds element is undefined behavior!");
 			return m_data[a_pos];
 		}
 
 		MYL_NO_DISCARD constexpr auto operator[](size_type a_pos) const -> const_reference {
-			/// Assert: check for out of bounds
-			return operator[](a_pos);
+			return (*this)[a_pos];
 		}
 	private:
 		template<typename... Args>
 		inline constexpr auto call_constructor(pointer a_ptr, Args&&... a_args) -> void {
-			/// Assert if the space is not empty
-
 			std::construct_at(a_ptr, std::forward<Args>(a_args)...);
 		}
 
-		inline constexpr auto call_destructor(pointer a_ptr) -> void {
-			/// Assert if ptr is null
-
-			a_ptr->~value_type();
+		inline constexpr auto out_of_bounds(pointer a_ptr) const noexcept -> bool {
+			return !(a_ptr < m_end);
 		}
 	};
+
+	/// https://en.cppreference.com/w/cpp/container/vector/operator_cmp
 
 	template<typename T, usize C>
 	MYL_NO_DISCARD constexpr auto operator==(const static_vector<T, C>& l, const static_vector<T, C>& r) -> bool {
@@ -248,6 +258,8 @@ namespace myl {
 	MYL_NO_DISCARD constexpr auto operator>=(const static_vector<T, C>& l, const static_vector<T, C>& r) -> bool {
 		return l.size() >= r.size();
 	}
+
+	/// https://en.cppreference.com/w/cpp/container/vector/erase2
 
 	template<typename T, usize C>
 	constexpr auto swap(static_vector<T, C>& a, static_vector<T, C>& b) noexcept(noexcept(a.swap(b))) -> void {
