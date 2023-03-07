@@ -22,28 +22,6 @@ namespace myl {
 	//template<> MYL_NO_DISCARD constexpr auto string_cast<f32, char>(const f32&) -> std::basic_string<char> { return; }
 	//template<> MYL_NO_DISCARD constexpr auto string_cast<f64, char>(const f64&) -> std::basic_string<char> { return; }
 
-	MYL_NO_DISCARD constexpr auto whitespace(char c) -> bool { /// : Support other types
-		switch (c) {
-			case ' ': return true;
-			case '\t': return true;
-			case '\n': return true;
-			case '\v': return true;
-			case '\f': return true;
-			case '\r': return true;
-			default: return false;
-		}
-	}
-
-	template<typename Elem = char, typename Traits = std::char_traits<Elem>, typename Alloc = std::allocator<Elem>>
-	MYL_NO_DISCARD constexpr auto to_upper(std::basic_string_view<Elem, Traits> view) -> std::basic_string<Elem, Traits, Alloc> {
-
-	}
-
-	template<typename Elem = char, typename Traits = std::char_traits<Elem>, typename Alloc = std::allocator<Elem>>
-	MYL_NO_DISCARD constexpr auto to_lower(std::basic_string_view<Elem, Traits> view) -> std::basic_string<Elem, Traits, Alloc> {
-
-	}
-
 	/// Really slow
 	template<typename Elem = char, typename Traits = std::char_traits<Elem>, typename Alloc = std::allocator<Elem>>
 	MYL_NO_DISCARD constexpr auto split(std::basic_string_view<Elem, Traits> view, const std::vector<Elem>& delimiters) -> std::vector<std::basic_string<Elem, Traits, Alloc>> {

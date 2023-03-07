@@ -1,0 +1,48 @@
+#pragma once
+#include <myl/defines.hpp>
+
+#include <cctype>
+#include <cwctype>
+#include <string>
+
+namespace myl {
+	//@return A fully capitalized string
+	template<typename Char = char>
+	MYL_NO_DISCARD constexpr auto to_upper(const std::basic_string<Char>& s) -> std::basic_string<Char> {
+		std::basic_string<Char> out;
+		out.reserve(s.size());
+		for (Char c : s)
+			out += static_cast<Char>(std::toupper(static_cast<unsigned char>(c)));
+		return out;
+	}
+
+	//@return A fully capitalized wstring
+	template<>
+	MYL_NO_DISCARD constexpr auto to_upper<wchar_t>(const std::wstring& s) -> std::wstring {
+		std::wstring out;
+		out.reserve(s.size());
+		for (wchar_t c : s)
+			out += static_cast<wchar_t>(std::toupper(static_cast<std::wint_t>(c)));
+		return out;
+	}
+
+	//@return A fully uncapitalized string
+	template<typename Char = char>
+	MYL_NO_DISCARD constexpr auto to_lower(const std::basic_string<Char>& s) -> std::basic_string<Char> {
+		std::basic_string<Char> out;
+		out.reserve(s.size());
+		for (Char c : s)
+			out += static_cast<Char>(std::tolower(static_cast<unsigned char>(c)));
+		return out;
+	}
+
+	//@return A fully uncapitalized wstring
+	template<>
+	MYL_NO_DISCARD constexpr auto to_lower<wchar_t>(const std::wstring& s) -> std::wstring {
+		std::wstring out;
+		out.reserve(s.size());
+		for (wchar_t c : s)
+			out += static_cast<wchar_t>(std::tolower(static_cast<std::wint_t>(c)));
+		return out;
+	}
+}
