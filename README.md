@@ -1,5 +1,5 @@
 # What is `myl`?
-Myl is my personal C++ library. Myl contains a variety of classes and functions I commonly use.
+Myl is my personal library of everything C++.
 
 # Table of Contents
 1. [Getting Started](#documentation)
