@@ -1,7 +1,4 @@
 #pragma once
-#include <myl/defines.hpp> ///m For #ifdef MYL_EXPERIMENTAL
-#ifdef MYL_EXPERIMENTAL
-
 #include <myl/math/vec2.hpp>
 
 namespace myl {
@@ -31,4 +28,3 @@ namespace myl {
 	using f32rect = rect<f32>;
 	using f64rect = rect<f64>;
 }
-#endif

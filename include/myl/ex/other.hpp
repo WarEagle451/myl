@@ -1,6 +1,5 @@
 #pragma once
 #include <myl/defines.hpp>
-#ifdef MYL_EXPERIMENTAL
 
 #include <list>
 
@@ -26,4 +25,3 @@ namespace myl {
 			return static_cast<T>(sorted.begin() + ((sorted.size() - 1) / 2));
 	}
 }
-#endif

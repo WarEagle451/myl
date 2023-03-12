@@ -1,7 +1,5 @@
 #pragma once
 #include <myl/defines.hpp>
-#ifdef MYL_EXPERIMENTAL
-
 #include <myl/exception.hpp>
 
 #include <bitset>
@@ -46,7 +44,7 @@ namespace myl {
 
 	//@tparam Size: The amount of memory blocks
 	//@tparam T: The size of each memory block
-	template<usize Size = 8, typename Block = u32>
+	template<usize Size, unsigned_integer Block = u32>
 	class static_allocator {
 	public:
 		using value_type	= Block;
@@ -95,4 +93,3 @@ namespace myl {
 		}
 	};
 }
-#endif

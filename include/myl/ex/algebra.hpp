@@ -1,6 +1,5 @@
 #pragma once
 #include <myl/math/common.hpp>
-#ifdef MYL_EXPERIMENTAL
 
 namespace myl {
 	template<typename T>
@@ -14,4 +13,3 @@ namespace myl {
 		};
 	}
 }
-#endif

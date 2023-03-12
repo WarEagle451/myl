@@ -5,6 +5,18 @@
 
 //////////////////////////////////////// General Macros ////////////////////////////////////////
 
+/* MYL_DEBUG
+* Enables myl to build as a debug version.
+* This should be only be defined when manually setting a build as debug
+*/
+//#define MYL_DEBUG
+
+/* MYL_SHARED_LIBRARY
+* Enables myl to build as a shared library
+* This should be only be defined when manually setting to build as a shared library
+*/
+//#define MYL_SHARED_LIBRARY
+
 /* MYL_DEFINE_TYPES:
 * Defines the following types in the global namespace;
 *	- i8, i16, i32, i64
@@ -21,12 +33,6 @@
 * Checks using a static_assert that a type/class/struct is of a certain size in bytes.
 */
 //#define MYL_TYPE_SIZE_CHECK
-
-/* MYL_EXPERIMENTAL:
-* Enables code in the myl/ex directory.
-* [NOTE]: Much of this code may be unfinished, buggy or may not compile at all.
-*/
-//#define MYL_EXPERIMENTAL
 
 /* MYL_ROUND_CONSTANTS
 * Rounds the 32nd digit of constants if applicable.

@@ -6,20 +6,14 @@
 *	- Meta programming templates
 */
 
-#include <myl/config.hpp>
-
 #define MYL_EXPAND_MACRO(x) x
 #define MYL_STRINGIFY(x) #x
 #define MYL_STRINGIFY_ARG(arg) MYL_STRINGIFY(arg)
 
-#define MYL_MAKE_VERSION(major, minor, patch) (major * 10000 + minor * 100 + patch)
+/// MYTodo: MYL_MAKE_VERSION_STRING outside of version.hpp is weird
 #define MYL_MAKE_VERSION_STRING(major, minor, patch) (MYL_STRINGIFY_ARG(major) "." MYL_STRINGIFY_ARG(minor) "." MYL_STRINGIFY_ARG(patch))
 
-#define MYL_VERSION_MAJOR 1
-#define MYL_VERSION_MINOR 0
-#define MYL_VERSION_PATCH 0
-
-#define MYL_VERSION MYL_MAKE_VERSION(MYL_VERSION_MAJOR, MYL_VERSION_MINOR, MYL_VERSION_PATCH)
+#include <myl/version.hpp>
 #define MYL_VERSION_STRING MYL_MAKE_VERSION_STRING(MYL_VERSION_MAJOR, MYL_VERSION_MINOR, MYL_VERSION_PATCH)
 
 #if __has_cpp_attribute(assume)
@@ -35,7 +29,6 @@
 #endif
 
 #if __has_cpp_attribute(deprecated) && defined(MYL_ENABLE_DEPRECATED_WARNINGS)
-
 #	define MYL_DEPRECATED [[deprecated]]
 #	define MYL_DEPRECATED_M(reason) [[deprecated(reason)]]
 #else
@@ -88,41 +81,77 @@
 #endif
 
 #include <myl/platform.hpp>
-#ifdef MYL_EXPORT
-#	ifdef MYL_COMPILER_MSVC
-#		define MYL_API __declspec(dllexport)
-#	else
-#		define MYL_API __attribute__((visibility("default")))
-#	endif
+#ifdef MYL_COMPILER_MSVC
+#	define MYL_COMPILER_NAME "Visual Studio"
+#elif defined(MYL_COMPILER_CLANG)
+#	define MYL_COMPILER_NAME "Clang"
+#elif defined(MYL_COMPILER_GCC)
+#	define MYL_COMPILER_NAME "GCC"
+#elif defined(MYL_COMPILER_UNKNOWN)
+#	define MYL_COMPILER_NAME "Unknown"
 #else
-#	ifdef MYL_COMPILER_MSVC
-#		define MYL_API __declspec(dllimport)
-#	else
-#		define MYL_API
-#	endif
-#endif
-
-#ifndef MYL_DEBUG
-#	ifdef MYL_COMPILER_MSVC
-#		ifdef _DEBUG
-#			define MYL_DEBUG
-#		endif
-#	elif defined(MYL_COMPILER_CLANG) || defined(MYL_COMPILER_GCC)
-#		ifdef _GLIBCXX_DEBUG
-#			define MYL_DEBUG
-#		endif
-#	else
-#		warning "Unknown compiler! Define 'MYL_DEBUG' if compiling a debug build!"
-#	endif
+#	error "Bug! 'MYL_COMPILER_NAME' not defined for this known compiler!"
 #endif
 
 #ifdef MYL_COMPILER_MSVC
-#	define MYL_DEBUG_BREAK __debugbreak()
-#elif defined(MYL_COMPILER_CLANG) || defined(MYL_COMPILER_GCC) || defined(MYL_COMPILER_UNKNOWN)
-#	define MYL_DEBUG_BREAK __builtin_trap()
+#	define MYL_EXPORT __declspec(dllexport)
+#	define MYL_IMPORT __declspec(dllimport)
+#	define MYL_LOCAL
+#elif defined(MYL_COMPILER_CLANG) || defined(MYL_COMPILER_GCC)
+#	define MYL_EXPORT __attribute__((visibility("default")))
+#	define MYL_IMPORT __attribute__((visibility("default")))
+#	define MYL_LOCAL __attribute__((visibility("hidden")))
+#elif defined(MYL_COMPILER_UNKNOWN)
+#	define MYL_EXPORT
+#	define MYL_IMPORT
+#	define MYL_LOCAL
 #else
-#	error "MYL_DEBUG_BREAK not implemented on known compiler!"
-#	define MYL_DEBUG_BREAK
+#	error "Bug! 'MYL_EXPORT', 'MYL_IMPORT' and 'MYL_LOCAL' not defined for this known compiler!"
+#	define MYL_EXPORT
+#	define MYL_IMPORT
+#	define MYL_LOCAL
+#endif
+
+#include <myl/config.hpp>
+#ifdef MYL_SHARED_LIBRARY
+#	define MYL_API MYL_EXPORT
+#else
+#	define MYL_API MYL_IMPORT
+#endif
+
+#ifndef MYL_DEBUG
+#	if defined(MYL_COMPILER_MSVC)
+#		ifdef _DEBUG
+#			define MYL_DEBUG
+#		endif
+#	elif defined(MYL_COMPILER_CLANG)
+#		ifdef /// MYBug: What in the world is Clang's debug macro?
+#			define MYL_DEBUG
+#		endif
+#	elif defined(MYL_COMPILER_GCC)
+#		ifdef _GLIBCXX_DEBUG
+#			define MYL_DEBUG
+#		endif
+#	elif  defined(MYL_COMPILER_UNKNOWN)
+#		warning "Unknown compiler! Define 'MYL_DEBUG' if compiling a debug build!"
+#	else
+#		error "Bug! 'MYL_DEBUG' is not defined for this known compiler!"
+#	endif
+#endif
+
+#if defined(MYL_COMPILER_MSVC)
+#	define MYL_DEBUG_BREAK __debugbreak() 
+#elif defined(MYL_COMPILER_CLANG) || defined(MYL_COMPILER_GCC)
+#	define MYL_DEBUG_BREAK __builtin_trap()
+#elif defined(MYL_COMPILER_UNKNOWN)
+#	include <signal.h>
+#	ifdef SIGTRAP
+#		define MYL_DEBUG_BREAK raise(SIGTRAP)
+#	else
+#		define MYL_DEBUG_BREAK raise(SIGABRT)
+#	endif
+#else
+#	error "Bug! 'MYL_DEBUG_BREAK' is not defined for this known compiler!"
 #endif
 
 #if defined(MYL_DEBUG) && !defined(MYL_DISABLE_ASSERTS)

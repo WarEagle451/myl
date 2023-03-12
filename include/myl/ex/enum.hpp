@@ -1,7 +1,4 @@
 #pragma once
-#include <myl/defines.hpp> /// For #ifdef MYL_EXPERIMENTAL
-
-#ifdef MYL_EXPERIMENTAL
 #include <type_traits>
 
 #define MYL_DEFINE_ENUM_INT_OPERATOR(enum_type) template<typename Int> MYL_NO_DISCARD Int constexpr operator Int() noexcept -> Int {}
@@ -21,5 +18,3 @@
 	auto constexpr operator^=(enum_type& lhs, enum_type& rhs) noexcept -> enum_type& {}\
 	\
 	MYL_DEFINE_ENUM_INT_OPERATOR(enum_type)
-
-#endif

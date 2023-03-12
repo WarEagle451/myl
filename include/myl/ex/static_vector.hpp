@@ -3,8 +3,6 @@
 /// https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0843r2.html
 /// https://www.boost.org/doc/libs/1_59_0/doc/html/boost/container/static_vector.html
 
-/// Restructure other containers like this
-
 /// <=> op instead
 
 #include <myl/iterative.hpp>
@@ -33,14 +31,14 @@ namespace myl {
 		using reverse_iterator			= std::reverse_iterator<iterator>;
 		using const_reverse_iterator	= const reverse_iterator;
 	private:
-		union { /// There has to be a better way to prevent the constructors in the C-array from being called
-			std::byte m_bytes[sizeof(value_type) * Capacity]; // This should never be accessed, is just a work around
+		union {
+			std::byte m_bytes[sizeof(value_type) * Capacity]; // This should never be accessed, is just a work around to prevent m_data constructors from triggering
 			value_type m_data[Capacity];
 		};
 
 		pointer m_end = nullptr;
 	public:
-		// Constructors / Destructor / Copy
+		// Constructors / Destructor
 
 		MYL_NO_DISCARD constexpr static_vector() noexcept
 			: m_end{ m_data } {}
@@ -64,19 +62,23 @@ namespace myl {
 			assign(a_begin, a_end);
 		}
 
-		///MYL_NO_DISCARD constexpr static_vector(const static_vector&);
-		///MYL_NO_DISCARD constexpr static_vector(static_vector&&);
-		///MYL_NO_DISCARD constexpr explicit static_vector(size_type);
-
 		constexpr ~static_vector() {
 			clear();
 		}
 
 		// Copy / Move Assignment
 
-		///MYL_NO_DISCARD constexpr auto operator=(const static_vector&) -> static_vector&;
-		///MYL_NO_DISCARD constexpr auto operator=(static_vector&&) -> static_vector&;
-		///MYL_NO_DISCARD constexpr auto operator=(std::initializer_list<value_type>) -> static_vector&;
+		///MYL_NO_DISCARD constexpr auto operator=(const static_vector&) -> static_vector& {
+		///
+		///}
+		
+		///MYL_NO_DISCARD constexpr auto operator=(static_vector&&) -> static_vector& {
+		///
+		///}
+		
+		///MYL_NO_DISCARD constexpr auto operator=(std::initializer_list<value_type>) -> static_vector& {
+		///
+		///}
 
 		// Utilities
 
@@ -90,7 +92,8 @@ namespace myl {
 		MYL_NO_DISCARD constexpr auto data() noexcept -> pointer { return m_data; }
 		MYL_NO_DISCARD constexpr auto data() const noexcept -> const_pointer { return m_data; }
 
-		constexpr auto swap(static_vector& a_other) noexcept -> void { /// https://en.cppreference.com/w/cpp/container/vector/swap
+		constexpr auto swap(static_vector& a_other) noexcept -> void {
+			/// https://en.cppreference.com/w/cpp/container/vector/swap
 			/// Do
 		}
 
@@ -158,7 +161,9 @@ namespace myl {
 		}
 
 		///template<typename... Args>
-		///constexpr auto emplace(const_iterator, Args&&...) -> iterator;
+		///MYL_NO_DISCARD constexpr auto emplace(const_iterator, Args&&...) -> iterator {
+		///	MYL_ASSERT(!full(), "Adding an element to a full static vector is undefined behavior!");
+		///}
 
 		constexpr auto push_back(value_type&& a_value) -> void {
 			MYL_ASSERT(!full(), "Adding an element to a full static vector is undefined behavior!");
@@ -185,15 +190,37 @@ namespace myl {
 			}
 		}
 
-		///constexpr auto insert(const_iterator, const value_type&) -> iterator;
-		///constexpr auto insert(const_iterator, value_type&&) -> iterator;
-		///constexpr auto insert(const_iterator, size_type, const value_type&) -> iterator;
-		///constexpr auto insert(const_iterator, std::initializer_list<value_type>) -> iterator;
-		///template<typename Iterator>
-		///constexpr auto insert(const_iterator, Iterator, Iterator) -> iterator;
+		///MYL_NO_DISCARD constexpr auto insert(const_iterator, const value_type&) -> iterator {
+		///	MYL_ASSERT(!full(), "Adding an element to a full static vector is undefined behavior!");
+		///}
 		
-		///constexpr auto erase(const_iterator) -> iterator;
-		///constexpr auto erase(const_iterator, const_iterator) -> iterator;
+		///MYL_NO_DISCARD constexpr auto insert(const_iterator, value_type&&) -> iterator {
+		///	MYL_ASSERT(!full(), "Adding an element to a full static vector is undefined behavior!");
+		///}
+		
+		///MYL_NO_DISCARD constexpr auto insert(const_iterator, size_type, const value_type&) -> iterator {
+		///	MYL_ASSERT(!full(), "Adding an element to a full static vector is undefined behavior!");
+		///}
+		
+		///MYL_NO_DISCARD constexpr auto insert(const_iterator, std::initializer_list<value_type>) -> iterator {
+		///	MYL_ASSERT(!full(), "Adding an element to a full static vector is undefined behavior!");
+		///}
+		
+		///template<typename Iterator>
+		///MYL_NO_DISCARD constexpr auto insert(const_iterator, Iterator, Iterator) -> iterator {
+		///	MYL_ASSERT(!full(), "Adding an element to a full static vector is undefined behavior!");
+		///}
+		
+		///MYL_NO_DISCARD constexpr auto erase(const_iterator a_it) -> iterator {
+		///	Iterator following the last removed element.
+		///	If pos refers to the last element, then the end() iterator is returned.
+		///}
+		
+		///MYL_NO_DISCARD constexpr auto erase(const_iterator, const_iterator) -> iterator {
+		/// Iterator following the last removed element.
+		/// If last == end() prior to removal, then the updated end() iterator is returned.
+		/// If[first, last) is an empty range, then last is returned.
+		///}
 
 		// Element access
 
@@ -260,6 +287,16 @@ namespace myl {
 	}
 
 	/// https://en.cppreference.com/w/cpp/container/vector/erase2
+
+	///template<typename T, usize Capacity>
+	///MYL_NO_DISCARD constexpr typename auto erase(static_vector<T, Capacity>& v, const T& value) -> static_vector<T, Capacity>::size_type {
+	///
+	///}
+	
+	///template<typename T, usize Capacity>
+	///MYL_NO_DISCARD constexpr typename auto erase_if(static_vector<T, Capacity>& v, Pred pred) -> static_vector<T, Capacity>::size_type {
+	///
+	///}
 
 	template<typename T, usize C>
 	constexpr auto swap(static_vector<T, C>& a, static_vector<T, C>& b) noexcept(noexcept(a.swap(b))) -> void {

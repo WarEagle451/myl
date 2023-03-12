@@ -8,8 +8,6 @@
 #	include <intrin.h>
 #endif
 
-/// MYTodo: Change to bit,hpp??
-
 namespace myl {
 	template<typename T, usize Bytes>
 	concept byte_size = sizeof(T) == Bytes;
@@ -80,6 +78,6 @@ namespace myl {
 	MYL_NO_DISCARD constexpr auto ntoh(u32 v) -> u32 { return std::endian::native == std::endian::big ? v : byteswap(v); }
 	MYL_NO_DISCARD constexpr auto ntoh(u64 v) -> u64 { return std::endian::native == std::endian::big ? v : byteswap(v); }
 
-	MYL_API MYL_NO_DISCARD constexpr auto ntohf(u32 v) -> f32 { return std::endian::native == std::endian::big ? std::bit_cast<f32, u32>(v) : std::bit_cast<f32, u32>(std::byteswap(v)); }
-	MYL_API MYL_NO_DISCARD constexpr auto ntohf(u64 v) -> f64 { return std::endian::native == std::endian::big ? std::bit_cast<f64, u64>(v) : std::bit_cast<f64, u64>(std::byteswap(v)); }
+	MYL_NO_DISCARD constexpr auto ntohf(u32 v) -> f32 { return std::endian::native == std::endian::big ? std::bit_cast<f32, u32>(v) : std::bit_cast<f32, u32>(std::byteswap(v)); }
+	MYL_NO_DISCARD constexpr auto ntohf(u64 v) -> f64 { return std::endian::native == std::endian::big ? std::bit_cast<f64, u64>(v) : std::bit_cast<f64, u64>(std::byteswap(v)); }
 }

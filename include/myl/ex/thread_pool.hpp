@@ -1,6 +1,5 @@
 #pragma once
 #include <myl/defines.hpp>
-#ifdef MYL_EXPERIMENTAL
 
 #include <atomic>
 #include <functional>
@@ -112,4 +111,3 @@ namespace myl {
 		}
 	};
 }
-#endif

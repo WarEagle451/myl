@@ -1,4 +1,4 @@
-#include <myl/endian.hpp>
+#include <myl/bit.hpp>
 #include <myl/exception.hpp> /// MYTemp: Add UUID creation for dce, md5, sha1
 #include <myl/random.hpp>
 #include <myl/uuid.hpp>
