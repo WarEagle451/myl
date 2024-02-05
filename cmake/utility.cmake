@@ -1,10 +1,10 @@
 function(gather FILES_OUT DIRECTORY EXTENSIONS)
-file(GLOB_RECURSE FOUND_FILES ${DIRECTORY} ${EXTENSIONS})
+    file(GLOB_RECURSE FOUND_FILES ${DIRECTORY} ${EXTENSIONS})
     source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${FOUND_FILES})
     set(${FILES_OUT} ${FOUND_FILES} PARENT_SCOPE)
 endfunction(gather)
 
-function(extract_version VERSION_OUT VERSION_PREFIX FILE)
+function(extract_version VERSION_PREFIX FILE VERSION_OUT)
     file(READ ${FILE} contents)
 
     string(REGEX MATCH "${VERSION_PREFIX}_MAJOR ([0-9]+)" _ ${contents})

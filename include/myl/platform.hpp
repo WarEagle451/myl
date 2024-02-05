@@ -39,11 +39,11 @@
 #endif
 
 #ifdef MYL_COMPILER_MSVC
-#	if _MSVC_LANG <= 202002L // MSVC for C++17
+#	if _MSVC_LANG < 202002L // MSVC for C++20
 #		error "Compile for C++20 or higher!"
 #	endif
 #elif !defined(__cplusplus) || __cplusplus < 202202L // C++20
-#	error "This project requires a compiler for C++20 or higher!"
+#		error "Compile for C++20 or higher!"
 #endif
 
 // OS detection
