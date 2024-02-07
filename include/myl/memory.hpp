@@ -16,10 +16,10 @@ namespace myl {
         MYL_NO_DISCARD constexpr observer_ptr() noexcept = default;
 
         MYL_NO_DISCARD constexpr observer_ptr(std::nullptr_t) noexcept
-        : m_ptr{ nullptr } {}
+            : m_ptr{ nullptr } {}
 
         MYL_NO_DISCARD constexpr explicit observer_ptr(pointer ptr) noexcept
-        : m_ptr{ ptr } {}
+            : m_ptr{ ptr } {}
 
         MYL_NO_DISCARD constexpr observer_ptr(const observer_ptr& other) noexcept = default;
 
@@ -60,6 +60,11 @@ namespace myl {
             return *this;
         }
 
+        constexpr auto operator=(const pointer r) noexcept -> observer_ptr& {
+            m_ptr = r;
+            return *this;
+        }
+
         constexpr auto operator=(const observer_ptr& r) noexcept -> observer_ptr& {
             m_ptr = r.m_ptr;
             return *this;
@@ -81,6 +86,11 @@ namespace myl {
     };
 
     template<typename T, typename U>
+    MYL_NO_DISCARD constexpr auto operator==(std::nullptr_t, const observer_ptr<U>& r) noexcept -> bool {
+        return nullptr == r.m_ptr;
+    }
+
+    template<typename T, typename U>
     MYL_NO_DISCARD constexpr auto operator==(const observer_ptr<T>& l, const observer_ptr<U>& r) noexcept -> bool {
         return l.m_ptr == r.m_ptr;
     }
@@ -93,11 +103,6 @@ namespace myl {
     template<typename T, typename U>
     MYL_NO_DISCARD constexpr auto operator==(const observer_ptr<T>& l, std::nullptr_t) noexcept -> bool {
         return l.m_ptr == nullptr;
-    }
-
-    template<typename T, typename U>
-    MYL_NO_DISCARD constexpr auto operator==(std::nullptr_t, const observer_ptr<U>& r) noexcept -> bool {
-        return nullptr == r.m_ptr;
     }
 
     template<typename T, typename U>
