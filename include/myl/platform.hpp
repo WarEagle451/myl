@@ -3,20 +3,30 @@
 
 // Compiler related macros
 
-#if defined(_MSC_VER)
+#if defined(__clang__)
+#   if defined(__apple_build_version__) // Detect Apple Clang
+#	    define MYL_COMPILER_NAME "Apple Clang"
+#   else
+#	    define MYL_COMPILER_NAME "Clang"
+#   endif
+#	define MYL_COMPILER_CLANG MYL_MAKE_VERSION(__clang_major__, __clang_minor__, __clang_patchlevel__)
+
+#   ifdef _MSC_VER // Detect clang-cl, some definitions need to change to be MSVC like 
+#	    define MYL_EXPORT __declspec(dllexport)
+#	    define MYL_IMPORT __declspec(dllimport)
+#	    define MYL_LOCAL
+#   else
+#	    define MYL_EXPORT __attribute__((visibility("default")))
+#	    define MYL_IMPORT __attribute__((visibility("default")))
+#	    define MYL_LOCAL __attribute__((visibility("hidden")))
+#   endif
+#elif defined(_MSC_VER)
 #	define MYL_COMPILER_NAME "Visual Studio"
 #	define MYL_COMPILER_MSVC _MSC_VER
 
 #	define MYL_EXPORT __declspec(dllexport)
 #	define MYL_IMPORT __declspec(dllimport)
 #	define MYL_LOCAL
-#elif defined(__clang__) /// TODO: Distingish Apple clang (__apple_build_version__ ), llvm clang, ibm clang
-#	define MYL_COMPILER_NAME "Clang"
-#	define MYL_COMPILER_CLANG MYL_MAKE_VERSION(__clang_major__, __clang_minor__, __clang_patchlevel__)
-
-#	define MYL_EXPORT __attribute__((visibility("default")))
-#	define MYL_IMPORT __attribute__((visibility("default")))
-#	define MYL_LOCAL __attribute__((visibility("hidden")))
 #elif defined(__GNUC__)
 #	define MYL_COMPILER_NAME "GCC"
 #	if defined(__GNUC_PATCHLEVEL__)
@@ -38,11 +48,11 @@
 #	define MYL_LOCAL
 #endif
 
-#ifdef MYL_COMPILER_MSVC
+#if defined(MYL_COMPILER_MSVC)
 #	if _MSVC_LANG < 202002L // MSVC for C++20
 #		error "Compile for C++20 or higher!"
 #	endif
-#elif !defined(__cplusplus) || __cplusplus < 202202L // C++20
+#elif !defined(__cplusplus) && __cplusplus < 202002L // C++20
 #		error "Compile for C++20 or higher!"
 #endif
 
@@ -53,7 +63,7 @@
 #elif defined(__APPLE__) || defined(macintosh) || defined(Macintosh) || defined(__MACH__)
 #	include <TargetConditionals.h>
 #	if defined(macintosh) || defined(Macintosh) || defined(__MACH__)
-#		if defined(__APPLE__) && define(__MACH__)
+#		if defined(__APPLE__) && defined(__MACH__)
 #			define MYL_OS_MAC MYL_MAKE_VERSION(10, 0, 0)
 #		else
 #			define MYL_OS_MAC MYL_MAKE_VERSION(9, 0, 0)
@@ -64,7 +74,7 @@
 #		warning "Unknown Apple OS!"
 #		define MYL_OS_APPLE_UNKNOWN
 #	endif
-#	ifdef(TARGET_OS_SIMULATOR) && TARGET_OS_SIMULATOR == 1
+#	if defined(TARGET_OS_SIMULATOR) && TARGET_OS_SIMULATOR == 1
 #		define MYL_OS_IOS_SIMULATOR
 #	elif TARGET_OS_WIN32
 #		define MYL_OS_WINDOWS

@@ -92,10 +92,18 @@
 #	error "Compiler dependent macros are not implemented on known compiler"
 #endif
 
-#if defined(MYL_DEBUG) && defined(MYL_ENABLE_ASSERTS)
+// Asserts
+
+#if defined(MYL_DEBUG) && defined(MYL_ENABLE_ASSERT)
 #	define MYL_ASSERT(condition, ...) { if (!(condition)) { MYL_DEBUG_BREAK; } }
 #else
 #	define MYL_ASSERT(condition, ...)
+#endif
+
+#ifdef MYL_ENABLE_VERIFY
+#	define MYL_VERIFY(condition, ...) { if (!(condition)) { MYL_DEBUG_BREAK; } }
+#else
+#	define MYL_VERIFY(condition, ...)
 #endif
 
 // Other Macros
