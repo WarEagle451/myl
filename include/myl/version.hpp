@@ -2,7 +2,7 @@
 #include <myl/macro.hpp>
 
 #define MYL_MAKE_VERSION(major, minor, patch) ((major << 24) + (minor << 16) + (patch))
-#define MYL_MAKE_VERSION_STRING(major, minor, patch) (MYL_STRINGIFY_ARG(major) "." MYL_STRINGIFY_ARG(minor) "." MYL_STRINGIFY_ARG(patch))
+#define MYL_MAKE_VERSION_STRING(major, minor, patch) (MYL_ARG_STRINGIFY(major) "." MYL_ARG_STRINGIFY(minor) "." MYL_ARG_STRINGIFY(patch))
 
 #define MYL_VERSION_EXTRACT_MAJOR(version) ((version & 0xFF00'0000) >> 24)
 #define MYL_VERSION_EXTRACT_MINOR(version) ((version & 0x00FF'0000) >> 16)

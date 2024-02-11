@@ -1,6 +1,5 @@
 #pragma once
 #include <myl/config.hpp>
-#define MYL_EXPAND_MACRO(x) x
 
 // Attributes
 

@@ -53,7 +53,7 @@
 #		error "Compile for C++20 or higher!"
 #	endif
 #elif !defined(__cplusplus) && __cplusplus < 202002L // C++20
-#		error "Compile for C++20 or higher!"
+#	error "Compile for C++20 or higher!"
 #endif
 
 // OS detection
