@@ -21,7 +21,7 @@
 #	    define MYL_LOCAL __attribute__((visibility("hidden")))
 #   endif
 #elif defined(_MSC_VER)
-#	define MYL_COMPILER_NAME "Visual Studio"
+#	define MYL_COMPILER_NAME "MSVC"
 #	define MYL_COMPILER_MSVC _MSC_VER
 
 #	define MYL_EXPORT __declspec(dllexport)

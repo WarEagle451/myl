@@ -92,14 +92,14 @@ namespace myl {
 			m_total_time += split_time;
 			m_start_time = now_or_stopped;
 
-			return std::chrono::duration_cast<std::chrono::duration<T, Duration::period>>(split_time).count();
+			return std::chrono::duration_cast<std::chrono::duration<T, typename Duration::period>>(split_time).count();
 		}
 
 		template<is_duration Duration = std::chrono::nanoseconds, typename T = i32>
 		MYL_NO_DISCARD auto elapsed() const -> T {
 			/// MYHack: - time_point{} probably changes the type, but to what?
 			auto time = (m_paused ? m_total_time : clock::now() - m_start_time + m_total_time) - time_point{};
-			return std::chrono::duration_cast<std::chrono::duration<T, Duration::period>>(time).count();
+			return std::chrono::duration_cast<std::chrono::duration<T, typename Duration::period>>(time).count();
 		}
 	};
 
