@@ -55,6 +55,9 @@ namespace myl {
 
         // Operators
 
+        constexpr auto operator=(const vec&) -> vec& = default;
+        constexpr auto operator=(const vec&&) -> vec& = default;
+
         MYL_NO_DISCARD constexpr operator bool() const {
             return
                 x == static_cast<value_type>(0) &&
