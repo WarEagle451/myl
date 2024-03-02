@@ -72,30 +72,30 @@ namespace myl {
         // Scaler Operators
 
         MYL_NO_DISCARD constexpr auto operator+(const value_type& s) const -> vec { return vec{ x + s, y + s }; }
-		MYL_NO_DISCARD constexpr auto operator-(const value_type& s) const -> vec { return vec{ x - s, y - s }; }
-		MYL_NO_DISCARD constexpr auto operator*(const value_type& s) const -> vec { return vec{ x * s, y * s }; }
-		MYL_NO_DISCARD constexpr auto operator/(const value_type& s) const -> vec { return vec{ x / s, y / s }; }
-		MYL_NO_DISCARD constexpr auto operator%(const value_type& s) const -> vec { return vec{ x % s, y % s }; }
+        MYL_NO_DISCARD constexpr auto operator-(const value_type& s) const -> vec { return vec{ x - s, y - s }; }
+        MYL_NO_DISCARD constexpr auto operator*(const value_type& s) const -> vec { return vec{ x * s, y * s }; }
+        MYL_NO_DISCARD constexpr auto operator/(const value_type& s) const -> vec { return vec{ x / s, y / s }; }
+        MYL_NO_DISCARD constexpr auto operator%(const value_type& s) const -> vec { return vec{ x % s, y % s }; }
 
         constexpr auto operator+=(const value_type& s) -> vec& { x += s; y += s; return *this; }
-		constexpr auto operator-=(const value_type& s) -> vec& { x -= s; y -= s; return *this; }
-		constexpr auto operator*=(const value_type& s) -> vec& { x *= s; y *= s; return *this; }
-		constexpr auto operator/=(const value_type& s) -> vec& { x /= s; y /= s; return *this; }
-		constexpr auto operator%=(const value_type& s) -> vec& { x %= s; y %= s; return *this; }
+        constexpr auto operator-=(const value_type& s) -> vec& { x -= s; y -= s; return *this; }
+        constexpr auto operator*=(const value_type& s) -> vec& { x *= s; y *= s; return *this; }
+        constexpr auto operator/=(const value_type& s) -> vec& { x /= s; y /= s; return *this; }
+        constexpr auto operator%=(const value_type& s) -> vec& { x %= s; y %= s; return *this; }
         
         // vec2 Operators
 
         MYL_NO_DISCARD constexpr auto operator+(const vec& r) const -> vec { return vec{ x + r.x, y + r.y }; }
-		MYL_NO_DISCARD constexpr auto operator-(const vec& r) const -> vec { return vec{ x - r.x, y - r.y }; }
-		MYL_NO_DISCARD constexpr auto operator*(const vec& r) const -> vec { return vec{ x * r.x, y * r.y }; }
-		MYL_NO_DISCARD constexpr auto operator/(const vec& r) const -> vec { return vec{ x / r.x, y / r.y }; }
-		MYL_NO_DISCARD constexpr auto operator%(const vec& r) const -> vec { return vec{ x % r.x, y % r.y }; }
+        MYL_NO_DISCARD constexpr auto operator-(const vec& r) const -> vec { return vec{ x - r.x, y - r.y }; }
+        MYL_NO_DISCARD constexpr auto operator*(const vec& r) const -> vec { return vec{ x * r.x, y * r.y }; }
+        MYL_NO_DISCARD constexpr auto operator/(const vec& r) const -> vec { return vec{ x / r.x, y / r.y }; }
+        MYL_NO_DISCARD constexpr auto operator%(const vec& r) const -> vec { return vec{ x % r.x, y % r.y }; }
 
-		constexpr auto operator+=(const vec& r) -> vec& { x += r.x; y += r.y; return *this; }
-		constexpr auto operator-=(const vec& r) -> vec& { x -= r.x; y -= r.y; return *this; }
-		constexpr auto operator*=(const vec& r) -> vec& { x *= r.x; y *= r.y; return *this; }
-		constexpr auto operator/=(const vec& r) -> vec& { x /= r.x; y /= r.y; return *this; }
-		constexpr auto operator%=(const vec& r) -> vec& { x %= r.x; y %= r.y; return *this; }
+        constexpr auto operator+=(const vec& r) -> vec& { x += r.x; y += r.y; return *this; }
+        constexpr auto operator-=(const vec& r) -> vec& { x -= r.x; y -= r.y; return *this; }
+        constexpr auto operator*=(const vec& r) -> vec& { x *= r.x; y *= r.y; return *this; }
+        constexpr auto operator/=(const vec& r) -> vec& { x /= r.x; y /= r.y; return *this; }
+        constexpr auto operator%=(const vec& r) -> vec& { x %= r.x; y %= r.y; return *this; }
     };
 
     template<usize C, typename T>
@@ -104,7 +104,7 @@ namespace myl {
     }
 
     template<typename T>
-	MYL_NO_DISCARD constexpr auto dot(const vec2<T>& a, const vec2<T>& b) -> T {
-		return a.x * b.x + a.y * b.y;
-	}
+    MYL_NO_DISCARD constexpr auto dot(const vec2<T>& a, const vec2<T>& b) -> T {
+        return a.x * b.x + a.y * b.y;
+    }
 }

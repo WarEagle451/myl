@@ -84,58 +84,58 @@ namespace myl {
         // Scaler Operators
 
         MYL_NO_DISCARD constexpr auto operator+(const value_type& s) const -> vec { return vec{ x + s, y + s, z + s, w + s }; }
-		MYL_NO_DISCARD constexpr auto operator-(const value_type& s) const -> vec { return vec{ x - s, y - s, z - s, w - s }; }
-		MYL_NO_DISCARD constexpr auto operator*(const value_type& s) const -> vec { return vec{ x * s, y * s, z * s, w * s }; }
-		MYL_NO_DISCARD constexpr auto operator/(const value_type& s) const -> vec { return vec{ x / s, y / s, z / s, w / s }; }
-		MYL_NO_DISCARD constexpr auto operator%(const value_type& s) const -> vec { return vec{ x % s, y % s, z % s, w % s }; }
+        MYL_NO_DISCARD constexpr auto operator-(const value_type& s) const -> vec { return vec{ x - s, y - s, z - s, w - s }; }
+        MYL_NO_DISCARD constexpr auto operator*(const value_type& s) const -> vec { return vec{ x * s, y * s, z * s, w * s }; }
+        MYL_NO_DISCARD constexpr auto operator/(const value_type& s) const -> vec { return vec{ x / s, y / s, z / s, w / s }; }
+        MYL_NO_DISCARD constexpr auto operator%(const value_type& s) const -> vec { return vec{ x % s, y % s, z % s, w % s }; }
 
         constexpr auto operator+=(const value_type& s) -> vec& { x += s; y += s; z += s; w += s; return *this; }
-		constexpr auto operator-=(const value_type& s) -> vec& { x -= s; y -= s; z -= s; w -= s; return *this; }
-		constexpr auto operator*=(const value_type& s) -> vec& { x *= s; y *= s; z *= s; w *= s; return *this; }
-		constexpr auto operator/=(const value_type& s) -> vec& { x /= s; y /= s; z /= s; w /= s; return *this; }
-		constexpr auto operator%=(const value_type& s) -> vec& { x %= s; y %= s; z %= s; w %= s; return *this; }
+        constexpr auto operator-=(const value_type& s) -> vec& { x -= s; y -= s; z -= s; w -= s; return *this; }
+        constexpr auto operator*=(const value_type& s) -> vec& { x *= s; y *= s; z *= s; w *= s; return *this; }
+        constexpr auto operator/=(const value_type& s) -> vec& { x /= s; y /= s; z /= s; w /= s; return *this; }
+        constexpr auto operator%=(const value_type& s) -> vec& { x %= s; y %= s; z %= s; w %= s; return *this; }
         
         // vec2 Operators
 
         MYL_NO_DISCARD constexpr auto operator+(const vec2<2, value_type>& r) const -> vec { return vec{ x + r.x, y + r.y, z, w }; }
-		MYL_NO_DISCARD constexpr auto operator-(const vec2<2, value_type>& r) const -> vec { return vec{ x - r.x, y - r.y, z, w }; }
-		MYL_NO_DISCARD constexpr auto operator*(const vec2<2, value_type>& r) const -> vec { return vec{ x * r.x, y * r.y, z, w }; }
-		MYL_NO_DISCARD constexpr auto operator/(const vec2<2, value_type>& r) const -> vec { return vec{ x / r.x, y / r.y, z, w }; }
-		MYL_NO_DISCARD constexpr auto operator%(const vec2<2, value_type>& r) const -> vec { return vec{ x % r.x, y % r.y, z, w }; }
+        MYL_NO_DISCARD constexpr auto operator-(const vec2<2, value_type>& r) const -> vec { return vec{ x - r.x, y - r.y, z, w }; }
+        MYL_NO_DISCARD constexpr auto operator*(const vec2<2, value_type>& r) const -> vec { return vec{ x * r.x, y * r.y, z, w }; }
+        MYL_NO_DISCARD constexpr auto operator/(const vec2<2, value_type>& r) const -> vec { return vec{ x / r.x, y / r.y, z, w }; }
+        MYL_NO_DISCARD constexpr auto operator%(const vec2<2, value_type>& r) const -> vec { return vec{ x % r.x, y % r.y, z, w }; }
 
-		constexpr auto operator+=(const vec<2, value_type>& r) -> vec& { x += r.x; y += r.y; return *this; }
-		constexpr auto operator-=(const vec<2, value_type>& r) -> vec& { x -= r.x; y -= r.y; return *this; }
-		constexpr auto operator*=(const vec<2, value_type>& r) -> vec& { x *= r.x; y *= r.y; return *this; }
-		constexpr auto operator/=(const vec<2, value_type>& r) -> vec& { x /= r.x; y /= r.y; return *this; }
-		constexpr auto operator%=(const vec<2, value_type>& r) -> vec& { x %= r.x; y %= r.y; return *this; }
+        constexpr auto operator+=(const vec<2, value_type>& r) -> vec& { x += r.x; y += r.y; return *this; }
+        constexpr auto operator-=(const vec<2, value_type>& r) -> vec& { x -= r.x; y -= r.y; return *this; }
+        constexpr auto operator*=(const vec<2, value_type>& r) -> vec& { x *= r.x; y *= r.y; return *this; }
+        constexpr auto operator/=(const vec<2, value_type>& r) -> vec& { x /= r.x; y /= r.y; return *this; }
+        constexpr auto operator%=(const vec<2, value_type>& r) -> vec& { x %= r.x; y %= r.y; return *this; }
 
         // vec3 Operators
 
         MYL_NO_DISCARD constexpr auto operator+(const vec<3, value_type>& r) const -> vec { return vec{ x + r.x, y + r.y, x + r.z, w }; }
-		MYL_NO_DISCARD constexpr auto operator-(const vec<3, value_type>& r) const -> vec { return vec{ x - r.x, y - r.y, x - r.z, w }; }
-		MYL_NO_DISCARD constexpr auto operator*(const vec<3, value_type>& r) const -> vec { return vec{ x * r.x, y * r.y, x * r.z, w }; }
-		MYL_NO_DISCARD constexpr auto operator/(const vec<3, value_type>& r) const -> vec { return vec{ x / r.x, y / r.y, x / r.z, w }; }
-		MYL_NO_DISCARD constexpr auto operator%(const vec<3, value_type>& r) const -> vec { return vec{ x % r.x, y % r.y, x % r.z, w }; }
+        MYL_NO_DISCARD constexpr auto operator-(const vec<3, value_type>& r) const -> vec { return vec{ x - r.x, y - r.y, x - r.z, w }; }
+        MYL_NO_DISCARD constexpr auto operator*(const vec<3, value_type>& r) const -> vec { return vec{ x * r.x, y * r.y, x * r.z, w }; }
+        MYL_NO_DISCARD constexpr auto operator/(const vec<3, value_type>& r) const -> vec { return vec{ x / r.x, y / r.y, x / r.z, w }; }
+        MYL_NO_DISCARD constexpr auto operator%(const vec<3, value_type>& r) const -> vec { return vec{ x % r.x, y % r.y, x % r.z, w }; }
 
-		constexpr auto operator+=(const vec<3, value_type>& r) -> vec& { x += r.x; y += r.y; z += r.z; return *this; }
-		constexpr auto operator-=(const vec<3, value_type>& r) -> vec& { x -= r.x; y -= r.y; z -= r.z; return *this; }
-		constexpr auto operator*=(const vec<3, value_type>& r) -> vec& { x *= r.x; y *= r.y; z *= r.z; return *this; }
-		constexpr auto operator/=(const vec<3, value_type>& r) -> vec& { x /= r.x; y /= r.y; z /= r.z; return *this; }
-		constexpr auto operator%=(const vec<3, value_type>& r) -> vec& { x %= r.x; y %= r.y; z %= r.z; return *this; }
+        constexpr auto operator+=(const vec<3, value_type>& r) -> vec& { x += r.x; y += r.y; z += r.z; return *this; }
+        constexpr auto operator-=(const vec<3, value_type>& r) -> vec& { x -= r.x; y -= r.y; z -= r.z; return *this; }
+        constexpr auto operator*=(const vec<3, value_type>& r) -> vec& { x *= r.x; y *= r.y; z *= r.z; return *this; }
+        constexpr auto operator/=(const vec<3, value_type>& r) -> vec& { x /= r.x; y /= r.y; z /= r.z; return *this; }
+        constexpr auto operator%=(const vec<3, value_type>& r) -> vec& { x %= r.x; y %= r.y; z %= r.z; return *this; }
 
         // vec4 Operators
 
         MYL_NO_DISCARD constexpr auto operator+(const vec& r) const -> vec { return vec{ x + r.x, y + r.y, x + r.z, w + r.w }; }
-		MYL_NO_DISCARD constexpr auto operator-(const vec& r) const -> vec { return vec{ x - r.x, y - r.y, x - r.z, w - r.w }; }
-		MYL_NO_DISCARD constexpr auto operator*(const vec& r) const -> vec { return vec{ x * r.x, y * r.y, x * r.z, w * r.w }; }
-		MYL_NO_DISCARD constexpr auto operator/(const vec& r) const -> vec { return vec{ x / r.x, y / r.y, x / r.z, w / r.w }; }
-		MYL_NO_DISCARD constexpr auto operator%(const vec& r) const -> vec { return vec{ x % r.x, y % r.y, x % r.z, w % r.w }; }
+        MYL_NO_DISCARD constexpr auto operator-(const vec& r) const -> vec { return vec{ x - r.x, y - r.y, x - r.z, w - r.w }; }
+        MYL_NO_DISCARD constexpr auto operator*(const vec& r) const -> vec { return vec{ x * r.x, y * r.y, x * r.z, w * r.w }; }
+        MYL_NO_DISCARD constexpr auto operator/(const vec& r) const -> vec { return vec{ x / r.x, y / r.y, x / r.z, w / r.w }; }
+        MYL_NO_DISCARD constexpr auto operator%(const vec& r) const -> vec { return vec{ x % r.x, y % r.y, x % r.z, w % r.w }; }
 
-		constexpr auto operator+=(const vec& r) -> vec& { x += r.x; y += r.y; z += r.z; w += r.w; return *this; }
-		constexpr auto operator-=(const vec& r) -> vec& { x -= r.x; y -= r.y; z -= r.z; w -= r.w; return *this; }
-		constexpr auto operator*=(const vec& r) -> vec& { x *= r.x; y *= r.y; z *= r.z; w *= r.w; return *this; }
-		constexpr auto operator/=(const vec& r) -> vec& { x /= r.x; y /= r.y; z /= r.z; w /= r.w; return *this; }
-		constexpr auto operator%=(const vec& r) -> vec& { x %= r.x; y %= r.y; z %= r.z; w %= r.w; return *this; }
+        constexpr auto operator+=(const vec& r) -> vec& { x += r.x; y += r.y; z += r.z; w += r.w; return *this; }
+        constexpr auto operator-=(const vec& r) -> vec& { x -= r.x; y -= r.y; z -= r.z; w -= r.w; return *this; }
+        constexpr auto operator*=(const vec& r) -> vec& { x *= r.x; y *= r.y; z *= r.z; w *= r.w; return *this; }
+        constexpr auto operator/=(const vec& r) -> vec& { x /= r.x; y /= r.y; z /= r.z; w /= r.w; return *this; }
+        constexpr auto operator%=(const vec& r) -> vec& { x %= r.x; y %= r.y; z %= r.z; w %= r.w; return *this; }
     };
 
     template<usize C, typename T>
@@ -144,7 +144,7 @@ namespace myl {
     }
 
     template<typename T>
-	MYL_NO_DISCARD constexpr auto dot(const vec4<T>& a, const vec4<T>& b) -> T {
-		return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
-	}
+    MYL_NO_DISCARD constexpr auto dot(const vec4<T>& a, const vec4<T>& b) -> T {
+        return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
+    }
 }
