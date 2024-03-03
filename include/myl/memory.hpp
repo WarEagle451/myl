@@ -76,7 +76,7 @@ namespace myl {
             return *this;
         }
 
-        MYL_NO_DISCARD constexpr explicit operator bool() const noexcept {
+        MYL_NO_DISCARD constexpr operator bool() const noexcept {
             return m_ptr != nullptr;
         }
 
