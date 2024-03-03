@@ -85,29 +85,29 @@ namespace myl {
         }
     };
 
-    template<typename T, typename U>
-    MYL_NO_DISCARD constexpr auto operator==(std::nullptr_t, const observer_ptr<U>& r) noexcept -> bool {
-        return nullptr == r.m_ptr;
+    template<typename T>
+    MYL_NO_DISCARD constexpr auto operator==(std::nullptr_t, const observer_ptr<T>& r) noexcept -> bool {
+        return nullptr == r.operator->();
     }
 
     template<typename T, typename U>
     MYL_NO_DISCARD constexpr auto operator==(const observer_ptr<T>& l, const observer_ptr<U>& r) noexcept -> bool {
-        return l.m_ptr == r.m_ptr;
+        return l.operator->() == r.operator->();
     }
 
     template<typename T, typename U>
     MYL_NO_DISCARD constexpr auto operator<=>(const observer_ptr<T>& l, const observer_ptr<U>& r) noexcept -> std::strong_ordering {
-        return l.m_ptr <=> r.m_ptr;
+        return l.operator->() <=> r.operator->();
     }
 
     template<typename T, typename U>
     MYL_NO_DISCARD constexpr auto operator==(const observer_ptr<T>& l, std::nullptr_t) noexcept -> bool {
-        return l.m_ptr == nullptr;
+        return l.operator->() == nullptr;
     }
 
-    template<typename T, typename U>
+    template<typename T>
     MYL_NO_DISCARD constexpr auto operator<=>(const observer_ptr<T>& l, std::nullptr_t) noexcept -> std::strong_ordering {
-        return l.m_ptr <=> nullptr;
+        return l.operator->() <=> nullptr;
     }
 
     template<typename T>
