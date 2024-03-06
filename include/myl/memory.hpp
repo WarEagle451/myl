@@ -4,7 +4,83 @@
 #include <compare>
 #include <memory>
 
+/// MYTODO: myl::buffer
+/// - Allocators
+
 namespace myl {
+    class buffer {
+    public:
+        using value_type = myl::u8;
+        using size_type  = myl::usize;
+        using pointer    = value_type*;
+    private:
+        pointer m_data;
+        size_type m_size;
+    public:
+        MYL_NO_DISCARD constexpr buffer() noexcept
+            : m_data{ nullptr }
+            , m_size{ 0 } {}
+
+        MYL_NO_DISCARD constexpr buffer(size_type bytes) {
+            allocate(bytes);
+        }
+
+        constexpr ~buffer() {
+            if (m_data)
+                delete[] m_data;
+        }
+
+        MYL_NO_DISCARD constexpr auto data() noexcept -> pointer {
+            return m_data;
+        }
+
+        MYL_NO_DISCARD constexpr auto data() const noexcept -> const pointer {
+            return m_data;
+        }
+
+        template<typename As>
+        MYL_NO_DISCARD constexpr auto as() noexcept -> As* {
+            return reinterpret_cast<As*>(m_data);
+        }
+
+        MYL_NO_DISCARD constexpr auto size() const noexcept -> size_type {
+            return m_size;
+        }
+
+        constexpr auto allocate(size_type bytes) -> void {
+            MYL_ASSERT(m_data == nullptr, "Data has already been allocated");
+            m_data = new value_type[bytes / sizeof(value_type)];
+            m_size = bytes;
+        }
+
+        constexpr auto deallocate() -> void {
+            MYL_ASSERT(m_data != nullptr, "Data is already deleted");
+            delete[] m_data;
+            m_size = 0;
+            m_data = nullptr;
+        }
+
+        constexpr auto reallocate(size_type bytes) -> void {
+            MYL_ASSERT(m_data != nullptr, "Data has not be allocated");
+            if (m_size == bytes)
+                return;
+
+            delete[] m_data;
+            m_data = new value_type[bytes / sizeof(value_type)];
+            m_size = bytes;
+        }
+
+        MYL_NO_DISCARD constexpr auto operator[](size_type index) -> value_type& {
+            MYL_ASSERT(index < m_size, "'index' is greater than the amount of bytes");
+            return m_data[index];
+        }
+
+        MYL_NO_DISCARD constexpr auto operator[](size_type index) const -> const value_type& {
+            MYL_ASSERT(index < m_size, "'index' is greater than the amount of bytes");
+            return m_data[index];
+        }
+    };
+
     template<typename T>
     class observer_ptr {
     public:
