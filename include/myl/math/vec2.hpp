@@ -98,8 +98,8 @@ namespace myl {
         constexpr auto operator%=(const vec& r) -> vec& { x %= r.x; y %= r.y; return *this; }
     };
 
-    template<usize C, typename T>
-    MYL_NO_DISCARD constexpr auto operator==(const vec<C, T>& l, const vec<C, T>& r) -> bool {
+    template<typename T>
+    MYL_NO_DISCARD constexpr auto operator==(const vec2<T>& l, const vec2<T>& r) -> bool {
         return l.x == r.x && l.y == r.y;
     }
 

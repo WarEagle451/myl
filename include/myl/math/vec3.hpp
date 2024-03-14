@@ -88,11 +88,11 @@ namespace myl {
         
         // vec2 Operators
 
-        MYL_NO_DISCARD constexpr auto operator+(const vec2<2, value_type>& r) const -> vec { return vec{ x + r.x, y + r.y, z }; }
-		MYL_NO_DISCARD constexpr auto operator-(const vec2<2, value_type>& r) const -> vec { return vec{ x - r.x, y - r.y, z }; }
-		MYL_NO_DISCARD constexpr auto operator*(const vec2<2, value_type>& r) const -> vec { return vec{ x * r.x, y * r.y, z }; }
-		MYL_NO_DISCARD constexpr auto operator/(const vec2<2, value_type>& r) const -> vec { return vec{ x / r.x, y / r.y, z }; }
-		MYL_NO_DISCARD constexpr auto operator%(const vec2<2, value_type>& r) const -> vec { return vec{ x % r.x, y % r.y, z }; }
+        MYL_NO_DISCARD constexpr auto operator+(const vec<2, value_type>& r) const -> vec { return vec{ x + r.x, y + r.y, z }; }
+		MYL_NO_DISCARD constexpr auto operator-(const vec<2, value_type>& r) const -> vec { return vec{ x - r.x, y - r.y, z }; }
+		MYL_NO_DISCARD constexpr auto operator*(const vec<2, value_type>& r) const -> vec { return vec{ x * r.x, y * r.y, z }; }
+		MYL_NO_DISCARD constexpr auto operator/(const vec<2, value_type>& r) const -> vec { return vec{ x / r.x, y / r.y, z }; }
+		MYL_NO_DISCARD constexpr auto operator%(const vec<2, value_type>& r) const -> vec { return vec{ x % r.x, y % r.y, z }; }
 
 		constexpr auto operator+=(const vec<2, value_type>& r) -> vec& { x += r.x; y += r.y; return *this; }
 		constexpr auto operator-=(const vec<2, value_type>& r) -> vec& { x -= r.x; y -= r.y; return *this; }
@@ -115,8 +115,8 @@ namespace myl {
 		constexpr auto operator%=(const vec& r) -> vec& { x %= r.x; y %= r.y; z %= r.z; return *this; }
     };
 
-    template<usize C, typename T>
-    MYL_NO_DISCARD constexpr auto operator==(const vec<C, T>& l, const vec<C, T>& r) -> bool {
+    template<typename T>
+    MYL_NO_DISCARD constexpr auto operator==(const vec3<T>& l, const vec3<T>& r) -> bool {
         return l.x == r.x && l.y == r.y && l.z == r.z;
     }
 

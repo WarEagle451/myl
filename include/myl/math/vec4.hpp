@@ -97,11 +97,11 @@ namespace myl {
         
         // vec2 Operators
 
-        MYL_NO_DISCARD constexpr auto operator+(const vec2<2, value_type>& r) const -> vec { return vec{ x + r.x, y + r.y, z, w }; }
-        MYL_NO_DISCARD constexpr auto operator-(const vec2<2, value_type>& r) const -> vec { return vec{ x - r.x, y - r.y, z, w }; }
-        MYL_NO_DISCARD constexpr auto operator*(const vec2<2, value_type>& r) const -> vec { return vec{ x * r.x, y * r.y, z, w }; }
-        MYL_NO_DISCARD constexpr auto operator/(const vec2<2, value_type>& r) const -> vec { return vec{ x / r.x, y / r.y, z, w }; }
-        MYL_NO_DISCARD constexpr auto operator%(const vec2<2, value_type>& r) const -> vec { return vec{ x % r.x, y % r.y, z, w }; }
+        MYL_NO_DISCARD constexpr auto operator+(const vec<2, value_type>& r) const -> vec { return vec{ x + r.x, y + r.y, z, w }; }
+        MYL_NO_DISCARD constexpr auto operator-(const vec<2, value_type>& r) const -> vec { return vec{ x - r.x, y - r.y, z, w }; }
+        MYL_NO_DISCARD constexpr auto operator*(const vec<2, value_type>& r) const -> vec { return vec{ x * r.x, y * r.y, z, w }; }
+        MYL_NO_DISCARD constexpr auto operator/(const vec<2, value_type>& r) const -> vec { return vec{ x / r.x, y / r.y, z, w }; }
+        MYL_NO_DISCARD constexpr auto operator%(const vec<2, value_type>& r) const -> vec { return vec{ x % r.x, y % r.y, z, w }; }
 
         constexpr auto operator+=(const vec<2, value_type>& r) -> vec& { x += r.x; y += r.y; return *this; }
         constexpr auto operator-=(const vec<2, value_type>& r) -> vec& { x -= r.x; y -= r.y; return *this; }
@@ -138,8 +138,8 @@ namespace myl {
         constexpr auto operator%=(const vec& r) -> vec& { x %= r.x; y %= r.y; z %= r.z; w %= r.w; return *this; }
     };
 
-    template<usize C, typename T>
-    MYL_NO_DISCARD constexpr auto operator==(const vec<C, T>& l, const vec<C, T>& r) -> bool {
+    template<typename T>
+    MYL_NO_DISCARD constexpr auto operator==(const vec4<T>& l, const vec4<T>& r) -> bool {
         return l.x == r.x && l.y == r.y && l.z == r.z && l.w == r.w;
     }
 
