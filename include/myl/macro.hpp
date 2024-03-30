@@ -16,7 +16,7 @@
 
 // Detection for C++20 or C++20 and MSVC's new preprocessor, MSVC's old preprocessor doesn't support __VA_OPT__
 #if __cplusplus >= 202002L || (defined(MYL_COMPILER_MSVC) && _MSVC_LANG >= 202002L && defined(_MSVC_TRADITIONAL) && _MSVC_TRADITIONAL == 0)
-#   define MYL_VA_EMPTY(...) (1 __VA_OPT__(== 0))
+#   define MYL_VA_EMPTY(...) int(1 __VA_OPT__(== 0))
 #else
-#   define MYL_VA_EMPTY(...) (sizeof((char[]){(#__VA_ARGS__)}) == 1)
+#   define MYL_VA_EMPTY(...) int(sizeof((char[]){#__VA_ARGS__}) == 1)
 #endif
