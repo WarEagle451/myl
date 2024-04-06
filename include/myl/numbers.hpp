@@ -1,4 +1,5 @@
 #pragma once
+#include <myl/definitions.hpp>
 
 namespace myl::numbers {
     template<typename T> inline constexpr T e            = static_cast<T>(2.7182818284590452353602874713526); //@brief Euler's number

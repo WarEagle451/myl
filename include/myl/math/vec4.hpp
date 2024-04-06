@@ -1,5 +1,5 @@
 #pragma once
-#include <myl/math/vec.hpp>
+#include <myl/math/vec_common.hpp>
 
 #include <utility>
 

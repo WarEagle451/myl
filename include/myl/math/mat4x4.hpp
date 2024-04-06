@@ -1,5 +1,5 @@
 #pragma once
-#include <myl/math/mat.hpp>
+#include <myl/math/mat_common.hpp>
 #include <myl/math/vec4.hpp>
 
 namespace myl {

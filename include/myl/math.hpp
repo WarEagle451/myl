@@ -17,3 +17,6 @@
 #include <myl/math/mat4x2.hpp>
 #include <myl/math/mat4x3.hpp>
 #include <myl/math/mat4x4.hpp>
+
+#include <myl/math/exponential.hpp>
+#include <myl/math/trigonometry.hpp>
