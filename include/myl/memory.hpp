@@ -14,12 +14,10 @@ namespace myl {
         using size_type  = myl::usize;
         using pointer    = value_type*;
     private:
-        pointer m_data;
-        size_type m_size;
+        pointer m_data = nullptr;
+        size_type m_size = 0;
     public:
-        MYL_NO_DISCARD constexpr buffer() noexcept
-            : m_data{ nullptr }
-            , m_size{ 0 } {}
+        MYL_NO_DISCARD constexpr buffer() noexcept = default;
 
         MYL_NO_DISCARD constexpr buffer(size_type bytes) {
             allocate(bytes);
