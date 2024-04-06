@@ -3,36 +3,107 @@
 
 #include <compare>
 #include <memory>
-
-/// MYTODO: myl::buffer
-/// - Allocators
+#include <utility>
 
 namespace myl {
+    template<typename Allocator = std::allocator<myl::u8>>
     class buffer {
+        using altr = std::allocator_traits<Allocator>;
     public:
-        using value_type = myl::u8;
-        using size_type  = myl::usize;
-        using pointer    = value_type*;
+        using allocator_type  = typename altr::allocator_type;
+        using value_type      = typename altr::value_type;
+        using size_type       = typename altr::size_type;
+        using pointer         = typename std::allocator_traits<allocator_type>::pointer;
+        using const_pointer   = typename std::allocator_traits<allocator_type>::const_pointer;
     private:
+        allocator_type m_allocator;
         pointer m_data = nullptr;
-        size_type m_size = 0;
+        size_type m_capacity = 0;
     public:
-        MYL_NO_DISCARD constexpr buffer() noexcept = default;
+        // Constructors, Destructor, Assignment
 
-        MYL_NO_DISCARD constexpr buffer(size_type bytes) {
+        MYL_NO_DISCARD constexpr buffer() noexcept(noexcept(allocator_type()))
+            : m_allocator() {}
+
+        MYL_NO_DISCARD constexpr buffer(const allocator_type& allocator) noexcept
+            : m_allocator{ allocator } {}
+
+        MYL_NO_DISCARD constexpr buffer(const buffer& other) noexcept
+            : m_allocator() {
+            allocate(other.m_capacity);
+            memcpy(m_data, other.m_data, other.m_capacity);
+        }
+
+        MYL_NO_DISCARD constexpr buffer(buffer&& other)
+            : m_allocator{ std::move(other.m_allocator) }
+            , m_data{ std::move(other.m_data) }
+            , m_capacity{ std::move(other.m_capacity) } {}
+
+        MYL_NO_DISCARD constexpr explicit buffer(size_type bytes, const allocator_type& allocator = allocator_type())
+            : m_allocator{ allocator } {
             allocate(bytes);
         }
 
         constexpr ~buffer() {
             if (m_data)
-                delete[] m_data;
+                deallocate();
+        }
+
+        constexpr auto operator=(const buffer& other) -> buffer& {
+            if (this == &other)
+                return;
+
+            if (m_data)
+                deallocate();
+
+            if constexpr (altr::propagate_on_container_copy_assignment::value)
+                m_allocator = other.m_allocator;
+
+            allocate(other.m_capacity);
+            memcpy(m_data, other.m_data, other.m_capacity);
+            return *this;
+        }
+
+        constexpr auto operator=(buffer&& other) noexcept(altr::propagate_on_container_move_assignment::value || altr::is_always_equal::value) -> buffer& {
+            if (this == &other)
+                return;
+            
+            if (m_data)
+                deallocate();
+
+            if constexpr (altr::propagate_on_container_move_assignment::value)
+                m_allocator = other.m_allocator;
+
+            m_data = std::move(other.m_data);
+            m_capacity = std::move(other.m_capacity);
+            return *this;
+        }
+
+        // Utility
+
+        MYL_NO_DISCARD constexpr auto get_allocator() const noexcept {
+            return m_allocator;
+        }
+
+        MYL_NO_DISCARD constexpr auto capacity() const noexcept -> size_type {
+            return m_capacity;
+        }
+
+        MYL_NO_DISCARD constexpr auto operator[](size_type index) -> value_type& {
+            MYL_ASSERT(index < m_capacity, "'index' is greater than capacity");
+            return m_data[index];
+        }
+
+        MYL_NO_DISCARD constexpr auto operator[](size_type index) const -> const value_type& {
+            MYL_ASSERT(index < m_capacity, "'index' is greater than capacity");
+            return m_data[index];
         }
 
         MYL_NO_DISCARD constexpr auto data() noexcept -> pointer {
             return m_data;
         }
 
-        MYL_NO_DISCARD constexpr auto data() const noexcept -> const pointer {
+        MYL_NO_DISCARD constexpr auto data() const noexcept -> const_pointer {
             return m_data;
         }
 
@@ -41,41 +112,49 @@ namespace myl {
             return reinterpret_cast<As*>(m_data);
         }
 
-        MYL_NO_DISCARD constexpr auto size() const noexcept -> size_type {
-            return m_size;
-        }
+        // Modifiers
 
         constexpr auto allocate(size_type bytes) -> void {
             MYL_ASSERT(m_data == nullptr, "Data has already been allocated");
-            m_data = new value_type[bytes / sizeof(value_type)];
-            m_size = bytes;
+            m_data = altr::allocate(m_allocator, bytes);
+            m_capacity = bytes;
         }
 
         constexpr auto deallocate() -> void {
             MYL_ASSERT(m_data != nullptr, "Data is already deleted");
-            delete[] m_data;
-            m_size = 0;
+            altr::deallocate(m_allocator, m_data, m_capacity);
+            m_capacity = 0;
             m_data = nullptr;
         }
 
         constexpr auto reallocate(size_type bytes) -> void {
             MYL_ASSERT(m_data != nullptr, "Data has not be allocated");
-            if (m_size == bytes)
+            if (m_capacity == bytes)
                 return;
 
-            delete[] m_data;
-            m_data = new value_type[bytes / sizeof(value_type)];
-            m_size = bytes;
+            altr::deallocate(m_allocator, m_data, m_capacity);
+            m_data = altr::allocate(m_allocator, bytes);
+            m_capacity = bytes;
         }
 
-        MYL_NO_DISCARD constexpr auto operator[](size_type index) -> value_type& {
-            MYL_ASSERT(index < m_size, "'index' is greater than the amount of bytes");
-            return m_data[index];
-        }
+        constexpr auto swap(buffer& other) noexcept(altr::propagate_on_container_swap::value || altr::is_always_equal::value) -> void {
+            if (this == &other)
+                return;
 
-        MYL_NO_DISCARD constexpr auto operator[](size_type index) const -> const value_type& {
-            MYL_ASSERT(index < m_size, "'index' is greater than the amount of bytes");
-            return m_data[index];
+            if constexpr (altr::propagate_on_container_swap::value) {
+                allocator_type t_allocator = std::move(m_allocator);
+                m_allocator = std::move(other.m_allocator);
+                other.m_allocator = std::move(t_allocator);
+            }
+            
+            pointer t_data = m_data;
+            size_type t_capacity = m_capacity;
+
+            m_data = other.m_data;
+            m_capacity = other.m_capacity;
+
+            other.m_data = t_data;
+            other.m_capacity = t_capacity;
         }
     };
 
@@ -202,7 +281,12 @@ namespace myl {
 
 namespace std {
     template<typename T>
-    constexpr auto swap(myl::observer_ptr<T>& l, myl::observer_ptr<T>& r) noexcept -> void {
+    constexpr auto swap(myl::buffer<T>& l, myl::buffer<T>& r) noexcept(noexcept(l.swap(r))) -> void {
+        l.swap(r);
+    }
+
+    template<typename T>
+    constexpr auto swap(myl::observer_ptr<T>& l, myl::observer_ptr<T>& r) noexcept(noexcept(l.swap(r))) -> void {
         l.swap(r);
     }
 }
