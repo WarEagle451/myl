@@ -4,22 +4,22 @@
 // Compiler related macros
 
 #if defined(__clang__)
-#   if defined(__apple_build_version__) // Detect Apple Clang
-#       define MYL_COMPILER_NAME "Apple Clang"
-#   else
-#       define MYL_COMPILER_NAME "Clang"
-#   endif
-#   define MYL_COMPILER_CLANG MYL_MAKE_VERSION(__clang_major__, __clang_minor__, __clang_patchlevel__)
-
-#   ifdef _MSC_VER // Detect clang-cl, some definitions need to change to be MSVC like 
+#   ifdef _MSC_VER // Detect clang-cl, some definitions need to change to be MSVC like
+#       define MYL_COMPILER_NAME "Clang-CL"
 #       define MYL_EXPORT __declspec(dllexport)
 #       define MYL_IMPORT __declspec(dllimport)
 #       define MYL_LOCAL
 #   else
+#       if defined(__apple_build_version__) // Detect Apple Clang
+#           define MYL_COMPILER_NAME "Apple Clang"
+#       else
+#           define MYL_COMPILER_NAME "Clang"
+#       endif
 #       define MYL_EXPORT __attribute__((visibility("default")))
 #       define MYL_IMPORT __attribute__((visibility("default")))
 #       define MYL_LOCAL __attribute__((visibility("hidden")))
 #   endif
+#   define MYL_COMPILER_CLANG MYL_MAKE_VERSION(__clang_major__, __clang_minor__, __clang_patchlevel__)
 #elif defined(_MSC_VER)
 #   define MYL_COMPILER_NAME "MSVC"
 #   define MYL_COMPILER_MSVC _MSC_VER
