@@ -15,7 +15,7 @@
 #   define MYL_CARRIES_DEPENDENCY
 #endif
 
-#if __has_cpp_attribute(deprecated) && defined(MYL_ENABLE_DEPRECATED_WARNINGS)
+#if __has_cpp_attribute(deprecated) && !defined(MYL_DISABLE_DEPRECATED_WARNINGS)
 #   define MYL_DEPRECATED [[deprecated]]
 #   define MYL_DEPRECATED_M(reason) [[deprecated(reason)]]
 #else
@@ -93,13 +93,13 @@
 
 // Asserts
 
-#if defined(MYL_DEBUG) && defined(MYL_ENABLE_ASSERT)
+#if defined(MYL_DEBUG) && !defined(MYL_DISABLE_ASSERTS)
 #   define MYL_ASSERT(condition, ...) { if (!(condition)) { MYL_DEBUG_BREAK; } }
 #else
 #   define MYL_ASSERT(condition, ...)
 #endif
 
-#ifdef MYL_ENABLE_VERIFY
+#ifndef MYL_DISABLE_VERIFY
 #   define MYL_VERIFY(condition, ...) { if (!(condition)) { MYL_DEBUG_BREAK; } }
 #else
 #   define MYL_VERIFY(condition, ...)
