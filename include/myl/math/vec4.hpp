@@ -148,3 +148,68 @@ namespace myl {
         return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
     }
 }
+
+#ifdef MTL_EXTEND_FORMAT
+#   include <format>
+
+/// MYTODO: Vec4 formatting of components
+
+namespace std {
+    template<typename T>
+    struct formatter<myl::vec4<T>> {
+    private:
+        enum : myl::u8 {
+            none = 0,
+            x = 1 << 0,
+            y = 1 << 1,
+            z = 1 << 2,
+            w = 1 << 3
+        };
+
+        myl::u8 m_flags = none;
+        myl::u8 m_component_count = 0;
+        myl::u8 m_component_order[4]{ 0, 1, 2, 3 };
+    public:
+        template<typename FormatParseContext>
+        constexpr auto parse(FormatParseContext& context) -> typename FormatParseContext::iterator {
+            auto position = context.begin();
+            for (; position != context.end() && *position != '}'; ++position)
+                switch(*position) {
+                    case 'x':
+                        m_component_order[m_component_count] = 0;
+                        m_flags |= x;
+                        ++m_component_count;
+                        break;
+                    case 'y':
+                        m_component_order[m_component_count] = 1;
+                        m_flags |= y;
+                        ++m_component_count;
+                        break;
+                    case 'z':
+                        m_component_order[m_component_count] = 2;
+                        m_flags |= z;
+                        ++m_component_count;
+                        break;
+                    case 'w':
+                        m_component_order[m_component_count] = 3;
+                        m_flags |= w;
+                        ++m_component_count;
+                        break;
+                    default: break;
+                }
+
+            return position;
+        }
+
+        template<typename FormatContext>
+        constexpr auto format(const myl::vec4<T>& vec, FormatContext& context) const -> typename FormatContext::iterator {
+            switch (m_component_count) {
+                case 1:  return format_to(context.out(), "{}", vec[m_component_order[0]]);
+                case 2:  return format_to(context.out(), "[{}, {}]", vec[m_component_order[0]], vec[m_component_order[1]]);
+                case 3:  return format_to(context.out(), "[{}, {}, {}]", vec[m_component_order[0]], vec[m_component_order[1]], vec[m_component_order[2]]);
+                default: return format_to(context.out(), "[{}, {}, {}, {}]", vec[m_component_order[0]], vec[m_component_order[1]], vec[m_component_order[2]], vec[m_component_order[3]]);
+            }
+        }
+    };
+}
+#endif

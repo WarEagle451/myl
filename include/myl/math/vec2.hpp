@@ -108,3 +108,53 @@ namespace myl {
         return a.x * b.x + a.y * b.y;
     }
 }
+
+#ifdef MTL_EXTEND_FORMAT
+#   include <format>
+
+/// MYTODO: Vec2 formatting of components
+
+namespace std {
+    template<typename T>
+    struct formatter<myl::vec2<T>> {
+    private:
+        enum : myl::u8 {
+            none = 0,
+            x = 1 << 0,
+            y = 1 << 1
+        };
+
+        myl::u8 m_flags = none;
+        myl::u8 m_component_count = 0;
+        myl::u8 m_component_order[2]{ 0, 1 };
+    public:
+        template<typename FormatParseContext>
+        constexpr auto parse(FormatParseContext& context) -> typename FormatParseContext::iterator {
+            auto position = context.begin();
+            for (; position != context.end() && *position != '}'; ++position)
+                switch(*position) {
+                    case 'x':
+                        m_component_order[m_component_count] = 0;
+                        m_flags |= x;
+                        ++m_component_count;
+                        break;
+                    case 'y':
+                        m_component_order[m_component_count] = 1;
+                        m_flags |= y;
+                        ++m_component_count;
+                        break;
+                    default: break;
+                }
+
+            return position;
+        }
+
+        template<typename FormatContext>
+        constexpr auto format(const myl::vec2<T>& vec, FormatContext& context) const -> typename FormatContext::iterator {
+            return m_component_count == 1 ?
+                format_to(context.out(), "{}", vec[m_component_order[0]]) :
+                format_to(context.out(), "[{}, {}]", vec[m_component_order[0]], vec[m_component_order[1]]);
+        }
+    };
+}
+#endif

@@ -1,7 +1,6 @@
 #pragma once
 #include <myl/definitions.hpp>
-
-#include <concepts>
+#include <myl/type.hpp>
 
 #ifdef min // War on Microsoft's min macro
 #   undef min
@@ -17,7 +16,7 @@ namespace myl {
         return a < b ? a : b;
     }
 
-    template<typename T, std::same_as<T>... Args>
+    template<typename T, same_as<T>... Args>
     MYL_NO_DISCARD constexpr auto min(const T a, const T b, const Args... args) -> T {
         return min(min(a, b), args...);
     }
@@ -27,7 +26,7 @@ namespace myl {
         return a > b ? a : b;
     }
 
-    template<typename T, std::same_as<T>... Args>
+    template<typename T, same_as<T>... Args>
     MYL_NO_DISCARD constexpr auto max(const T a, const T b, const Args... args) -> T {
         return max(max(a, b), args...);
     }

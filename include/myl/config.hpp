@@ -22,6 +22,14 @@
 /* MYL_NO_INTRINSICS
 * When defined, disables MYL from defining macros related to intrinsics.
 */
-// #define MYL_NO_INTRINSICS
+//#define MYL_NO_INTRINSICS
+
+/* MTL_EXTEND_FORMAT
+* When defined extends std::format to the following types;
+* - vec2
+* - vec3
+* - vec4
+*/
+#define MTL_EXTEND_FORMAT
 
 //////////////////////////////////////// Math Related Macros ////////////////////////////////////////

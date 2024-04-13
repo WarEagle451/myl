@@ -133,3 +133,61 @@ namespace myl {
 			a.x * b.y - b.x * a.y);
 	}
 }
+
+#ifdef MTL_EXTEND_FORMAT
+#   include <format>
+
+/// MYTODO: Vec3 formatting of components
+
+namespace std {
+    template<typename T>
+    struct formatter<myl::vec3<T>> {
+    private:
+        enum : myl::u8 {
+            none = 0,
+            x = 1 << 0,
+            y = 1 << 1,
+            z = 1 << 2
+        };
+
+        myl::u8 m_flags = none;
+        myl::u8 m_component_count = 0;
+        myl::u8 m_component_order[3]{ 0, 1, 2 };
+    public:
+        template<typename FormatParseContext>
+        constexpr auto parse(FormatParseContext& context) -> typename FormatParseContext::iterator {
+            auto position = context.begin();
+            for (; position != context.end() && *position != '}'; ++position)
+                switch(*position) {
+                    case 'x':
+                        m_component_order[m_component_count] = 0;
+                        m_flags |= x;
+                        ++m_component_count;
+                        break;
+                    case 'y':
+                        m_component_order[m_component_count] = 1;
+                        m_flags |= y;
+                        ++m_component_count;
+                        break;
+                    case 'z':
+                        m_component_order[m_component_count] = 2;
+                        m_flags |= z;
+                        ++m_component_count;
+                        break;
+                    default: break;
+                }
+
+            return position;
+        }
+
+        template<typename FormatContext>
+        constexpr auto format(const myl::vec3<T>& vec, FormatContext& context) const -> typename FormatContext::iterator {
+            switch (m_component_count) {
+                case 1:  return format_to(context.out(), "{}", vec[m_component_order[0]]);
+                case 2:  return format_to(context.out(), "[{}, {}]", vec[m_component_order[0]], vec[m_component_order[1]]);
+                default: return format_to(context.out(), "[{}, {}, {}]", vec[m_component_order[0]], vec[m_component_order[1]], vec[m_component_order[2]]);
+            }
+        }
+    };
+}
+#endif
