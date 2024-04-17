@@ -5,6 +5,11 @@
 
 namespace myl {
     template<usize Components, typename Type> struct vec;
+
+    template<usize C, typename T>
+    MYL_NO_DISCARD consteval auto component_count(const vec<C, T>&) -> usize {
+        return C;
+    }
     
     template<usize C, typename T>
     MYL_NO_DISCARD constexpr auto dot(const vec<C, T>& a, const vec<C, T>& b) -> T;

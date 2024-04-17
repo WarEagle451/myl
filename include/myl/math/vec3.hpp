@@ -102,11 +102,11 @@ namespace myl {
 
         // vec3 Operators
 
-        MYL_NO_DISCARD constexpr auto operator+(const vec& r) const -> vec { return vec{ x + r.x, y + r.y, x + r.z }; }
-		MYL_NO_DISCARD constexpr auto operator-(const vec& r) const -> vec { return vec{ x - r.x, y - r.y, x - r.z }; }
-		MYL_NO_DISCARD constexpr auto operator*(const vec& r) const -> vec { return vec{ x * r.x, y * r.y, x * r.z }; }
-		MYL_NO_DISCARD constexpr auto operator/(const vec& r) const -> vec { return vec{ x / r.x, y / r.y, x / r.z }; }
-		MYL_NO_DISCARD constexpr auto operator%(const vec& r) const -> vec { return vec{ x % r.x, y % r.y, x % r.z }; }
+        MYL_NO_DISCARD constexpr auto operator+(const vec& r) const -> vec { return vec{ x + r.x, y + r.y, z + r.z }; }
+		MYL_NO_DISCARD constexpr auto operator-(const vec& r) const -> vec { return vec{ x - r.x, y - r.y, z - r.z }; }
+		MYL_NO_DISCARD constexpr auto operator*(const vec& r) const -> vec { return vec{ x * r.x, y * r.y, z * r.z }; }
+		MYL_NO_DISCARD constexpr auto operator/(const vec& r) const -> vec { return vec{ x / r.x, y / r.y, z / r.z }; }
+		MYL_NO_DISCARD constexpr auto operator%(const vec& r) const -> vec { return vec{ x % r.x, y % r.y, z % r.z }; }
 
 		constexpr auto operator+=(const vec& r) -> vec& { x += r.x; y += r.y; z += r.z; return *this; }
 		constexpr auto operator-=(const vec& r) -> vec& { x -= r.x; y -= r.y; z -= r.z; return *this; }

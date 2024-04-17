@@ -113,6 +113,8 @@ namespace myl {
 #   include <format>
 
 /// MYTODO: Vec2 formatting of components
+/// https://en.cppreference.com/w/cpp/utility/format/spec
+/// - There has to be a way to extend formatter<T> to this formatter
 
 namespace std {
     template<typename T>

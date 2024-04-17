@@ -10,6 +10,8 @@
 #   undef max
 #endif
 
+/// MYTODO: variadic functions should be able to take common types like int and float
+
 namespace myl {
     template<typename T>
     MYL_NO_DISCARD constexpr auto min(const T a, const T b) -> T {

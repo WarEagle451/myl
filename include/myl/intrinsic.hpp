@@ -1,6 +1,5 @@
 #pragma once
 #include <myl/definitions.hpp>
-
 #ifndef MYL_NO_INTRINSICS
 #   ifdef _MSC_VER
 #      include <cstdlib>
