@@ -56,8 +56,8 @@ namespace myl {
     }
 
     template<typename T>
-    MYL_NO_DISCARD constexpr auto host_to_network(T v) noexcept -> byte_size_to_uint<sizeof(T)> {
-        using to = byte_size_to_uint<sizeof(T)>;
+    MYL_NO_DISCARD constexpr auto host_to_network(T v) noexcept -> byte_count_to_uint<sizeof(T)> {
+        using to = byte_count_to_uint<sizeof(T)>;
         if constexpr (std::endian::native == std::endian::big)
             if constexpr (same_as<to, T>)
                 return v;
@@ -68,8 +68,8 @@ namespace myl {
     }
 
     template<typename T>
-    MYL_NO_DISCARD constexpr auto network_to_host(byte_size_to_uint<sizeof(T)> v) noexcept -> T {
-        using from = byte_size_to_uint<sizeof(T)>;
+    MYL_NO_DISCARD constexpr auto network_to_host(byte_count_to_uint<sizeof(T)> v) noexcept -> T {
+        using from = byte_count_to_uint<sizeof(T)>;
         if constexpr (std::endian::native == std::endian::big)
             if constexpr (same_as<T, from>)
                 return v;

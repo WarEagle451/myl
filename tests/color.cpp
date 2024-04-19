@@ -3,7 +3,6 @@
 
 /// MYTODO: Blend, Complement, Greyscale, Mix
 
-#define CONFIG_CATCH_MAIN
 #include <catch2/catch_all.hpp>
 
 static myl::f32vec3 cmy{ .8f, .6f, .2f };

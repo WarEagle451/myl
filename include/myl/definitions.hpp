@@ -15,7 +15,7 @@
 #   define MYL_CARRIES_DEPENDENCY
 #endif
 
-#if __has_cpp_attribute(deprecated) && !defined(MYL_DISABLE_DEPRECATED_WARNINGS)
+#if __has_cpp_attribute(deprecated) && !defined(MYL_NO_DEPRECATED_WARNINGS)
 #   define MYL_DEPRECATED [[deprecated]]
 #   define MYL_DEPRECATED_M(reason) [[deprecated(reason)]]
 #else
@@ -93,16 +93,30 @@
 
 // Asserts
 
-#if defined(MYL_DEBUG) && !defined(MYL_DISABLE_ASSERTS)
+#if defined(MYL_DEBUG) && !defined(MYL_NO_ASSERTS)
 #   define MYL_ASSERT(condition, ...) { if (!(condition)) { MYL_DEBUG_BREAK; } }
 #else
 #   define MYL_ASSERT(condition, ...)
 #endif
 
-#ifndef MYL_DISABLE_VERIFY
+#ifndef MYL_NO_VERIFY
 #   define MYL_VERIFY(condition, ...) { if (!(condition)) { MYL_DEBUG_BREAK; } }
 #else
 #   define MYL_VERIFY(condition, ...)
+#endif
+
+// Exceptions
+
+#ifdef MYL_NO_EXCEPTIONS
+#   define MYL_TRY
+#   define MYL_CATCH(exception_statement, block)
+#   define MYL_THROW(exception)
+#   define MYL_THROW_IF(condition, exception) MYL_ASSERT(!(condition))
+#else
+#   define MYL_TRY try
+#   define MYL_CATCH(exception_statement, block) catch (exception_statement) block
+#   define MYL_THROW(exception) throw exception
+#   define MYL_THROW_IF(condition, exception) if (!(condition)) throw exception
 #endif
 
 // Other Macros

@@ -1,0 +1,58 @@
+Unit Tests:
+- definitions.hpp
+- intrinsic.hpp
+- io.hpp
+- iterative.hpp
+- macro.hpp
+- memory.hpp
+- numbers.hpp
+- platform.hpp
+- shaping.hpp
+- string.hpp
+- timer.hpp
+- type.hpp
+- version.hpp
+- math/exponential.hpp
+- math/mat_common.hpp
+- math/mat2x2.hpp
+- math/mat2x3.hpp
+- math/mat2x4.hpp
+- math/mat3x2.hpp
+- math/mat3x3.hpp
+- math/mat3x4.hpp
+- math/mat4x2.hpp
+- math/mat4x3.hpp
+- math/mat4x4.hpp
+- math/vec_common.hpp
+- math/vec2.hpp
+- math/vec3.hpp
+- math/vec4.hpp
+
+Features:
+- cyclic_buffer.hpp
+- random.hpp
+- static_cyclic_buffer.hpp
+- static_vector.hpp
+- uuid.hpp
+- math/projection.hpp
+- math/quaternion.hpp
+- math/transform.hpp
+- threadpool.hpp
+- logging library
+- cpuid library
+	- https://en.wikipedia.org/wiki/CPUID
+- requirements.hpp
+	- Meta programming often needs certain functions to exist, like in containers.
+	  Define concepts like 'container' to satisfy those requirements.
+- vector.hpp
+	- Custom vector implementation
+- memory.hpp
+	- Add tracking_allocator
+		- This will be an allocator that keeps track of the amount of bytes it ha allocated
+- dynamic_bitset
+	- vector<bool> sucks
+- demangle.hpp
+	- Demangling typeid names
+- algorithm
+	- average
+	- median

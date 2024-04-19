@@ -31,4 +31,7 @@ namespace myl::numbers {
     template<typename T> inline constexpr T sqrt3            = static_cast<T>(1.7320508075688772935274463415058); //@brief Square root of 3, Theodorus' constant
     template<typename T> inline constexpr T sqrt5            = static_cast<T>(2.2360679774997896964091736687312); //@brief Square root of 5
     template<typename T> inline constexpr T twelfth_root_two = static_cast<T>(1.0594630943592952645618252949463);
+
+    template<typename T> inline constexpr T one_rad_in_degree = static_cast<T>(57.295779513082320876798154814105);
+    template<typename T> inline constexpr T one_degree_in_rad = static_cast<T>(0.0174532925199432957692369076849);
 }

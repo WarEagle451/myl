@@ -14,14 +14,14 @@ namespace myl {
         template<class T> inline constexpr bool same_as_imple<T, T> = true;
 
         template<usize Count>
-        consteval auto bits_size_to_uint_imple() {
-            if constexpr (Count <= std::numeric_limits<u8>::max())
+        consteval auto bit_count_to_uint_imple() {
+            if constexpr (Count <= CHAR_BIT)
                 return u8{};
-            else if constexpr (Count <= std::numeric_limits<u16>::max())
+            else if constexpr (Count <= CHAR_BIT * 2)
                 return u16{};
-            else if constexpr (Count <= std::numeric_limits<u32>::max())
+            else if constexpr (Count <= CHAR_BIT * 4)
                 return u32{};
-            else if constexpr (Count <= std::numeric_limits<u64>::max())
+            else if constexpr (Count <= CHAR_BIT * 8)
                 return u64{};
             else
                 static_assert(false, "Unexpected bit size, must be 64 or less");
@@ -43,6 +43,6 @@ namespace myl {
 
     template<typename T, usize Bytes> concept of_size = sizeof(T) == Bytes;
 
-    template<usize Bits> using bits_size_to_uint = decltype(details::bits_size_to_uint_imple<Bits>());
-    template<usize Bytes> using byte_size_to_uint = decltype(details::bits_size_to_uint_imple<Bytes * CHAR_BIT>());
+    template<usize Bits> using bit_count_to_uint = decltype(details::bit_count_to_uint_imple<Bits>());
+    template<usize Bytes> using byte_count_to_uint = decltype(details::bit_count_to_uint_imple<Bytes * CHAR_BIT>());
 }

@@ -24,8 +24,13 @@ set(MYL_INCLUDE_DIR "../include")
 gather(MYL_FILES ${MYL_INCLUDE_DIR} "*.hpp;*.cpp")
 
 set(MYL_TESTS_SOURCES
+    "algorithm.cpp"
+    "bit.cpp"
     "color.cpp"
+    "math/trigonometry.cpp"
 )
+
+enable_testing()
 
 function(prepare_test target)
     add_executable(${target} ${MYL_INCLUDE_DIR} ${MYL_TESTS_SOURCES})
@@ -33,9 +38,9 @@ function(prepare_test target)
     target_include_directories(${target} PUBLIC "../include")
 
     add_test(NAME ${target} COMMAND ${target})
+    set_tests_properties(${target} PROPERTIES RUN_SERIAL ON)
 endfunction()
 
-enable_testing()
 prepare_test(myl_tests)
 
 list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
