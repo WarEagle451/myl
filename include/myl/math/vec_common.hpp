@@ -41,6 +41,11 @@ namespace myl {
         return k < static_cast<T>(0) ? vec<C, T>(static_cast<T>(0)) : (incident * eta) - (normal * (eta * d + std::sqrt(k)));
     }
 
+    ///template<usize C, typename T>
+    ///MYL_NO_DISCARD constexpr auto operator<=>(const vec<C, T>& l, const vec<C, T>& r) -> bool {
+    ///    return dot(l, l) <=> dot(r, r);
+    ///}
+
     template<usize C, typename T>
     MYL_NO_DISCARD constexpr auto operator<(const vec<C, T>& l, const vec<C, T>& r) -> bool {
         return dot(l, l) < dot(r, r);

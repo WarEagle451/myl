@@ -23,8 +23,7 @@ Unit Tests:
 - math/mat4x2.hpp
 - math/mat4x3.hpp
 - math/mat4x4.hpp
-- math/vec_common.hpp
-- math/vec2.hpp
+- math/vec2.hpp - format
 - math/vec3.hpp
 - math/vec4.hpp
 

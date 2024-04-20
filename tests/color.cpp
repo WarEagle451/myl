@@ -21,7 +21,7 @@ static myl::u32 u32_rgba = 0x33'66'CC'FF;
     SECTION(#c1" == "#c2) {\
         for (auto i = 0; i != myl::component_count(c2); i++)\
             if (!myl::approx(result[i], c2[i]))\
-                FAIL_CHECK("Component " << i << " is not equal");\
+                FAIL_CHECK("Component " << i << " is not equal: " << result[i] << " != " << c2[i]);\
         SUCCEED(#c1" == "#c2);\
     }\
 }

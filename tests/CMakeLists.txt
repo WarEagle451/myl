@@ -28,6 +28,8 @@ set(MYL_TESTS_SOURCES
     "bit.cpp"
     "color.cpp"
     "math/trigonometry.cpp"
+    "math/vec_common.cpp"
+    "math/vec2.cpp"
 )
 
 enable_testing()

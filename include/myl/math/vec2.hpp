@@ -24,7 +24,7 @@ namespace myl {
         using value_type = T;
 
         union {
-            value_type data[2];
+            value_type data[2]{ 0 };
             struct { value_type x, y; };
             struct { value_type r, g; };
             struct { value_type s, t; };
@@ -60,8 +60,8 @@ namespace myl {
 
         MYL_NO_DISCARD constexpr operator bool() const {
             return
-                x == static_cast<value_type>(0) &&
-                y == static_cast<value_type>(0);
+                !(x == static_cast<value_type>(0) &&
+                y == static_cast<value_type>(0));
         }
 
         MYL_NO_DISCARD constexpr auto operator[](usize i) -> value_type& { return data[i]; }
