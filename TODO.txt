@@ -25,7 +25,7 @@ Unit Tests:
 - math/mat4x4.hpp
 - math/vec2.hpp - format
 - math/vec3.hpp - format
-- math/vec4.hpp
+- math/vec4.hpp - format
 
 Features:
 - cyclic_buffer.hpp

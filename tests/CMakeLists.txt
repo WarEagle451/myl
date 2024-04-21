@@ -31,6 +31,7 @@ set(MYL_TESTS_SOURCES
     "math/vec_common.cpp"
     "math/vec2.cpp"
     "math/vec3.cpp"
+    "math/vec4.cpp"
 )
 
 enable_testing()
