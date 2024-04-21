@@ -50,7 +50,7 @@ namespace myl {
             : data{ xy.x, xy.y, z } {}
 
         MYL_NO_DISCARD constexpr vec(const value_type& x, const vec<2, value_type>& yz)
-            : data{ x, yz.y, yz.z } {}
+            : data{ x, yz.x, yz.y } {}
 
         MYL_NO_DISCARD constexpr explicit vec(const vec<4, value_type>& v)
             : data{ v.x, v.y, v.z } {}

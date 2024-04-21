@@ -6,240 +6,142 @@
 
 #include <utility>
 
-TEST_CASE("vec2 - constructor: default", "[vec2.hpp]") {
-    myl::i8vec2 a;
-    bool result = (a.x == 0 && a.y == 0);
-    CHECK(result);
-}
+TEST_CASE("vec2", "[vec2.hpp]") {
+    SECTION("constructor") {
+        SECTION("default") {
+            myl::i8vec2 a;
+            CHECK(a == myl::i8vec2{ 0, 0 });
+        }
+        SECTION("copy") {
+            myl::i8vec2 a{ 2, 1 };
+            myl::i8vec2 b(a);
+            CHECK(b == myl::i8vec2{ 2, 1 });
+        }
+        SECTION("move") {
+            myl::i8vec2 a{ 2, 1 };
+            myl::i8vec2 b(std::move(a));
+            CHECK(b == myl::i8vec2{ 2, 1 });
+        }
+        SECTION("scalar copy") {
+            myl::i8vec2 a(2);
+            CHECK(a == myl::i8vec2{ 2, 2 });
+        }
+        SECTION("2 scalar copy") {
+            myl::i8vec2 a(2, 1);
+            CHECK(a == myl::i8vec2{ 2, 1 });
+        }
+        SECTION("2 scalar move") {
+            myl::i32 a = 2, b = 1;
+            myl::i8vec2 c(std::move(a), std::move(b));
+            CHECK(c == myl::i8vec2{ 2, 1 });
+        }
+        SECTION("vec3") {
+            myl::i8vec3 a{ 1, 2, 3 };
+            myl::i8vec2 b(a);
+            CHECK(a == myl::i8vec2{ 1, 2 });
+        }
+        SECTION("vec4") {
+            myl::i8vec4 a{ 1, 2, 3, 4 };
+            myl::i8vec2 b(a);
+            CHECK(a == myl::i8vec2{ 1, 2 });
+        }
+    }
+    SECTION("assignment") {
+        SECTION("copy") {
+            myl::i8vec2 a{ 1, 2 };
+            myl::i8vec2 b = a;
+            CHECK(b == myl::i8vec2{ 1, 2 });
+        }
+        SECTION("move") {
+            myl::i8vec2 a{ 1, 2 };
+            myl::i8vec2 b = std::move(a);
+            CHECK(b == myl::i8vec2{ 1, 2 });
+        }
+    }
+    SECTION("bool conversion") {
+        CHECK(bool(myl::i8vec2{ 1, 2 }));
+        CHECK_FALSE(bool(myl::i8vec2()));
+    }
+    SECTION("index") {
+        {
+            myl::i8vec2 a{ 1, 2 };
+            myl::u8 b = a[0];
+            myl::u8 c = a[1];
+            CHECK(b == 1);
+            CHECK(c == 2);
+        }
+        {
+            myl::i8vec2 a{ 1, 2 };
+            const myl::u8 b = a[0];
+            const myl::u8 c = a[1];
+            CHECK(b == 1);
+            CHECK(c == 2);
+        }
+    }
+    SECTION("negation") {
+        CHECK(-myl::i32vec2{ 2, -4 } == myl::i32vec2{ -2, 4 });
+    }
+    SECTION("scalar arithmetic") {
+        myl::i32vec2 a{ 2, 4 };
 
-TEST_CASE("vec2 - constructor: copy", "[vec2.hpp]") {
-    myl::i8vec2 a{ 2, 1 };
-    myl::i8vec2 b(a);
-    bool result = (a == b);
-    CHECK(result);
-}
+        CHECK(a + 2 == myl::i32vec2{ 4, 6 });
+        CHECK(a - 2 == myl::i32vec2{ 0, 2 });
+        CHECK(a * 2 == myl::i32vec2{ 4, 8 });
+        CHECK(a / 2 == myl::i32vec2{ 1, 2 });
+        CHECK(a % 3 == myl::i32vec2{ 2, 1 });
 
-TEST_CASE("vec2 - constructor: move", "[vec2.hpp]") {
-    myl::i8vec2 a{ 2, 1 };
-    myl::i8vec2 b(std::move(a));
-    bool result = (b.x == 2 && b.y == 1);
-    CHECK(result);
-}
+        myl::i32vec2 b = a;
+        b += 2;
+        CHECK(b == myl::i32vec2{ 4, 6 });
 
-TEST_CASE("vec2 - constructor: scalar copy", "[vec2.hpp]") {
-    myl::i8vec2 a(2);
-    bool result = (a.x == 2 && a.y == 2);
-    CHECK(result);
-}
+        b = a;
+        b -= 2;
+        CHECK(b == myl::i32vec2{ 0, 2 });
 
-TEST_CASE("vec2 - constructor: 2 scalars copy", "[vec2.hpp]") {
-    myl::i8vec2 a(1, 4);
-    bool result = (a.x == 1 && a.y == 4);
-    CHECK(result);
-}
+        b = a;
+        b *= 2;
+        CHECK(b == myl::i32vec2{ 4, 8 });
 
-TEST_CASE("vec2 - constructor: 2 scalar move", "[vec2.hpp]") {
-    myl::i8 i0 = 1, i1 = 4;
-    myl::i8vec2 a(std::move(i0), std::move(i1));
-    bool result = (a.x == 1 && a.y == 4);
-    CHECK(result);
-}
+        b = a;
+        b /= 2;
+        CHECK(b == myl::i32vec2{ 1, 2 });
 
-TEST_CASE("vec2 - constructor: vec3", "[vec2.hpp]") {
-    myl::i8vec3 a{ 1, 2, 3 };
-    myl::i8vec2 b(a);
-    bool result = (a.x == 1 && a.y == 2);
-    CHECK(result);
-}
+        b = b;
+        b %= 2;
+        CHECK(b == myl::i32vec2{ 1, 0 });
+    }
+    SECTION("vec2 arithmetic") {
+        myl::i32vec2 a{ 2, 4 };
+        myl::i32vec2 b{ 1, 2 };
+        myl::i32vec2 c = a;
 
-TEST_CASE("vec2 - constructor: vec4", "[vec2.hpp]") {
-    myl::i8vec4 a{ 1, 2, 3, 4 };
-    myl::i8vec2 b(a);
-    bool result = (a.x == 1 && a.y == 2);
-    CHECK(result);
-}
+        CHECK(a + b == myl::i32vec2{ 3, 6 });
+        CHECK(a - b == myl::i32vec2{ 1, 2 });
+        CHECK(a * b == myl::i32vec2{ 2, 8 });
+        CHECK(a / b == myl::i32vec2{ 2, 2 });
+        CHECK(a % b == myl::i32vec2{ 0, 0 });
 
-TEST_CASE("vec2 - assignment: copy", "[vec2.hpp]") {
-    myl::i8vec2 a{ 1, 2 };
-    myl::i8vec2 b = a;
-    bool result = (a == b);
-    CHECK(result);
-}
+        c += b;
+        CHECK(c == myl::i32vec2{ 3, 6 });
 
-TEST_CASE("vec2 - assignment: move", "[vec2.hpp]") {
-    myl::i8vec2 a{ 1, 2 };
-    myl::i8vec2 b = std::move(a);
-    bool result = (b.x == 1 && b.y == 2);
-    CHECK(result);
-}
+        c = a;
+        c -= b;
+        CHECK(c == myl::i32vec2{ 1, 2 });
 
-TEST_CASE("vec2 - implicit bool conversion", "[vec2.hpp]") {
-    myl::i8vec2 a{ 1, 2 };
-    myl::i8vec2 b;
-    bool result = a && !b;
-    CHECK(result);
-}
+        c = a;
+        c *= b;
+        CHECK(c == myl::i32vec2{ 2, 8 });
 
-TEST_CASE("vec2 - index", "[vec2.hpp]") {
-    myl::i8vec2 a{ 1, 2 };
-    myl::u8 b = a[0];
-    myl::u8 c = a[1];
-    bool result = (b == 1 && c == 2);
-    CHECK(result);
-}
+        c = a;
+        c /= b;
+        CHECK(c == myl::i32vec2{ 2, 2 });
 
-TEST_CASE("vec2 - index: const", "[vec2.hpp]") {
-    myl::i8vec2 a{ 1, 2 };
-    const myl::u8 b = a[0];
-    const myl::u8 c = a[1];
-    bool result = (b == 1 && c == 2);
-    CHECK(result);
-}
-
-TEST_CASE("vec2 - negation", "[vec2.hpp]") {
-    myl::i32vec2 a = -myl::i32vec2{ 2, 4 };
-    bool result = (a.x == -2 && a.y == -4);
-    CHECK(result);
-}
-
-TEST_CASE("vec2 - add scalar", "[vec2.hpp]") {
-    myl::u32vec2 a{ 2, 4 };
-    myl::u32vec2 b = a + 2u;
-    bool result = (b.x == 4 && b.y == 6);
-    CHECK(result);
-}
-
-TEST_CASE("vec2 - subtract scalar", "[vec2.hpp]") {
-    myl::u32vec2 a{ 2, 4 };
-    myl::u32vec2 b = a - 2u;
-    bool result = (b.x == 0 && b.y == 2);
-    CHECK(result);
-}
-
-TEST_CASE("vec2 - multiply by scalar", "[vec2.hpp]") {
-    myl::u32vec2 a{ 2, 4 };
-    myl::u32vec2 b = a * 2u;
-    bool result = (b.x == 4 && b.y == 8);
-    CHECK(result);
-}
-
-TEST_CASE("vec2 - divide by scalar", "[vec2.hpp]") {
-    myl::u32vec2 a{ 2, 4 };
-    myl::u32vec2 b = a / 2u;
-    bool result = (b.x == 1 && b.y == 2);
-    CHECK(result);
-}
-
-TEST_CASE("vec2 - mod by scalar", "[vec2.hpp]") {
-    myl::u32vec2 a{ 2, 5 };
-    myl::u32vec2 b = a % 2u;
-    bool result = (b.x == 0 && b.y == 1);
-    CHECK(result);
-}
-
-TEST_CASE("vec2 - add to by scalar", "[vec2.hpp]") {
-    myl::u32vec2 a{ 2, 4 };
-    a += 2u;
-    bool result = (a.x == 4 && a.y == 6);
-    CHECK(result);
-}
-
-TEST_CASE("vec2 - subtract to by scalar", "[vec2.hpp]") {
-    myl::u32vec2 a{ 2, 4 };
-    a -= 2u;
-    bool result = (a.x == 0 && a.y == 2);
-    CHECK(result);
-}
-
-TEST_CASE("vec2 - multiply to by scalar", "[vec2.hpp]") {
-    myl::u32vec2 a{ 2, 4 };
-    a *= 2u;
-    bool result = (a.x == 4 && a.y == 8);
-    CHECK(result);
-}
-
-TEST_CASE("vec2 - divide to by scalar", "[vec2.hpp]") {
-    myl::u32vec2 a{ 2, 4 };
-    a /= 2u;
-    bool result = (a.x == 1 && a.y == 2);
-    CHECK(result);
-}
-
-TEST_CASE("vec2 - mod to by scalar", "[vec2.hpp]") {
-    myl::u32vec2 a{ 2, 5 };
-    a %= 2u;
-    bool result = (a.x == 0 && a.y == 1);
-    CHECK(result);
-}
-
-TEST_CASE("vec2 - add vec2", "[vec2.hpp]") {
-    myl::i32vec2 a = myl::i32vec2{ 1, 2 } + myl::i32vec2{ 3, 4 };
-    bool result = (a.x == 4 && a.y == 6);
-    CHECK(result);
-}
-
-TEST_CASE("vec2 - subtract vec2", "[vec2.hpp]") {
-    myl::i32vec2 a = myl::i32vec2{ 1, 2 } - myl::i32vec2{ 3, 4 };
-    bool result = (a.x == -2 && a.y == -2);
-    CHECK(result);
-}
-
-TEST_CASE("vec2 - multiply by vec2", "[vec2.hpp]") {
-    myl::i32vec2 a = myl::i32vec2{ 1, 2 } * myl::i32vec2{ 3, 4 };
-    bool result = (a.x == 3 && a.y == 8);
-    CHECK(result);
-}
-
-TEST_CASE("vec2 - divide by vec2", "[vec2.hpp]") {
-    myl::i32vec2 a = myl::i32vec2{ 4, 3 } / myl::i32vec2{ 2, 1 };
-    bool result = (a.x == 2 && a.y == 3);
-    CHECK(result);
-}
-
-TEST_CASE("vec2 - mod by vec2", "[vec2.hpp]") {
-    myl::i32vec2 a = myl::i32vec2{ 5, 3 } % myl::i32vec2{ 2, 1 };
-    bool result = (a.x == 1 && a.y == 0);
-    CHECK(result);
-}
-
-TEST_CASE("vec2 - add to by vec2", "[vec2.hpp]") {
-    myl::i32vec2 a{ 4, 3 };
-    a += myl::i32vec2{ 2, 1 };
-    bool result = (a.x == 6 && a.y == 4);
-    CHECK(result);
-}
-
-TEST_CASE("vec2 - subtract to by vec2", "[vec2.hpp]") {
-    myl::i32vec2 a{ 4, 3 };
-    a -= myl::i32vec2{ 2, 1 };
-    bool result = (a.x == 2 && a.y == 2);
-    CHECK(result);
-}
-
-TEST_CASE("vec2 - multiply to by vec2", "[vec2.hpp]") {
-    myl::i32vec2 a{ 4, 3 };
-    a *= myl::i32vec2{ 2, 1 };
-    bool result = (a.x == 8 && a.y == 3);
-    CHECK(result);
-}
-
-TEST_CASE("vec2 - divide to by vec2", "[vec2.hpp]") {
-    myl::i32vec2 a{ 4, 3 };
-    a /= myl::i32vec2{ 2, 1 };
-    bool result = (a.x == 2 && a.y == 3);
-    CHECK(result);
-}
-
-TEST_CASE("vec2 - mod to by vec2", "[vec2.hpp]") {
-    myl::i32vec2 a{ 5, 3 };
-    a %= myl::i32vec2{ 2, 1 };
-    bool result = (a.x == 1 && a.y == 0);
-    CHECK(result);
-}
-
-TEST_CASE("vec2 - comparision", "[vec2.hpp]") {
-    myl::i32vec2 a{ 5, 3 };
-    myl::i32vec2 b{ 5, 3 };
-    bool result = (a == b);
-    CHECK(result);
+        c = a;
+        c %= b;
+        CHECK(c == myl::i32vec2{ 0, 0 });
+    }
+    SECTION("comparision") {
+        CHECK(myl::i32vec2{ 5, 3 } == myl::i32vec2{ 5, 3 });
+        CHECK(myl::i32vec2{ 5, 2 } != myl::i32vec2{ 5, 3 });
+    }
 }

@@ -49,19 +49,19 @@ namespace myl {
             : data{ xy.x, xy.y, z, w } {}
 
         MYL_NO_DISCARD constexpr vec(const value_type& x, const vec<2, value_type>& yz, const value_type& w)
-            : data{ x, yz.y, yz.z, w } {}
+            : data{ x, yz.x, yz.y, w } {}
 
         MYL_NO_DISCARD constexpr vec(const value_type& x, const value_type& y, const vec<2, value_type>& zw)
-            : data{ x, y, zw.z, zw.w } {}
+            : data{ x, y, zw.x, zw.y } {}
 
         MYL_NO_DISCARD constexpr vec(const vec<2, value_type>& xy, const vec<2, value_type>& zw)
-            : data{ xy.x, xy.y, zw.z, zw.w } {}
+            : data{ xy.x, xy.y, zw.x, zw.y } {}
 
         MYL_NO_DISCARD constexpr vec(const vec<3, value_type>& xyz, const value_type& w)
             : data{ xyz.x, xyz.y, xyz.z, w } {}
 
         MYL_NO_DISCARD constexpr vec(const value_type& x, const vec<3, value_type>& yzw)
-            : data{ x, yzw.y, yzw.z, yzw.w } {}
+            : data{ x, yzw.x, yzw.y, yzw.z } {}
 
         // Operators
 
