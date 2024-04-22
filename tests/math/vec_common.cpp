@@ -27,7 +27,7 @@ TEST_CASE("myl::component_count", "vec_common.hpp") {
 }
 
 TEST_CASE("myl::dot", "vec_common.hpp") {
-	CHECK(myl::dot(i32v2a, i32v2b) == 76);
+	CHECK(myl::dot(i32v2a, i32v2b) == 92);
 	CHECK(myl::dot(i32v3a, i32v3b) == 34);
 	CHECK(myl::dot(i32v4a, i32v4b) == 69);
 }
@@ -35,7 +35,7 @@ TEST_CASE("myl::dot", "vec_common.hpp") {
 TEST_CASE("myl::length", "vec_common.hpp") {
 	CHECK(myl::approx(myl::length(f32v2a), 6.403124f));
 	CHECK(myl::approx(myl::length(f32v3a), 6.403124f));
-	CHECK(myl::approx(myl::length(f32v4a), 11.53256f));
+	CHECK(myl::approx(myl::length(f32v4a), 11.532562f));
 }
 
 //TEST_CASE("myl::normalize", "vec_common.hpp") {

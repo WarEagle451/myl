@@ -26,7 +26,7 @@ namespace myl {
 
     template<usize C, typename T>
     MYL_NO_DISCARD constexpr auto distance(const vec<C, T>& a, const vec<C, T>& b) -> T {
-        return std::sqrt(dot(a, b));
+        return length(b - a);
     }
     
     template<usize C, typename T>

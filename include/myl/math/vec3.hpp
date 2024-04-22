@@ -122,7 +122,7 @@ namespace myl {
 
     template<typename T>
 	MYL_NO_DISCARD constexpr auto dot(const vec3<T>& a, const vec3<T>& b) -> T {
-		return a.x * b.x + a.y * b.y + a.z * b.z;
+		return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
 	}
 
     template<typename T>

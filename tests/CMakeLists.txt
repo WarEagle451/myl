@@ -27,11 +27,13 @@ set(MYL_TESTS_SOURCES
     "algorithm.cpp"
     "bit.cpp"
     "color.cpp"
+    "math/exponential.cpp"
     "math/trigonometry.cpp"
     "math/vec_common.cpp"
     "math/vec2.cpp"
     "math/vec3.cpp"
     "math/vec4.cpp"
+    "version.cpp"
 )
 
 enable_testing()

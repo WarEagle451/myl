@@ -11,8 +11,6 @@ Unit Tests:
 - string.hpp
 - timer.hpp
 - type.hpp
-- version.hpp
-- math/exponential.hpp
 - math/mat_common.hpp
 - math/mat2x2.hpp
 - math/mat2x3.hpp
