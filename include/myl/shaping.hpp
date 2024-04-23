@@ -15,12 +15,12 @@ namespace myl {
 
     template<typename T>
     MYL_NO_DISCARD constexpr auto step(const T& edge, const T& value) -> T {
-        return edge > value ? 0 : 1;
+        return edge > value ? static_cast<T>(0) : edge;
     }
 
     template<typename T, floating_point F = f32>
     MYL_NO_DISCARD constexpr auto smoothstep(const T& edge0, const T& edge1, F percentage) -> T {
-        const T t = clamp((percentage - edge0) / (edge1 - edge0), 0, 1);
+        const T t = clamp((percentage - edge0) / (edge1 - edge0), edge0, edge1);
         return t * t * (static_cast<T>(3) - static_cast<T>(2) * t);
     }
 }

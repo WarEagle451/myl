@@ -3,7 +3,6 @@ Unit Tests:
 - iterative.hpp
 - memory.hpp
 - platform.hpp
-- shaping.hpp
 - math/mat_common.hpp
 - math/mat2x2.hpp
 - math/mat2x3.hpp
