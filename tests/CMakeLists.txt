@@ -23,23 +23,26 @@ include("../cmake/utility.cmake")
 set(MYL_INCLUDE_DIR "../include")
 gather(MYL_FILES ${MYL_INCLUDE_DIR} "*.hpp;*.cpp")
 
-set(MYL_TESTS_SOURCES
+set(MYL_TEST_SOURCES
     "algorithm.cpp"
     "bit.cpp"
     "color.cpp"
+    "macro.cpp"
     "math/exponential.cpp"
     "math/trigonometry.cpp"
     "math/vec_common.cpp"
     "math/vec2.cpp"
     "math/vec3.cpp"
     "math/vec4.cpp"
+    "string.cpp"
+    "type.cpp"
     "version.cpp"
 )
 
 enable_testing()
 
 function(prepare_test target)
-    add_executable(${target} ${MYL_INCLUDE_DIR} ${MYL_TESTS_SOURCES})
+    add_executable(${target} ${MYL_INCLUDE_DIR} ${MYL_TEST_SOURCES})
     target_link_libraries(${target} PRIVATE Catch2::Catch2WithMain)
     target_include_directories(${target} PUBLIC "../include")
 

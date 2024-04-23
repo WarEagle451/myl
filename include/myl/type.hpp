@@ -32,7 +32,7 @@ namespace myl {
     template<typename A, typename B> concept is_not  = !same_as<A, B>;
 
     template<typename T, typename... Args> concept any_of = (same_as<T, Args> || ...);
-    template<typename T, typename... Args> concept none_of = (is_not<T, Args> || ...);
+    template<typename T, typename... Args> concept none_of = !(same_as<T, Args> || ...);
 
     template<typename T> concept character        = any_of<T, char, signed char, unsigned char, wchar_t, char8_t, char16_t, char32_t>;
     template<typename T> concept signed_integer   = any_of<T, signed char, short, signed short, int, signed int, long, signed long, long int, signed long int, long long, signed long long>;

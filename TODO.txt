@@ -1,16 +1,9 @@
 Unit Tests:
-- definitions.hpp
-- intrinsic.hpp
 - io.hpp
 - iterative.hpp
-- macro.hpp
 - memory.hpp
-- numbers.hpp
 - platform.hpp
 - shaping.hpp
-- string.hpp
-- timer.hpp
-- type.hpp
 - math/mat_common.hpp
 - math/mat2x2.hpp
 - math/mat2x3.hpp

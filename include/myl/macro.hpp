@@ -2,8 +2,8 @@
 #define MYL_STRINGIFY(...) #__VA_ARGS__
 
 #define MYL_ARG_STRINGIFY(x) MYL_STRINGIFY(x)
-#define MYL_ARG_DISCARD(discard, ...) __VA_ARGS__
 
+#define MYL_ARG_DISCARD(discard, ...) __VA_ARGS__
 #define MYL_ARG_1(a1, ...) a1
 #define MYL_ARG_2(a1, a2, ...) a2
 #define MYL_ARG_3(a1, a2, a3, ...) a3
