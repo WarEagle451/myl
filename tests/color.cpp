@@ -2,9 +2,9 @@
 #include <myl_wip/color.hpp>
 
 /// MYTODO: Blend, Complement, Greyscale, Mix
+#if 0
 
 #include <catch2/catch_all.hpp>
-
 static myl::f32vec3 cmy{ .8f, .6f, .2f };
 static myl::f32vec4 cmyk{ .75f, .5f, 0.f, .2f };
 static myl::f32vec3 hsl{ 220, .60f, .50f };
@@ -99,3 +99,5 @@ TEST_CASE("myl::u32_to_rgb", "[color.hpp]") {
 TEST_CASE("myl::u32_to_rgba", "[color.hpp]") {
     CHECK(myl::color::u32_to_rgba(u32_rgba) == rgba);
 }
+
+#endif

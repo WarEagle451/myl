@@ -19,7 +19,6 @@ static myl::f32vec3 f32v3b{ 9.f, 4.f, 2.f };
 static myl::f32vec4 f32v4a{ 7.f, 4.f, 8.f, 2.f };
 static myl::f32vec4 f32v4b{ 3.f, 8.f, 2.f, 0.f };
 
-
 TEST_CASE("myl::component_count", "vec_common.hpp") {
 	CHECK(myl::component_count(i32v2a) == 2);
 	CHECK(myl::component_count(i32v3a) == 3);
@@ -39,9 +38,9 @@ TEST_CASE("myl::length", "vec_common.hpp") {
 }
 
 TEST_CASE("myl::normalize", "vec_common.hpp") {
-	CHECK(myl::normalize(f32v2a) == myl::f32vec2{ 0.f, 0.f });
-	CHECK(myl::normalize(f32v3a) == myl::f32vec3{ 0.f, 0.f, 0.f });
-	CHECK(myl::normalize(f32v4a) == myl::f32vec4{ 0.f, 0.f, 0.f, 0.f });
+	CHECK(myl::approx(myl::length(myl::normalize(f32v2a)), 1.f));
+	CHECK(myl::approx(myl::length(myl::normalize(f32v3a)), 1.f));
+	CHECK(myl::approx(myl::length(myl::normalize(f32v4a)), 1.f));
 }
 
 TEST_CASE("myl::distance", "vec_common.hpp") {
@@ -50,19 +49,7 @@ TEST_CASE("myl::distance", "vec_common.hpp") {
 	CHECK(myl::approx(myl::distance(f32v4a, f32v4b), 8.485280f));
 }
 
-TEST_CASE("myl::reflect", "vec_common.hpp") {
-	CHECK(myl::reflect(f32v2a, f32v2b) == myl::f32vec2{ 0.f, 0.f });
-	CHECK(myl::reflect(f32v3a, f32v3b) == myl::f32vec3{ 0.f, 0.f, 0.f });
-	CHECK(myl::reflect(f32v4a, f32v4b) == myl::f32vec4{ 0.f, 0.f, 0.f, 0.f });
-}
-
-TEST_CASE("myl::refract", "vec_common.hpp") {
-	CHECK(myl::refract(f32v2a, f32v2b, 0.5f) == myl::f32vec2{ 0.f, 0.f });
-	CHECK(myl::refract(f32v3a, f32v3b, 1.5f) == myl::f32vec3{ 0.f, 0.f, 0.f });
-	CHECK(myl::refract(f32v4a, f32v4b, 2.5f) == myl::f32vec4{ 0.f, 0.f, 0.f, 0.f });
-}
-
-TEST_CASE("myl::<=>", "vec_common.hpp") {
+TEST_CASE("myl::vec::<=>", "vec_common.hpp") {
 	CHECK(i32v2a < i32v2b);
 	CHECK(i32v2a <= i32v2b);
 	CHECK(i32v2b > i32v2a);

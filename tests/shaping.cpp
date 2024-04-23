@@ -10,9 +10,9 @@ TEST_CASE("myl::lerp", "[shaping.hpp]") {
 }
 
 TEST_CASE("myl::inverse_lerp", "[shaping.hpp]") {
-	CHECK(myl::approx(myl::inverse_lerp(-100.f, 10.f, 0.f), 0.f));
-	CHECK(myl::approx(myl::inverse_lerp(-100.f, 10.f, .5f), 0.f));
-	CHECK(myl::approx(myl::inverse_lerp(-100.f, 10.f, 1.f), 0.f));
+	CHECK(myl::approx(myl::inverse_lerp(-100.f, 10.f, -100.f), 0.f));
+	CHECK(myl::approx(myl::inverse_lerp(0.f, 100.f, 40.f), .4f));
+	CHECK(myl::approx(myl::inverse_lerp(-100.f, 10.f, 10.f), 1.f));
 }
 
 TEST_CASE("myl::step", "[shaping.hpp]") {
@@ -21,7 +21,7 @@ TEST_CASE("myl::step", "[shaping.hpp]") {
 }
 
 TEST_CASE("myl::smoothstep", "[shaping.hpp]") {
-	CHECK(myl::approx(myl::smoothstep(-100.f, 10.f, 0.f), 0.f));
-	CHECK(myl::approx(myl::smoothstep(-100.f, 10.f, .5f), 0.f));
-	CHECK(myl::approx(myl::smoothstep(-100.f, 10.f, 1.f), 0.f));
+	CHECK(myl::approx(myl::smoothstep(-4.f, 2.f, -4.f), 0.f));
+	CHECK(myl::approx(myl::smoothstep(-4.f, 2.f, -1.f), 0.5f));
+	CHECK(myl::approx(myl::smoothstep(-4.f, 2.f, 2.f), 1.f));
 }

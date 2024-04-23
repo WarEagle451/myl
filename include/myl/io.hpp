@@ -12,6 +12,7 @@ namespace myl {
         if (std::basic_ifstream<Char> in(file, std::ios::binary); in) {
             std::basic_string<Char> content{};
             content.resize(std::filesystem::file_size(file));
+
             in.read(content.data(), content.size());
             return content;
         }

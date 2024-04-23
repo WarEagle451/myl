@@ -19,8 +19,8 @@ namespace myl {
     }
 
     template<typename T, floating_point F = f32>
-    MYL_NO_DISCARD constexpr auto smoothstep(const T& edge0, const T& edge1, F percentage) -> T {
-        const T t = clamp((percentage - edge0) / (edge1 - edge0), edge0, edge1);
+    MYL_NO_DISCARD constexpr auto smoothstep(const T& edge0, const T& edge1, F value) -> T {
+        const T t = clamp((value - edge0) / (edge1 - edge0), static_cast<T>(0), static_cast<T>(1));
         return t * t * (static_cast<T>(3) - static_cast<T>(2) * t);
     }
 }
