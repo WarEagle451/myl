@@ -38,7 +38,7 @@ namespace myl {
         using value_type     = T;
         using column_type    = vec<3, value_type>;
         using row_type       = vec<3, value_type>;
-        using transpose_type = mat<3, 3, value_type>
+        using transpose_type = mat<3, 3, value_type>;
     private:
         column_type m_data[3];
     public:
@@ -57,6 +57,9 @@ namespace myl {
         MYL_NO_DISCARD constexpr mat() noexcept
             : mat(0) {}
 
+        MYL_NO_DISCARD constexpr mat(const mat&) = default;
+        MYL_NO_DISCARD constexpr mat(mat&&) = default;
+
         MYL_NO_DISCARD constexpr explicit mat(const value_type& scalar)
             : m_data{ column_type(scalar), column_type(scalar), column_type(scalar) } {}
 
@@ -70,7 +73,7 @@ namespace myl {
             value_type&& c0r0, value_type&& c1r0, value_type&& c2r0,
             value_type&& c0r1, value_type&& c1r1, value_type&& c2r1,
             value_type&& c0r2, value_type&& c1r2, value_type&& c2r2) noexcept
-            : m_data{ column_type{ std::move(c0r0), std::move(c0r1), std::move(c0r2) }, column_type{ std::move(c1r0), std::move(c1r1), std::move(c1r2) }, column_type{ std::move(c2r0), std::move(c2r1), , std::move(c2r2) } } {}
+            : m_data{ column_type{ std::move(c0r0), std::move(c0r1), std::move(c0r2) }, column_type{ std::move(c1r0), std::move(c1r1), std::move(c1r2) }, column_type{ std::move(c2r0), std::move(c2r1), std::move(c2r2) } } {}
 
         MYL_NO_DISCARD constexpr mat(const column_type& c0, const column_type& c1, const column_type& c2) noexcept
             : m_data{ c0, c1, c2 } {}
@@ -134,7 +137,7 @@ namespace myl {
 
         // vec3 Operators
 
-        MYL_NO_DISCARD constexpr auto operator*(const row_type& r) const -> col_type { return m_data[0] * r[0] + m_data[1] * r[1] + m_data[2] * r[2]; }
+        MYL_NO_DISCARD constexpr auto operator*(const row_type& r) const -> column_type { return m_data[0] * r[0] + m_data[1] * r[1] + m_data[2] * r[2]; }
 
         // mat3x3 Operators
 
@@ -178,14 +181,16 @@ namespace myl {
     MYL_NO_DISCARD constexpr auto inverse(const mat3<T>& m) -> mat3<T> {
         return mat3<T>(
              (m[1][1] * m[2][2] - m[1][2] * m[2][1]), //  (ei - hf)
-            -(m[0][1] * m[2][2] - m[2][1] * m[0][2]), // -(di - fg)
-             (m[0][1] * m[1][2] - m[0][2] * m[1][1]), //  (dh - ge)
             -(m[1][0] * m[2][2] - m[1][2] * m[2][0]), // -(bi - hc)
-             (m[0][0] * m[2][2] - m[0][2] * m[2][0]), //  (ai - gc)
-            -(m[0][0] * m[1][2] - m[0][2] * m[1][0]), // -(ah - gb)
              (m[1][0] * m[2][1] - m[1][1] * m[2][0]), //  (bf - ec)
+
+            -(m[0][1] * m[2][2] - m[2][1] * m[0][2]), // -(di - fg)
+             (m[0][0] * m[2][2] - m[0][2] * m[2][0]), //  (ai - gc)
             -(m[0][0] * m[2][1] - m[0][1] * m[2][0]), // -(af - dc)
+
+             (m[0][1] * m[1][2] - m[0][2] * m[1][1]), //  (dh - ge)
+            -(m[0][0] * m[1][2] - m[0][2] * m[1][0]), // -(ah - gb)
              (m[0][0] * m[1][1] - m[0][1] * m[1][0])  //  (ae - db)
-            ) / determinant(m);
+        ) / determinant(m);
     }
 }

@@ -58,6 +58,9 @@ namespace myl {
         MYL_NO_DISCARD constexpr mat() noexcept
             : mat(0) {}
 
+        MYL_NO_DISCARD constexpr mat(const mat&) = default;
+        MYL_NO_DISCARD constexpr mat(mat&&) = default;
+
         MYL_NO_DISCARD constexpr explicit mat(const value_type& scalar)
             : m_data{ column_type(scalar), column_type(scalar), column_type(scalar), column_type(scalar) } {}
 
@@ -231,6 +234,7 @@ namespace myl {
             {  a1, -b1,  c1, -d1 },
             { -e1,  f1, -g1,  h1 },
             {  i1, -j1,  k1, -l1 },
-            { -m1,  n1, -o1,  p1 }) / determinant(m);
+            { -m1,  n1, -o1,  p1 }
+        ) / determinant(m);
     }
 }

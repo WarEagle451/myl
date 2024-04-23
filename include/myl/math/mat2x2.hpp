@@ -56,6 +56,9 @@ namespace myl {
         MYL_NO_DISCARD constexpr mat() noexcept
             : mat(0) {}
 
+        MYL_NO_DISCARD constexpr mat(const mat&) = default;
+        MYL_NO_DISCARD constexpr mat(mat&&) = default;
+
         MYL_NO_DISCARD constexpr explicit mat(const value_type& scalar)
             : m_data{ column_type(scalar), column_type(scalar) } {}
 
@@ -162,6 +165,9 @@ namespace myl {
 
     template<typename T>
     MYL_NO_DISCARD constexpr auto inverse(const mat2<T>& m) -> mat2<T> {
-        return mat2<T>(m[1][1], -m[0][1], -m[1][0], m[0][0]) / determinant(m);
+        return mat2<T>(
+            m[1][1], -m[1][0],
+            -m[0][1], m[0][0]
+        ) / determinant(m);
     }
 }

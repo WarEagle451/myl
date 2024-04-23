@@ -33,6 +33,9 @@ namespace myl {
         MYL_NO_DISCARD constexpr mat() noexcept
             : mat(0) {}
 
+        MYL_NO_DISCARD constexpr mat(const mat&) = default;
+        MYL_NO_DISCARD constexpr mat(mat&&) = default;
+
         MYL_NO_DISCARD constexpr explicit mat(const value_type& scalar)
             : m_data{ column_type(scalar), column_type(scalar), column_type(scalar) } {}
 
@@ -48,7 +51,7 @@ namespace myl {
             value_type&& c0r1, value_type&& c1r1, value_type&& c2r1,
             value_type&& c0r2, value_type&& c1r2, value_type&& c2r2,
             value_type&& c0r3, value_type&& c1r3, value_type&& c2r3) noexcept
-            : m_data{ column_type{ std::move(c0r0), std::move(c0r1), std::move(c0r2), std::move(c0r3) }, column_type{ std::move(c1r0), std::move(c1r1), std::move(c1r2), std::move(c1r3) }, column_type{ std::move(c2r0), std::move(c2r1), , std::move(c2r2), std::move(c2r3) } } {}
+            : m_data{ column_type{ std::move(c0r0), std::move(c0r1), std::move(c0r2), std::move(c0r3) }, column_type{ std::move(c1r0), std::move(c1r1), std::move(c1r2), std::move(c1r3) }, column_type{ std::move(c2r0), std::move(c2r1), std::move(c2r2), std::move(c2r3) } } {}
 
         MYL_NO_DISCARD constexpr mat(const column_type& c0, const column_type& c1, const column_type& c2) noexcept
             : m_data{ c0, c1, c2 } {}
