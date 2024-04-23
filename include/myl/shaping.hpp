@@ -15,7 +15,7 @@ namespace myl {
 
     template<typename T>
     MYL_NO_DISCARD constexpr auto step(const T& edge, const T& value) -> T {
-        return edge > value ? static_cast<T>(0) : edge;
+        return static_cast<T>(edge > value ? 0 : 1);
     }
 
     template<typename T, floating_point F = f32>

@@ -17,7 +17,7 @@ TEST_CASE("myl::inverse_lerp", "[shaping.hpp]") {
 
 TEST_CASE("myl::step", "[shaping.hpp]") {
 	CHECK(myl::step(5, 3) == 0);
-	CHECK(myl::step(5, 7) == 5);
+	CHECK(myl::step(5, 7) == 1);
 }
 
 TEST_CASE("myl::smoothstep", "[shaping.hpp]") {
