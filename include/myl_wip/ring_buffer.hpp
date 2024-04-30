@@ -7,7 +7,7 @@
 
 namespace myl {
     template<typename T, typename Allocator = std::allocator<T>>
-    class cyclic_buffer {
+    class ring_buffer {
         using altr = std::allocator_traits<>;
     public:
         using allocator_type         = Allocator;
@@ -18,8 +18,8 @@ namespace myl {
         using const_reference        = const value_type&;
         using pointer                = value_type*;
         using const_pointer          = const value_type*;
-        using iterator               = circulator<cyclic_buffer>;
-        using const_iterator         = const circulator<cyclic_buffer>;
+        using iterator               = circulator<ring_buffer>;
+        using const_iterator         = const circulator<ring_buffer>;
         using reverse_iterator       = std::reverse_iterator<iterator>;
         using const_reverse_iterator = const std::reverse_iterator<iterator>;
     private:
@@ -31,19 +31,19 @@ namespace myl {
     public:
         // Constructors, Destructor, Assignment
 
-        //MYL_NO_DISCARD constexpr cyclic_buffer() = default;
+        MYL_NO_DISCARD constexpr ring_buffer() = default;
         
         //template<value_type... Args>
-        //MYL_NO_DISCARD constexpr cyclic_buffer(Args&&... args);
+        //MYL_NO_DISCARD constexpr ring_buffer(Args&&... args);
 
-        //MYL_NO_DISCARD constexpr explicit cyclic_buffer(size_type capacity) noexcept(noexcept(allocator_type()));
+        //MYL_NO_DISCARD constexpr explicit ring_buffer(size_type capacity) noexcept(noexcept(allocator_type()));
 
-        //MYL_NO_DISCARD constexpr explicit cyclic_buffer(size_type count, const_reference value);
+        //MYL_NO_DISCARD constexpr explicit ring_buffer(size_type count, const_reference value);
 
         //template<typename InputIt>
-        //MYL_NO_DISCARD constexpr explicit cyclic_buffer(InputIt begin, InputIt end);
+        //MYL_NO_DISCARD constexpr explicit ring_buffer(InputIt begin, InputIt end);
 
-        //constexpr ~cyclic_buffer();
+        //constexpr ~ring_buffer();
 
         // Iterators
 
@@ -75,17 +75,25 @@ namespace myl {
 
         //MYL_NO_DISCARD constexpr auto get_allocator() const -> allocator_type;
 
-        //MYL_NO_DISCARD constexpr auto data() const noexcept -> const_pointer;
+        MYL_NO_DISCARD constexpr auto data() const noexcept -> const_pointer {
+            return m_begin;
+        }
 
-        //MYL_NO_DISCARD constexpr auto data()  noexcept -> pointer;
+        MYL_NO_DISCARD constexpr auto data() noexcept -> pointer {
+            return m_begin;
+        }
 
         //MYL_NO_DISCARD constexpr auto max_size() noexcept -> size_type;
 
         //MYL_NO_DISCARD constexpr auto size() const noexcept -> size_type;
 
-        //MYL_NO_DISCARD constexpr auto capacity() const noexcept -> size_type;
+        MYL_NO_DISCARD constexpr auto capacity() const noexcept -> size_type {
+            return static_cast<size_type>(m_end - m_begin);
+        }
 
-        //MYL_NO_DISCARD constexpr auto offset() const noexcept -> difference_type;
+        MYL_NO_DISCARD constexpr auto offset() const noexcept -> size_type {
+            return static_cast<size_type>(m_head - m_begin);
+        }
 
         //MYL_NO_DISCARD constexpr auto linear() const noexcept -> bool;
 
@@ -95,21 +103,31 @@ namespace myl {
 
         // Access
 
-        //MYL_NO_DISCARD constexpr auto front() -> reference;
+        MYL_NO_DISCARD constexpr auto front() -> reference {
+            MYL_ASSERT(m_head != nullptr);
+            return *m_head;
+        }
 
-        //MYL_NO_DISCARD constexpr auto front() const -> const_reference;
+        MYL_NO_DISCARD constexpr auto front() const -> const_reference {
+            MYL_ASSERT(m_head != nullptr);
+            return *m_head;
+        }
 
-        //MYL_NO_DISCARD constexpr auto back() -> reference;
+        MYL_NO_DISCARD constexpr auto back() -> reference {
+            MYL_ASSERT(m_tail != nullptr);
+            return *m_tail;
+        }
 
-        //MYL_NO_DISCARD constexpr auto back() const -> const_reference;
+        MYL_NO_DISCARD constexpr auto back() const -> const_reference {
+            MYL_ASSERT(m_tail != nullptr);
+            return *m_tail;
+        }
 
         //MYL_NO_DISCARD constexpr auto at(size_type position) -> reference;
 
         //MYL_NO_DISCARD constexpr auto at(size_type position) const -> const_reference;
 
         //MYL_NO_DISCARD constexpr auto operator[](size_type index) -> reference;
-
-        //MYL_NO_DISCARD constexpr auto operator[](size_type index) const -> const_reference;
 
         //MYL_NO_DISCARD constexpr auto operator[](size_type index) const -> const_reference;
 

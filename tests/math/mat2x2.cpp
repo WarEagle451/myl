@@ -1,5 +1,7 @@
 #include <myl/math/mat2x2.hpp>
 
+#include "../utility/matrix_approx.hpp"
+
 #include <catch2/catch_all.hpp>
 
 TEST_CASE("mat2x2", "[mat2x2.hpp]") {
@@ -216,14 +218,24 @@ TEST_CASE("mat2x2", "[mat2x2.hpp]") {
             0, 18
         );
 
-        myl::i32mat2x2 div( /// MYTODO:
-            3
+        myl::f32mat2x2 fa(
+            4, -2,
+            0, 6
+        );
+        myl::f32mat2x2 fb(
+            -2, -1,
+            0, 3
+        );
+
+        myl::f32mat2x2 div(
+            -2, -4.f/3.f,
+            0, 2
         );
 
         CHECK(a + b == add);
         CHECK(a - b == sub);
         CHECK(a * b == mul);
-        CHECK(a / b == div);
+        CHECK(approx_fmat(fa / fb, div));
 
         myl::i32mat2x2 c = a;
         c += b;
@@ -237,8 +249,8 @@ TEST_CASE("mat2x2", "[mat2x2.hpp]") {
         c *= b;
         CHECK(c == mul);
 
-        c = a;
-        c /= b;
-        CHECK(c == div);
+        myl::f32mat2x2 d = fa;
+        d /= fb;
+        CHECK(approx_fmat(d, div));
     }
 }

@@ -1,5 +1,7 @@
 #include <myl/math/mat4x4.hpp>
 
+#include "../utility/matrix_approx.hpp"
+
 #include <catch2/catch_all.hpp>
 
 TEST_CASE("mat4x4", "[mat4x4.hpp]") {
@@ -316,14 +318,31 @@ TEST_CASE("mat4x4", "[mat4x4.hpp]") {
             116, 84, 107, 94
         );
 
-        myl::i32mat4x4 div( /// MYTODO:
-            3
+        myl::f32mat4x4 fa(
+            1, 2, 9, 0,
+            3, 7, 1, 2,
+            5, 7, 9, 2,
+            8, 9, 1, 3
+        );
+
+        myl::f32mat4x4 fb(
+            3, 6, 6, 7,
+            9, 1, 4, 2,
+            2, 0, 8, 2,
+            3, 9, 5, 6
+        );
+
+        myl::f32mat4x4 div(
+            -901.f/650.f, -49.f/325.f, 1967.f/1300.f, 378.f/325.f,
+            -57.f/65.f, 14.f/65.f, -21.f/130.f, 87.f/65.f,
+            -566.f/325.f, 82.f/325.f, 361.f/325.f, 621.f/325.f,
+            -332.f/325.f, 264.f/325.f, -331.f/650.f, 517.f/325.f
         );
 
         CHECK(a + b == add);
         CHECK(a - b == sub);
         CHECK(a * b == mul);
-        CHECK(a / b == div);
+        CHECK(approx_fmat(fa / fb, div));
 
         myl::i32mat4x4 c = a;
         c += b;
@@ -337,8 +356,8 @@ TEST_CASE("mat4x4", "[mat4x4.hpp]") {
         c *= b;
         CHECK(c == mul);
 
-        c = a;
-        c /= b;
-        CHECK(c == div);
+        myl::f32mat4x4 d = fa;
+        d /= fb;
+        CHECK(approx_fmat(d, div));
     }
 }

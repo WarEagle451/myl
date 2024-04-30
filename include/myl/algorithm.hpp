@@ -18,10 +18,7 @@
 namespace myl {
     template<floating_point T>
     MYL_NO_DISCARD constexpr auto approx(const T& a, const T& b) -> bool {
-        constexpr auto infinity = std::numeric_limits<T>::infinity();
-        const auto min = std::nextafter(a, -infinity);
-        const auto max = std::nextafter(a, infinity);
-        return min <= b && b <= max;
+        return b == std::nextafter(a, b);
     }
 
     template<typename T>

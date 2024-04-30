@@ -1,5 +1,7 @@
 #include <myl/math/mat3x3.hpp>
 
+#include "../utility/matrix_approx.hpp"
+
 #include <catch2/catch_all.hpp>
 
 TEST_CASE("mat3x3", "[mat3x3.hpp]") {
@@ -248,14 +250,28 @@ TEST_CASE("mat3x3", "[mat3x3.hpp]") {
             102, 56, 120
         );
 
-        myl::i32mat3x3 div( /// MYTODO:
-            3
+        myl::f32mat3x3 fa(
+            0, -2, 2,
+            4, 8, 12,
+            9, 6, 14
+        );
+
+        myl::f32mat3x3 fb(
+            2, -1, 1,
+            2, 4, 2,
+            5, 3, 7
+        );
+
+        myl::f32mat3x3 div(
+            -10.f/17.f, -20.f/17.f, 12.f/17.f,
+            -56.f/17.f, -10.f/17.f, 40.f/17.f,
+            -11.f/17.f, -5.f/17.f, 37.f/17.f
         );
 
         CHECK(a + b == add);
         CHECK(a - b == sub);
         CHECK(a * b == mul);
-        CHECK(a / b == div);
+        CHECK(approx_fmat(fa / fb, div));
 
         myl::i32mat3x3 c = a;
         c += b;
@@ -269,8 +285,8 @@ TEST_CASE("mat3x3", "[mat3x3.hpp]") {
         c *= b;
         CHECK(c == mul);
 
-        c = a;
-        c /= b;
-        CHECK(c == div);
+        myl::f32mat3x3 d = fa;
+        d /= fb;
+        CHECK(approx_fmat(d, div));
     }
 }
