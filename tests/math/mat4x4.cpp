@@ -234,13 +234,13 @@ TEST_CASE("mat4x4", "[mat4x4.hpp]") {
             0, -1, 1, 2,
             4, 6, 3, 5,
             7, 8, 10, -2,
-            -4, -5, -33, -6
+            -4, -5, -3, -6
         );
         myl::i32mat4x4 mod(
-            0, 1, 2, 1,
+            0, -2 % 3, 2, 1,
             2, 0, 0, 1,
-            2, 1, 2, 2,
-            1, 2, 0, 0
+            2, 1, 2, -4 % 3,
+            -8 % 3, -10 % 3, -6 % 3, -12 % 3
         );
 
         CHECK(t + 2 == add);
@@ -296,20 +296,25 @@ TEST_CASE("mat4x4", "[mat4x4.hpp]") {
         );
 
         myl::i32mat4x4 add(
-            0
+            4, 8, 15, 7,
+            12, 8, 5, 4,
+            7, 7, 17, 4,
+            11, 18, 6, 9
         );
 
         myl::i32mat4x4 sub(
-            0
-
+            -2, -4, 3, -7,
+            -6, 6, -3, 0,
+            3, 7, 1, 0,
+            5, 0, -4, -3
         );
 
         myl::i32mat4x4 mul(
-            0
+            3
         );
 
-        myl::i32mat4x4 div(
-            0
+        myl::i32mat4x4 div( /// MYTODO:
+            3
         );
 
         CHECK(a + b == add);
@@ -322,15 +327,15 @@ TEST_CASE("mat4x4", "[mat4x4.hpp]") {
         CHECK(c == add);
 
         c = a;
-        c += b;
+        c -= b;
         CHECK(c == sub);
 
         c = a;
-        c += b;
+        c *= b;
         CHECK(c == mul);
 
         c = a;
-        c += b;
+        c /= b;
         CHECK(c == div);
     }
 }

@@ -37,7 +37,7 @@ namespace myl {
         MYL_NO_DISCARD constexpr mat(mat&&) = default;
 
         MYL_NO_DISCARD constexpr explicit mat(const value_type& scalar)
-            : m_data{ column_type(scalar), column_type(scalar) } {}
+            : m_data{ column_type(scalar), column_type(scalar), column_type(scalar), column_type(scalar) } {}
 
         MYL_NO_DISCARD constexpr mat(
             const value_type& c0r0, const value_type& c1r0, const value_type& c2r0, const value_type& c3r0,

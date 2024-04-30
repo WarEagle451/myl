@@ -72,7 +72,7 @@ namespace myl {
 
         MYL_NO_DISCARD constexpr auto operator-() const -> vec { return vec{ -x, -y, -z }; }
 
-        // Scaler Operators
+        // Scalar Operators
 
         MYL_NO_DISCARD constexpr auto operator+(const value_type& s) const -> vec { return vec{ x + s, y + s, z + s }; }
 		MYL_NO_DISCARD constexpr auto operator-(const value_type& s) const -> vec { return vec{ x - s, y - s, z - s }; }

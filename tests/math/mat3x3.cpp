@@ -184,7 +184,7 @@ TEST_CASE("mat3x3", "[mat3x3.hpp]") {
         CHECK(t - 2 == myl::i32mat3x3(-2, -4, 0, 2, 6, 10, 8, 4, 12));
         CHECK(t * 2 == myl::i32mat3x3(0, -4, 4, 8, 16, 24, 20, 12, 28));
         CHECK(t / 2 == myl::i32mat3x3(0, -1, 1, 2, 4, 6, 5, 3, 7));
-        CHECK(t % 3 == myl::i32mat3x3(0, -2, 2, 1, 2, 0, 1, 0, 2));
+        CHECK(t % 3 == myl::i32mat3x3(0, -2 % 3, 2, 1, 2, 0, 1, 0, 2));
 
         myl::i32mat3x3 m = t;
         m += 2;
@@ -204,7 +204,7 @@ TEST_CASE("mat3x3", "[mat3x3.hpp]") {
 
         m = t;
         m %= 3;
-        CHECK(m == myl::i32mat3x3(0, -2, 2, 1, 2, 0, 1, 0, 2));
+        CHECK(m == myl::i32mat3x3(0, -2 % 3, 2, 1, 2, 0, 1, 0, 2));
     }
     SECTION("vec3 arithmetic") {
         myl::i32mat3x3 t(
@@ -230,25 +230,45 @@ TEST_CASE("mat3x3", "[mat3x3.hpp]") {
             5, 3, 7
         );
 
-        CHECK(a + b == myl::i32mat3x3());
-        CHECK(a - b == myl::i32mat3x3());
-        CHECK(a * b == myl::i32mat3x3());
-        CHECK(a / b == myl::i32mat3x3());
+        myl::i32mat3x3 add(
+            2, -3, 3,
+            6, 12, 14,
+            15, 9, 21
+        );
+
+        myl::i32mat3x3 sub(
+            -2, -1, 1,
+            2, 4, 10,
+            5, 3, 7
+        );
+
+        myl::i32mat3x3 mul(
+            3
+        );
+
+        myl::i32mat3x3 div( /// MYTODO:
+            3
+        );
+
+        CHECK(a + b == add);
+        CHECK(a - b == sub);
+        CHECK(a * b == mul);
+        CHECK(a / b == div);
 
         myl::i32mat3x3 c = a;
         c += b;
-        CHECK(c == myl::i32mat3x3());
+        CHECK(c == add);
 
         c = a;
-        c += b;
-        CHECK(c == myl::i32mat3x3());
+        c -= b;
+        CHECK(c == sub);
 
         c = a;
-        c += b;
-        CHECK(c == myl::i32mat3x3());
+        c *= b;
+        CHECK(c == mul);
 
         c = a;
-        c += b;
-        CHECK(c == myl::i32mat3x3());
+        c /= b;
+        CHECK(c == div);
     }
 }

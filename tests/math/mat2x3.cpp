@@ -193,7 +193,7 @@ TEST_CASE("mat2x3", "[mat2x3.hpp]") {
             7, 8
         );
         myl::i32mat2x3 mod(
-            0, 1,
+            0, -2 % 3,
             2, 0,
             2, 1
         );
@@ -248,11 +248,15 @@ TEST_CASE("mat2x3", "[mat2x3.hpp]") {
         );
 
         myl::i32mat2x3 add(
-            0
+            4, 8,
+            12, 8,
+            7, 7
         );
 
         myl::i32mat2x3 sub(
-            0
+            -2, -4,
+            -6, 6,
+            3, 7
         );
 
         CHECK(a + b == add);
@@ -263,7 +267,7 @@ TEST_CASE("mat2x3", "[mat2x3.hpp]") {
         CHECK(c == add);
 
         c = a;
-        c += b;
+        c -= b;
         CHECK(c == sub);
     }
 }

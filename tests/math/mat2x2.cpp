@@ -201,25 +201,43 @@ TEST_CASE("mat2x2", "[mat2x2.hpp]") {
             0, 3
         );
 
-        CHECK(a + b == myl::i32mat2x2());
-        CHECK(a - b == myl::i32mat2x2());
-        CHECK(a * b == myl::i32mat2x2());
-        CHECK(a / b == myl::i32mat2x2());
+        myl::i32mat2x2 add(
+            2, -3,
+            0, 9
+        );
+
+        myl::i32mat2x2 sub(
+            6, -1,
+            0, 3
+        );
+
+        myl::i32mat2x2 mul(
+            3
+        );
+
+        myl::i32mat2x2 div( /// MYTODO:
+            3
+        );
+
+        CHECK(a + b == add);
+        CHECK(a - b == sub);
+        CHECK(a * b == mul);
+        CHECK(a / b == div);
 
         myl::i32mat2x2 c = a;
         c += b;
-        CHECK(c == myl::i32mat2x2());
+        CHECK(c == add);
 
         c = a;
-        c += b;
-        CHECK(c == myl::i32mat2x2());
+        c -= b;
+        CHECK(c == sub);
 
         c = a;
-        c += b;
-        CHECK(c == myl::i32mat2x2());
+        c *= b;
+        CHECK(c == mul);
 
         c = a;
-        c += b;
-        CHECK(c == myl::i32mat2x2());
+        c /= b;
+        CHECK(c == div);
     }
 }

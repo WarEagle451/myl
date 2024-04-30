@@ -217,10 +217,10 @@ TEST_CASE("mat2x4", "[mat2x4.hpp]") {
             -4, -5
         );
         myl::i32mat2x4 mod(
-            0, 1,
+            0, -2 % 3,
             2, 0,
             2, 1,
-            1, 2
+            -8 % 3, -10 % 3
         );
 
         CHECK(t + 2 == add);
@@ -276,11 +276,17 @@ TEST_CASE("mat2x4", "[mat2x4.hpp]") {
         );
 
         myl::i32mat2x4 add(
-            0
+            4, 8,
+            12, 8,
+            7, 7,
+            11, 18
         );
 
         myl::i32mat2x4 sub(
-            0
+            -2, -4,
+            -6, 6,
+            3, 7,
+            5, 0
         );
 
         CHECK(a + b == add);
@@ -291,7 +297,7 @@ TEST_CASE("mat2x4", "[mat2x4.hpp]") {
         CHECK(c == add);
 
         c = a;
-        c += b;
+        c -= b;
         CHECK(c == sub);
     }
 }
