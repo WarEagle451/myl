@@ -212,7 +212,8 @@ TEST_CASE("mat2x2", "[mat2x2.hpp]") {
         );
 
         myl::i32mat2x2 mul(
-            3
+            -8, -10,
+            0, 18
         );
 
         myl::i32mat2x2 div( /// MYTODO:

@@ -243,7 +243,9 @@ TEST_CASE("mat3x3", "[mat3x3.hpp]") {
         );
 
         myl::i32mat3x3 mul(
-            3
+            6, -2, 10,
+            84, 64, 104,
+            102, 56, 120
         );
 
         myl::i32mat3x3 div( /// MYTODO:
