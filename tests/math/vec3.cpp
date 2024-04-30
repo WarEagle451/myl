@@ -25,7 +25,8 @@ TEST_CASE("vec3", "[vec3.hpp]") {
             CHECK(myl::i32vec3(2) == myl::i32vec3{ 2, 2, 2 });
         }
         SECTION("3 scalar copy") {
-            CHECK(myl::i32vec3(2, 1, 7) == myl::i32vec3{ 2, 1, 7 });
+            myl::i32 a = 4, b = 5, c = 1;
+            CHECK(myl::i32vec3(a, b, c) == myl::i32vec3{ 4, 5, 1 });
         }
         SECTION("3 scalar move") {
             myl::i32 a = 4, b = 5, c = 1;

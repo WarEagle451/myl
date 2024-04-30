@@ -24,7 +24,8 @@ TEST_CASE("vec4", "[vec4.hpp]") {
             CHECK(myl::i32vec4(2) == myl::i32vec4{ 2, 2, 2, 2 });
         }
         SECTION("4 scalar copy") {
-            CHECK(myl::i32vec4(2, 1, 7, 6) == myl::i32vec4{ 2, 1, 7, 6 });
+            myl::i32 a = 4, b = 5, c = 1, d = 9;
+            CHECK(myl::i32vec4(a, b, c, d) == myl::i32vec4{ 4, 5, 1, 9 });
         }
         SECTION("4 scalar move") {
             myl::i32 a = 4, b = 5, c = 1, d = 9;

@@ -2,6 +2,18 @@
 #include <myl/algorithm.hpp>
 #include <myl/type.hpp>
 
+/// MYTODO: shaping.hpp
+/// https://www.youtube.com/watch?v=YJB1QnEmlTs
+/// - quadratic_ease_in
+/// - quadratic_ease_out
+/// - parabola
+/// - triangle
+/// - elastic_out
+/// - elastic_in
+/// - bounce_out
+/// - bounce_in
+/// - slerp
+
 namespace myl {
     template<typename T, floating_point F = f32>
     MYL_NO_DISCARD constexpr auto lerp(const T& a, const T& b, F percentage) -> T {

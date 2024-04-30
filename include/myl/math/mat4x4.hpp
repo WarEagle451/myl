@@ -97,7 +97,7 @@ namespace myl {
 
         MYL_NO_DISCARD constexpr operator bool() const {
             constexpr mat zero = mat(static_cast<value_type>(0));
-            return *this == zero;
+            return *this != zero;
         }
 
         MYL_NO_DISCARD constexpr auto operator[](usize c) -> column_type& {

@@ -27,13 +27,12 @@ TEST_CASE("vec2", "[vec2.hpp]") {
             CHECK(a == myl::i8vec2{ 2, 2 });
         }
         SECTION("2 scalar copy") {
-            myl::i8vec2 a(2, 1);
-            CHECK(a == myl::i8vec2{ 2, 1 });
+            myl::i32 a = 2, b = 1;
+            CHECK(myl::i8vec2(a, b) == myl::i8vec2{ 2, 1 });
         }
         SECTION("2 scalar move") {
             myl::i32 a = 2, b = 1;
-            myl::i8vec2 c(std::move(a), std::move(b));
-            CHECK(c == myl::i8vec2{ 2, 1 });
+            CHECK(myl::i8vec2(std::move(a), std::move(b)) == myl::i8vec2{ 2, 1 });
         }
         SECTION("vec3") {
             myl::i8vec3 a{ 1, 2, 3 };
