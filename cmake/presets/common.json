@@ -23,7 +23,8 @@
                 "CMAKE_ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL":     "${sourceDir}/build/bin/${presetName}-tiny/lib",
                 "CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL":     "${sourceDir}/build/bin/${presetName}-tiny/lib",
                 "CMAKE_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL":     "${sourceDir}/build/bin/${presetName}-tiny",
-                "MYL_BUILD_TESTS": "ON"
+                "MYL_BUILD_TESTS": "ON",
+                "MYL_NO_EXCEPTIONS":  "ON"
             }
         }
     ]

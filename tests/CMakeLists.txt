@@ -45,6 +45,7 @@ set(MYL_TEST_SOURCES
     "math/vec2.cpp"
     "math/vec3.cpp"
     "math/vec4.cpp"
+    "ring_buffer.cpp"
     "shaping.cpp"
     "string.cpp"
     "type.cpp"
@@ -52,6 +53,12 @@ set(MYL_TEST_SOURCES
 )
 
 enable_testing()
+
+option(MYL_NO_EXCEPTIONS "Disable execeptions" OFF)
+
+if (MYL_NO_EXCEPTIONS)
+    add_compile_definitions("MYL_NO_EXCEPTIONS")
+endif()
 
 function(prepare_test target)
     add_executable(${target} ${MYL_INCLUDE_DIR} ${MYL_TEST_SOURCES})

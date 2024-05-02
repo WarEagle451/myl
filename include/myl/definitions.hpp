@@ -111,12 +111,12 @@
 #   define MYL_TRY
 #   define MYL_CATCH(exception_statement, block)
 #   define MYL_THROW(exception)
-#   define MYL_THROW_IF(condition, exception) MYL_ASSERT(!(condition))
+#   define MYL_THROW_IF(condition, exception, ...) MYL_ASSERT(!(condition), __VA_ARGS__)
 #else
 #   define MYL_TRY try
 #   define MYL_CATCH(exception_statement, block) catch (exception_statement) block
 #   define MYL_THROW(exception) throw exception
-#   define MYL_THROW_IF(condition, exception) if (!(condition)) throw exception
+#   define MYL_THROW_IF(condition, exception, ...) if (condition) throw exception(__VA_ARGS__)
 #endif
 
 // Other Macros
