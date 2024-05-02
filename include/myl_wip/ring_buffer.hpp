@@ -6,6 +6,9 @@
 #include <stdexcept>
 #include <utility>
 
+/// Emplace
+/// Should make [] access elements in order or the raw array
+
 // Use arg pack over initializer list to prevent unnecessary copies, moves and contructions
 
 namespace myl {
@@ -36,21 +39,29 @@ namespace myl {
         // Constructors, Destructor, Assignment
 
         MYL_NO_DISCARD constexpr ring_buffer() = default;
+        MYL_NO_DISCARD constexpr ring_buffer(const ring_buffer&) = default;
+        //MYL_NO_DISCARD constexpr ring_buffer(const ring_buffer&, const allocator_type& allocator);
+        MYL_NO_DISCARD constexpr ring_buffer(ring_buffer&&) = default;
+        //MYL_NO_DISCARD constexpr ring_buffer(ring_buffer&&, const allocator_type& allocator);
+
+        MYL_NO_DISCARD constexpr explicit ring_buffer(const allocator_type& allocator) noexcept
+            : m_allocator{ allocator } {}
         
         //template<value_type... Elements>
-        //MYL_NO_DISCARD constexpr ring_buffer(Elements&&... elements);
+        //MYL_NO_DISCARD constexpr ring_buffer(Elements&&... elements); /// const allocator_type& allocator??
 
-        MYL_NO_DISCARD constexpr explicit ring_buffer(size_type capacity) noexcept(noexcept(allocator_type())) {
+        MYL_NO_DISCARD constexpr explicit ring_buffer(size_type capacity, const allocator_type& allocator = allocator_type())
+            : m_allocator{ allocator } {
             m_begin = altr::allocate(m_allocator, capacity);
             m_end = m_begin + capacity;
             m_head = m_begin;
             m_tail = m_head;
         }
 
-        //MYL_NO_DISCARD constexpr explicit ring_buffer(size_type count, const_reference value);
+        //MYL_NO_DISCARD constexpr explicit ring_buffer(size_type count, const_reference value, const allocator_type& allocator = allocator_type());
 
         //template<typename InputIt>
-        //MYL_NO_DISCARD constexpr explicit ring_buffer(InputIt begin, InputIt end);
+        //MYL_NO_DISCARD constexpr explicit ring_buffer(InputIt begin, InputIt end, const allocator_type& allocator = allocator_type());
 
         constexpr ~ring_buffer() {
             clear();
@@ -210,6 +221,7 @@ namespace myl {
 
         template<typename... Args>
         constexpr auto emplace_back(Args&&... args) -> reference {
+
             pointer new_back = m_tail;
             if (m_size != 0)
                 increment(new_back);
@@ -297,7 +309,7 @@ namespace myl {
                 pop_back(m_size - new_size);
             else if (new_size > capacity()) {
                 reallocate(new_size);
-                fill_up();
+                fill_up(value);
             }
             else if (new_size > m_size)
                 while (m_size != new_size) /// MYTODO: This could be improved
@@ -378,7 +390,7 @@ namespace myl {
             m_begin = new_begin;
             m_end = new_begin + new_capacity;
             m_head = new_begin;
-            m_tail = new_begin + m_size - 1; // This works because new_capacity should not be 0
+            m_tail = new_begin + (m_size == 0 ? 0 : m_size - 1);
         }
     };
 }

@@ -2,250 +2,301 @@
 
 #include <catch2/catch_all.hpp>
 
-/// MYTODO: Add an allocator that tracks memory
+/// test cases: x = no element, o = element
+/// xoox
+/// xxoo
+/// oxxo
+/// ooxx
+/// oooo
+/// xxxx
 
 TEST_CASE("myl::ring_buffer", "[ring_buffer.hpp]") {
-	SECTION("constructor") {
-		SECTION("default") {
-			myl::ring_buffer<myl::i32> a;
-			CHECK(a.size() == 0);
-			CHECK(a.capacity() == 0);
-			CHECK(a.offset() == 0);
-			CHECK(a.linear());
-			CHECK(a.empty());
-			CHECK(a.full());
-		}
-		///SECTION("elements") {
-		///	myl::ring_buffer<myl::i32> a;
-		///	CHECK(a.size() == 0);
-		///	CHECK(a.capacity() == 0);
-		///	CHECK(a.offset() == 0);
-		///	CHECK(a.linear());
-		///	CHECK(a.empty());
-		///	CHECK_FALSE(a.full());
-		///}
-		SECTION("capacity") {
-			myl::ring_buffer<myl::i32> a(10);
-			CHECK(a.size() == 0);
-			CHECK(a.capacity() == 10);
-			CHECK(a.offset() == 0);
-			CHECK(a.linear());
-			CHECK(a.empty());
-			CHECK_FALSE(a.full());
-		}
-		///SECTION("count") {
-		///	myl::ring_buffer<myl::i32> a;
-		///	CHECK(a.size() == 0);
-		///	CHECK(a.capacity() == 0);
-		///	CHECK(a.offset() == 0);
-		///	CHECK(a.linear());
-		///	CHECK(a.empty());
-		///	CHECK_FALSE(a.full());
-		///}
-		///SECTION("iterator") {
-		///	myl::ring_buffer<myl::i32> a;
-		///	CHECK(a.size() == 0);
-		///	CHECK(a.capacity() == 0);
-		///	CHECK(a.offset() == 0);
-		///	CHECK(a.linear());
-		///	CHECK(a.empty());
-		///	CHECK_FALSE(a.full());
-		///}
-	}
-	SECTION("iterators") {
-		SECTION("begin") {
-			SECTION("begin") {
+    SECTION("constructor") {
+        SECTION("default") {
+            myl::ring_buffer<myl::i32> a;
+            CHECK(a.size() == 0);
+            CHECK(a.capacity() == 0);
+            CHECK(a.offset() == 0);
+            CHECK(a.linear());
+            CHECK(a.empty());
+            CHECK(a.full());
+        }
+        SECTION("copy") {
+            SECTION("copy") {
 
-			}
-			SECTION("begin - const") {
+            }
+            SECTION("allocator") {
 
-			}
-		}
-		SECTION("cbegin") {
+            }
+        }
+        SECTION("move") {
+            SECTION("move") {
 
-		}
-		SECTION("end") {
-			SECTION("end") {
+            }
+            SECTION("allocator") {
 
-			}
-			SECTION("end - const") {
+            }
+        }
+        SECTION("allocator") {
 
-			}
-		}
-		SECTION("cend") {
+        }
+        SECTION("allocator") {
 
-		}
-		SECTION("rbegin") {
-			SECTION("rbegin") {
+        }
+        ///SECTION("elements") {
+        ///    myl::ring_buffer<myl::i32> a;
+        ///    CHECK(a.size() == 0);
+        ///    CHECK(a.capacity() == 0);
+        ///    CHECK(a.offset() == 0);
+        ///    CHECK(a.linear());
+        ///    CHECK(a.empty());
+        ///    CHECK_FALSE(a.full());
+        ///}
+        SECTION("capacity") {
+            myl::ring_buffer<myl::i32> a(10);
+            CHECK(a.size() == 0);
+            CHECK(a.capacity() == 10);
+            CHECK(a.offset() == 0);
+            CHECK(a.linear());
+            CHECK(a.empty());
+            CHECK_FALSE(a.full());
+        }
+        ///SECTION("count") {
+        ///    myl::ring_buffer<myl::i32> a;
+        ///    CHECK(a.size() == 0);
+        ///    CHECK(a.capacity() == 0);
+        ///    CHECK(a.offset() == 0);
+        ///    CHECK(a.linear());
+        ///    CHECK(a.empty());
+        ///    CHECK_FALSE(a.full());
+        ///}
+        ///SECTION("iterator") {
+        ///    myl::ring_buffer<myl::i32> a;
+        ///    CHECK(a.size() == 0);
+        ///    CHECK(a.capacity() == 0);
+        ///    CHECK(a.offset() == 0);
+        ///    CHECK(a.linear());
+        ///    CHECK(a.empty());
+        ///    CHECK_FALSE(a.full());
+        ///}
+    }
+    SECTION("iterators") {
+        SECTION("begin") {
+            SECTION("begin") {
 
-			}
-			SECTION("rbegin - const") {
+            }
+            SECTION("begin - const") {
 
-			}
-		}
-		SECTION("crbegin") {
+            }
+        }
+        SECTION("cbegin") {
 
-		}
-		SECTION("rend") {
-			SECTION("rend") {
+        }
+        SECTION("end") {
+            SECTION("end") {
 
-			}
-			SECTION("rend - const") {
+            }
+            SECTION("end - const") {
 
-			}
-		}
-		SECTION("crend") {
+            }
+        }
+        SECTION("cend") {
 
-		}
-	}
-	SECTION("get_allocator") {
+        }
+        SECTION("rbegin") {
+            SECTION("rbegin") {
 
-	}
-	SECTION("data") {
-		SECTION("data") {
+            }
+            SECTION("rbegin - const") {
 
-		}
-		SECTION("data - const") {
+            }
+        }
+        SECTION("crbegin") {
 
-		}
-	}
-	SECTION("max_size") {
+        }
+        SECTION("rend") {
+            SECTION("rend") {
 
-	}
-	SECTION("size") {
+            }
+            SECTION("rend - const") {
 
-	}
-	SECTION("capacity") {
+            }
+        }
+        SECTION("crend") {
 
-	}
-	SECTION("offset") {
+        }
+    }
+    SECTION("get_allocator") {
 
-	}
-	SECTION("linear") {
+    }
+    SECTION("data") {
+        SECTION("data") {
 
-	}
-	SECTION("empty") {
+        }
+        SECTION("data - const") {
 
-	}
-	SECTION("full") {
+        }
+    }
+    SECTION("max_size") {
 
-	}
-	SECTION("front") {
-		SECTION("front") {
+    }
+    SECTION("size") {
 
-		}
-		SECTION("front - const") {
+    }
+    SECTION("capacity") {
 
-		}
-	}
-	SECTION("back") {
-		SECTION("back") {
+    }
+    SECTION("offset") {
 
-		}
-		SECTION("back - const") {
+    }
+    SECTION("linear") {
 
-		}
-	}
-	SECTION("at") {
-		SECTION("at") {
+    }
+    SECTION("empty") {
 
-		}
-		SECTION("at - const") {
+    }
+    SECTION("full") {
 
-		}
-	}
-	SECTION("operator[]") {
-		SECTION("operator[]") {
+    }
+    SECTION("front") {
+        SECTION("front") {
 
-		}
-		SECTION("operator[] - const") {
+        }
+        SECTION("front - const") {
 
-		}
-	}
-	SECTION("clear") {
+        }
+    }
+    SECTION("back") {
+        SECTION("back") {
 
-	}
-	SECTION("fill") {
+        }
+        SECTION("back - const") {
 
-	}
-	SECTION("fill_up") {
+        }
+    }
+    SECTION("at") {
+        SECTION("at") {
 
-	}
-	SECTION("assign") {
-		SECTION("iterator") {
+        }
+        SECTION("at - const") {
 
-		}
-		SECTION("count") {
+        }
+    }
+    SECTION("operator[]") {
+        SECTION("operator[]") {
 
-		}
-		SECTION("elements") {
+        }
+        SECTION("operator[] - const") {
 
-		}
-	}
-	SECTION("emplace_back") {
+        }
+    }
+    SECTION("clear") {
 
-	}
-	SECTION("push_back") {
-		SECTION("copy") {
+    }
+    SECTION("fill") {
 
-		}
-		SECTION("move") {
+    }
+    SECTION("fill_up") {
 
-		}
-	}
-	SECTION("pop_back") {
-		SECTION("pop_back") {
+    }
+    SECTION("assign") {
+        SECTION("iterator") {
 
-		}
-		SECTION("count") {
+        }
+        SECTION("count") {
 
-		}
-	}
-	SECTION("emplace_front") {
+        }
+        SECTION("elements") {
 
-	}
-	SECTION("push_front") {
-		SECTION("copy") {
+        }
+    }
+    SECTION("emplace_back") {
+        myl::ring_buffer<myl::i32> a(3);
+        a.emplace_back(1);
+        a.emplace_back(2);
 
-		}
-		SECTION("move") {
+        CHECK(a.size() == 2);
+        CHECK(a.capacity() == 3);
+        CHECK(a.offset() == 0);
+        CHECK(a.linear());
+        CHECK_FALSE(a.empty());
+        CHECK_FALSE(a.full());
+        CHECK(a[0] == 1);
+        CHECK(a[1] == 2);
 
-		}
-	}
-	SECTION("pop_front") {
-		SECTION("pop_front") {
+        a.emplace_back(3);
+        a.emplace_back(4);
+        CHECK(a.size() == 3);
+        CHECK(a.capacity() == 3);
+        CHECK(a.offset() == 1);
+        CHECK_FALSE(a.linear());
+        CHECK_FALSE(a.empty());
+        CHECK(a.full());
+        CHECK(a[0] == 4);
+        CHECK(a[1] == 2);
+        CHECK(a[2] == 3);
+    }
+    SECTION("push_back") {
+        SECTION("copy") {
 
-		}
-		SECTION("count") {
+        }
+        SECTION("move") {
 
-		}
-	}
-	SECTION("pop_front") {
-		SECTION("pop_front") {
+        }
+    }
+    SECTION("pop_back") {
+        SECTION("pop_back") {
 
-		}
-		SECTION("count") {
+        }
+        SECTION("count") {
 
-		}
-	}
-	SECTION("resize") {
+        }
+    }
+    SECTION("emplace_front") {
 
-	}
-	SECTION("reserve") {
+    }
+    SECTION("push_front") {
+        SECTION("copy") {
 
-	}
-	SECTION("shrink_to_fit") {
+        }
+        SECTION("move") {
 
-	}
-	SECTION("rotate") {
-		SECTION("pointer") {
+        }
+    }
+    SECTION("pop_front") {
+        SECTION("pop_front") {
 
-		}
-		SECTION("offset") {
+        }
+        SECTION("count") {
 
-		}
-	}
-	SECTION("align") {
+        }
+    }
+    SECTION("pop_front") {
+        SECTION("pop_front") {
 
-	}
+        }
+        SECTION("count") {
+
+        }
+    }
+    SECTION("resize") {
+
+    }
+    SECTION("reserve") {
+
+    }
+    SECTION("shrink_to_fit") {
+
+    }
+    SECTION("rotate") {
+        SECTION("pointer") {
+
+        }
+        SECTION("offset") {
+
+        }
+    }
+    SECTION("align") {
+
+    }
 }
