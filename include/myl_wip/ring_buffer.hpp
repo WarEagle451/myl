@@ -6,10 +6,92 @@
 #include <stdexcept>
 #include <utility>
 
-/// Emplace
-/// Should make [] access elements in order or the raw array
 
 // Use arg pack over initializer list to prevent unnecessary copies, moves and contructions
+
+namespace myl { /// Requires on this for increment and decrement
+    template<typename Container>
+    class circulator {
+    public:
+        using iterator_concept  = std::random_access_iterator_tag;
+        using iterator_category = std::random_access_iterator_tag;
+        using value_type        = typename Container::value_type;
+        using difference_type   = typename Container::difference_type;
+        using pointer           = value_type*;
+        using reference         = value_type&;
+    private:
+        const Container* m_container;
+        pointer m_ptr          = nullptr;
+        bool m_has_looped      = false;
+    public:
+        MYL_NO_DISCARD constexpr circulator() noexcept = default;
+
+        MYL_NO_DISCARD constexpr circulator(pointer ptr, const Container* container, bool has_looped)
+            : m_container{ container }
+            , m_ptr{ ptr }
+            , m_has_looped{ has_looped } {}
+
+        constexpr ~circulator() noexcept = default;
+
+        MYL_NO_DISCARD constexpr auto operator*() -> reference {
+            return *m_ptr;
+        }
+
+        MYL_NO_DISCARD constexpr auto operator*() const -> const reference {
+            return *m_ptr;
+        }
+
+        MYL_NO_DISCARD constexpr auto operator->() -> pointer {
+            return m_ptr;
+        }
+
+        constexpr auto operator++() noexcept -> circulator& {
+            if (m_ptr == m_tail)
+                ;
+            m_container->increment(m_ptr);
+            return *this;
+        }
+
+        MYL_NO_DISCARD constexpr auto operator++(int) noexcept -> circulator& {
+            circulator temp(*this);
+            if (m_ptr == m_tail)
+                ;
+            m_container->increment(m_ptr);
+            return temp;
+        }
+
+        constexpr auto operator--() noexcept -> circulator& {
+            if (m_ptr == m_head)
+                ;
+            m_container->decrement(m_ptr);
+            return *this;
+        }
+
+        MYL_NO_DISCARD constexpr auto operator--(int) noexcept -> circulator& {
+            circulator temp(*this);
+            if (m_ptr == m_head)
+                ;
+            m_container->decrement(m_ptr);
+            return temp;
+        }
+
+        MYL_NO_DISCARD constexpr auto operator==(const circulator& r) const -> bool {
+            return
+                m_ptr == r.m_ptr &&
+                m_container == r.m_container &&
+                m_has_looped == r.m_has_looped;
+        }
+    };
+}
+
+/// MYTODO:
+/// MYL_NO_DISCARD constexpr emplace() -> reference;
+/// MYL_NO_DISCARD constexpr ring_buffer(const ring_buffer&, const allocator_type& allocator);
+/// MYL_NO_DISCARD constexpr ring_buffer(ring_buffer&&, const allocator_type& allocator);
+/// template<value_type... Elements> MYL_NO_DISCARD constexpr ring_buffer(Elements&&... elements);
+/// MYL_NO_DISCARD constexpr explicit ring_buffer(size_type count, const_reference value, const allocator_type& allocator = allocator_type());
+/// template<typename InputIt> MYL_NO_DISCARD constexpr explicit ring_buffer(InputIt begin, InputIt end, const allocator_type& allocator = allocator_type());
+/// template<value_type... Elements> constexpr auto assign(Elements&&... elements) -> void;
 
 namespace myl {
     template<typename T, typename Allocator = std::allocator<T>>
@@ -18,17 +100,19 @@ namespace myl {
     public:
         using allocator_type         = Allocator;
         using value_type             = typename altr::value_type;
-        using size_type              = usize;
+        using size_type              = typename altr::size_type;
         using difference_type        = typename altr::difference_type;
         using reference              = value_type&;
         using const_reference        = const value_type&;
         using pointer                = value_type*;
         using const_pointer          = const value_type*;
-        ///using iterator               = circulator<ring_buffer>;
-        ///using const_iterator         = const circulator<ring_buffer>;
-        ///using reverse_iterator       = std::reverse_iterator<iterator>;
-        ///using const_reverse_iterator = const std::reverse_iterator<iterator>;
+        using iterator               = circulator<ring_buffer>;
+        using const_iterator         = const circulator<ring_buffer>;
+        using reverse_iterator       = std::reverse_iterator<iterator>;
+        using const_reverse_iterator = const std::reverse_iterator<iterator>;
     private:
+        friend iterator;
+
         allocator_type m_allocator{};
         pointer m_begin  = nullptr;
         pointer m_end    = nullptr;
@@ -39,9 +123,13 @@ namespace myl {
         // Constructors, Destructor, Assignment
 
         MYL_NO_DISCARD constexpr ring_buffer() = default;
+
         MYL_NO_DISCARD constexpr ring_buffer(const ring_buffer&) = default;
+
         //MYL_NO_DISCARD constexpr ring_buffer(const ring_buffer&, const allocator_type& allocator);
+
         MYL_NO_DISCARD constexpr ring_buffer(ring_buffer&&) = default;
+
         //MYL_NO_DISCARD constexpr ring_buffer(ring_buffer&&, const allocator_type& allocator);
 
         MYL_NO_DISCARD constexpr explicit ring_buffer(const allocator_type& allocator) noexcept
@@ -70,29 +158,53 @@ namespace myl {
 
         // Iterators
 
-        //MYL_NO_DISCARD constexpr auto begin() noexcept -> iterator;
+        MYL_NO_DISCARD constexpr auto begin() noexcept -> iterator {
+            return iterator(m_head, this, empty());
+        }
 
-        //MYL_NO_DISCARD constexpr auto begin() const noexcept -> const_iterator;
+        MYL_NO_DISCARD constexpr auto begin() const noexcept -> const_iterator {
+            return begin();
+        }
 
-        //MYL_NO_DISCARD constexpr auto cbegin() const noexcept -> const_iterator;
+        MYL_NO_DISCARD constexpr auto cbegin() const noexcept -> const_iterator {
+            return begin();
+        }
 
-        //MYL_NO_DISCARD constexpr auto end() noexcept -> iterator;
+        MYL_NO_DISCARD constexpr auto end() noexcept -> iterator {
+            return (m_end, this, true);
+        }
 
-        //MYL_NO_DISCARD constexpr auto end() const noexcept -> const_iterator;
+        MYL_NO_DISCARD constexpr auto end() const noexcept -> const_iterator {
+            return end();
+        }
 
-        //MYL_NO_DISCARD constexpr auto cend() const noexcept -> const_iterator;
+        MYL_NO_DISCARD constexpr auto cend() const noexcept -> const_iterator {
+            return end();
+        }
 
-        //MYL_NO_DISCARD constexpr auto rbegin() noexcept -> reverse_iterator;
+        MYL_NO_DISCARD constexpr auto rbegin() noexcept -> reverse_iterator {
+            return reverse_iterator(iterator(m_head, this, empty()));
+        }
 
-        //MYL_NO_DISCARD constexpr auto rbegin() const noexcept -> const_reverse_iterator;
+        MYL_NO_DISCARD constexpr auto rbegin() const noexcept -> const_reverse_iterator {
+            return rbegin();
+        }
 
-        //MYL_NO_DISCARD constexpr auto crbegin() const noexcept -> const_reverse_iterator;
+        MYL_NO_DISCARD constexpr auto crbegin() const noexcept -> const_reverse_iterator {
+            return rbegin();
+        }
 
-        //MYL_NO_DISCARD constexpr auto rend() noexcept -> reverse_iterator;
+        MYL_NO_DISCARD constexpr auto rend() noexcept -> reverse_iterator {
+            return reverse_iterator(iterator(m_head, this, true));
+        }
 
-        //MYL_NO_DISCARD constexpr auto rend() const noexcept -> const_reverse_iterator;
+        MYL_NO_DISCARD constexpr auto rend() const noexcept -> const_reverse_iterator {
+            return rend();
+        }
 
-        //MYL_NO_DISCARD constexpr auto crend() const noexcept -> const_reverse_iterator;
+        MYL_NO_DISCARD constexpr auto crend() const noexcept -> const_reverse_iterator {
+            return rend();
+        }
 
         // Utilities
 
@@ -167,8 +279,9 @@ namespace myl {
         }
 
         MYL_NO_DISCARD constexpr auto operator[](size_type index) -> reference {
-            MYL_ASSERT(!out_of_bounds(m_begin + index), "Accessing an out of bounds element is undefined behavior");
-            return m_begin[index];
+            pointer ptr = m_begin + ((offset() + position) % capacity());
+            MYL_ASSERT(!out_of_bounds(ptr), "Accessing an out of bounds element is undefined behavior");
+            return *ptr;
         }
 
         MYL_NO_DISCARD constexpr auto operator[](size_type index) const -> const_reference {
@@ -250,7 +363,6 @@ namespace myl {
 
         template<typename... Args>
         constexpr auto emplace_back(Args&&... args) -> reference {
-
             pointer new_back = m_tail;
             if (m_size != 0)
                 increment(new_back);
