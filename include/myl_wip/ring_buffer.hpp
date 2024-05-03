@@ -211,10 +211,39 @@ namespace myl {
             m_size = capacity();
         }
 
-        //template<typename InputIt>
-        //constexpr auto assign(InputIt begin, InputIt end) -> void;
+        template<typename InputIt>
+        constexpr auto assign(InputIt begin, InputIt end) -> void {
+            clear();
 
-        //constexpr auto assign(size_type count, const_reference value) -> void;
+            const size_type new_size = static_cast<size_type>(end - begin);
+            if (new_size > capacity()) {
+                altr::deallocate(m_allocator, m_begin, capacity());
+                m_begin = altr::allocate(m_allocator, new_size);
+                m_end = m_begin + new_size;
+            }
+
+            for (pointer ptr = m_begin; begin != end; ++ptr, ++begin)
+                altr::construct(m_allocator, ptr, *begin);
+
+            m_head = m_begin;
+            m_tail = m_begin + new_size - 1;
+            m_size = new_size;
+        }
+
+        constexpr auto assign(size_type count, const_reference value) -> void {
+            clear();
+            if (count > capacity()) {
+                m_begin = altr::deallocate(m_allocator, count);
+                m_end = m_begin + count;
+            }
+
+            m_size = count;
+            for (pointer ptr = m_begin; count != 0; ++ptr, --count)
+                altr::construct(m_allocator, ptr, value);
+
+            m_head = m_begin;
+            m_tail = m_begin + m_size - 1;
+        }
 
         //template<value_type... Elements>
         //constexpr auto assign(Elements&&... elements) -> void;
@@ -326,9 +355,23 @@ namespace myl {
                 reallocate(m_size);
         }
 
-        //constexpr auto rotate(pointer new_head) -> void;
+        constexpr auto rotate(pointer new_head) -> void {
+            MYL_ASSERT(!out_of_bounds(new_head), "The ring buffer must contain the address of the new head");
+            if (new_head == m_head)
+                return;
 
-        //constexpr auto rotate(difference_type offset) -> void;
+            m_head = new_head;
+            /// Is (offset % m_size) - 1 not good enough???
+            m_tail = m_begin + ((offset() + m_size) % m_size) - 1;
+        }
+
+        constexpr auto rotate(difference_type offset) -> void {
+            if (offset == 0 || m_size == offset % m_size)
+                return;
+
+            m_head = m_begin + ((this->offset() + offset - 1) % m_size) + 1;
+            m_tail = m_begin + ((this->offset() + m_size) % m_size) - 1;
+        }
 
         constexpr auto align() -> void {
             if (m_head == m_begin)
@@ -393,4 +436,13 @@ namespace myl {
             m_tail = new_begin + (m_size == 0 ? 0 : m_size - 1);
         }
     };
+
+    template<typename T, typename A>
+    MYL_NO_DISCARD constexpr auto operator==(const ring_buffer<T, A>& l, const ring_buffer<T, A>& r) -> bool {
+        if (l.size() != r.size())
+            return false;
+
+        /// compare elements
+        return true;
+    }
 }

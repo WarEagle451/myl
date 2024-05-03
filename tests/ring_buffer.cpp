@@ -23,7 +23,18 @@ TEST_CASE("myl::ring_buffer", "[ring_buffer.hpp]") {
         }
         SECTION("copy") {
             SECTION("copy") {
+                myl::ring_buffer<myl::i32> a(3);
+                a.emplace_back(1);
+                a.emplace_back(2);
+                auto b = a;
 
+                CHECK(b.size() == 2);
+                CHECK(b.capacity() == 3);
+                CHECK(b.offset() == 0);
+                CHECK(b.linear());
+                CHECK(b.empty());
+                CHECK_FALSE(b.full());
+                CHECK(b == a);
             }
             SECTION("allocator") {
 
