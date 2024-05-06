@@ -6,10 +6,7 @@
 #include <stdexcept>
 #include <utility>
 
-
-// Use arg pack over initializer list to prevent unnecessary copies, moves and contructions
-
-namespace myl { /// Requires on this for increment and decrement
+namespace myl {
     template<typename Container>
     class circulator {
     public:
@@ -46,32 +43,24 @@ namespace myl { /// Requires on this for increment and decrement
         }
 
         constexpr auto operator++() noexcept -> circulator& {
-            if (m_ptr == m_tail)
-                ;
-            m_container->increment(m_ptr);
+            m_container->increment_circulator(m_ptr, m_has_looped);
             return *this;
         }
 
         MYL_NO_DISCARD constexpr auto operator++(int) noexcept -> circulator& {
             circulator temp(*this);
-            if (m_ptr == m_tail)
-                ;
-            m_container->increment(m_ptr);
+            m_container->increment_circulator(m_ptr, m_has_looped);
             return temp;
         }
 
         constexpr auto operator--() noexcept -> circulator& {
-            if (m_ptr == m_head)
-                ;
-            m_container->decrement(m_ptr);
+            m_container->decrement_circulator(m_ptr, m_has_looped);
             return *this;
         }
 
         MYL_NO_DISCARD constexpr auto operator--(int) noexcept -> circulator& {
             circulator temp(*this);
-            if (m_ptr == m_head)
-                ;
-            m_container->decrement(m_ptr);
+            m_container->decrement_circulator(m_ptr, m_has_looped);
             return temp;
         }
 
@@ -86,12 +75,13 @@ namespace myl { /// Requires on this for increment and decrement
 
 /// MYTODO:
 /// MYL_NO_DISCARD constexpr emplace() -> reference;
-/// MYL_NO_DISCARD constexpr ring_buffer(const ring_buffer&, const allocator_type& allocator);
-/// MYL_NO_DISCARD constexpr ring_buffer(ring_buffer&&, const allocator_type& allocator);
-/// template<value_type... Elements> MYL_NO_DISCARD constexpr ring_buffer(Elements&&... elements);
-/// MYL_NO_DISCARD constexpr explicit ring_buffer(size_type count, const_reference value, const allocator_type& allocator = allocator_type());
-/// template<typename InputIt> MYL_NO_DISCARD constexpr explicit ring_buffer(InputIt begin, InputIt end, const allocator_type& allocator = allocator_type());
-/// template<value_type... Elements> constexpr auto assign(Elements&&... elements) -> void;
+/// - expand_back(), expand_front(), works like push/emplace front but if the conatiner is full it expands it
+/// - insert
+/// - erase
+/// std::swap
+/// std::erase
+/// std::erase_if
+/// <=>
 
 namespace myl {
     template<typename T, typename Allocator = std::allocator<T>>
@@ -124,19 +114,19 @@ namespace myl {
 
         MYL_NO_DISCARD constexpr ring_buffer() = default;
 
-        MYL_NO_DISCARD constexpr ring_buffer(const ring_buffer&) = default;
+        ///MYL_NO_DISCARD constexpr ring_buffer(const ring_buffer& other) /// how does the allocatpr proagate?
 
-        //MYL_NO_DISCARD constexpr ring_buffer(const ring_buffer&, const allocator_type& allocator);
+        ///MYL_NO_DISCARD constexpr ring_buffer(const ring_buffer&, const allocator_type& allocator);
 
         MYL_NO_DISCARD constexpr ring_buffer(ring_buffer&&) = default;
 
-        //MYL_NO_DISCARD constexpr ring_buffer(ring_buffer&&, const allocator_type& allocator);
+        ///MYL_NO_DISCARD constexpr ring_buffer(ring_buffer&&, const allocator_type& allocator);
 
         MYL_NO_DISCARD constexpr explicit ring_buffer(const allocator_type& allocator) noexcept
             : m_allocator{ allocator } {}
         
-        //template<value_type... Elements>
-        //MYL_NO_DISCARD constexpr ring_buffer(Elements&&... elements); /// const allocator_type& allocator??
+        ///template<value_type... Elements>
+        ///MYL_NO_DISCARD constexpr ring_buffer(Elements&&... elements); /// const allocator_type& allocator??
 
         MYL_NO_DISCARD constexpr explicit ring_buffer(size_type capacity, const allocator_type& allocator = allocator_type())
             : m_allocator{ allocator } {
@@ -146,10 +136,10 @@ namespace myl {
             m_tail = m_head;
         }
 
-        //MYL_NO_DISCARD constexpr explicit ring_buffer(size_type count, const_reference value, const allocator_type& allocator = allocator_type());
+        ///MYL_NO_DISCARD constexpr explicit ring_buffer(size_type count, const_reference value, const allocator_type& allocator = allocator_type());
 
-        //template<typename InputIt>
-        //MYL_NO_DISCARD constexpr explicit ring_buffer(InputIt begin, InputIt end, const allocator_type& allocator = allocator_type());
+        ///template<typename InputIt>
+        ///MYL_NO_DISCARD constexpr explicit ring_buffer(InputIt begin, InputIt end, const allocator_type& allocator = allocator_type());
 
         constexpr ~ring_buffer() {
             clear();
@@ -171,7 +161,7 @@ namespace myl {
         }
 
         MYL_NO_DISCARD constexpr auto end() noexcept -> iterator {
-            return (m_end, this, true);
+            return iterator(m_end, this, true);
         }
 
         MYL_NO_DISCARD constexpr auto end() const noexcept -> const_iterator {
@@ -279,7 +269,7 @@ namespace myl {
         }
 
         MYL_NO_DISCARD constexpr auto operator[](size_type index) -> reference {
-            pointer ptr = m_begin + ((offset() + position) % capacity());
+            pointer ptr = m_begin + ((offset() + index) % capacity());
             MYL_ASSERT(!out_of_bounds(ptr), "Accessing an out of bounds element is undefined behavior");
             return *ptr;
         }
@@ -290,39 +280,105 @@ namespace myl {
 
         // Modifiers
 
-        constexpr auto clear() noexcept -> void {
-            while (m_size != 0) { // Destroys elements tail to head
+        template<typename... Args>
+        constexpr auto emplace_front(Args&&... args) -> reference {
+            pointer new_front = m_head;
+            if (m_size != 0)
+                decrement(new_front);
+
+            if (m_size == capacity()) {
                 altr::destroy(m_allocator, m_tail);
                 decrement(m_tail);
-                --m_size;
             }
+            else
+                ++m_size;
 
-            m_tail = m_head; // Loop sets m_tail to m_head decremented by 1
+            altr::construct(m_allocator, new_front, std::forward<Args>(args)...);
+            m_head = new_front;
+            return *m_head;
         }
 
-        constexpr auto fill(const_reference value) -> void {
-            clear();
-            for (pointer ptr = m_begin; ptr != m_end; ++ptr)
-                altr::construct(m_allocator, ptr, value);
+        template<typename... Args>
+        constexpr auto emplace_back(Args&&... args) -> reference {
+            pointer new_back = m_tail;
+            if (m_size != 0)
+                increment(new_back);
 
-            m_head = m_begin;
-            m_tail = m_end - 1;
-            m_size = capacity();
-        }
-
-        constexpr auto fill_up(const_reference value) -> void {
-            pointer ptr = m_tail;
-            increment(ptr);
-
-            while (ptr != m_head) {
-                altr::construct(m_allocator, ptr, value);
-                increment(ptr);
+            if (m_size == capacity()) {
+                altr::destroy(m_allocator, m_head);
+                increment(m_head);
             }
+            else
+                ++m_size;
 
-            decrement(ptr);
-            m_tail = ptr;
-            m_size = capacity();
+            altr::construct(m_allocator, new_back, std::forward<Args>(args)...);
+            m_tail = new_back;
+            return *m_tail;
         }
+
+        constexpr auto push_front(const_reference value) -> void {
+            emplace_front(value);
+        }
+
+        constexpr auto push_front(value_type&& value) -> void {
+            emplace_front(std::move(value));
+        }
+
+        constexpr auto push_back(const_reference value) -> void {
+            emplace_back(value);
+        }
+
+        constexpr auto push_back(value_type&& value) -> void {
+            emplace_back(std::move(value));
+        }
+
+        constexpr auto pop_front() -> void {
+            MYL_ASSERT(!empty(), "Attempting to destroy an element of an empty ring buffer is undefined behavior");
+            altr::destroy(m_allocator, m_head);
+            --m_size;
+            if (m_size != 0)
+                increment(m_head);
+        }
+
+        constexpr auto pop_front(size_type count) -> void { /// MYTODO: This could be improved
+            MYL_ASSERT(count <= m_size, "Popping more elements than the ring buffer contains is undefined behavior");
+            while (count != 0) {
+                pop_front();
+                --count;
+            }
+        }
+
+        constexpr auto pop_back() -> void {
+            MYL_ASSERT(!empty(), "Attempting to destroy an element of an empty ring buffer is undefined behavior");
+            altr::destroy(m_allocator, m_tail);
+            --m_size;
+            if (m_size != 0)
+                decrement(m_tail);
+        }
+
+        constexpr auto pop_back(size_type count) -> void { /// MYTODO: This could be improved
+            MYL_ASSERT(count <= m_size, "Popping more elements than the ring buffer contains is undefined behavior");
+            while (count != 0) {
+                pop_back();
+                --count;
+            }
+        }
+
+        ///constexpr auto insert(const_iterator position, const value_type& value) -> iterator;
+
+        ///constexpr auto insert(const_iterator position, value_type&& value) -> iterator;
+
+        ///constexpr auto insert(const_iterator position, size_type count, const value_type& value) -> iterator;
+
+        ///template<typename InputIt>
+        ///constexpr auto insert(const_pointer position, InputIt first, InputIt last) -> iterator;
+
+        ///template<value_type... Elements>
+        ///constexpr auto insert(const_iterator position, Elements&&... elements) -> iterator;
+        
+        ///constexpr auto erase(const_iterator position) -> iterator;
+
+        ///constexpr auto erase(const_iterator first, const_iterator last) -> iterator;
 
         template<typename InputIt>
         constexpr auto assign(InputIt begin, InputIt end) -> void {
@@ -358,103 +414,41 @@ namespace myl {
             m_tail = m_begin + m_size - 1;
         }
 
-        //template<value_type... Elements>
-        //constexpr auto assign(Elements&&... elements) -> void;
+        ///template<value_type... Elements>
+        ///constexpr auto assign(Elements&&... elements) -> void;
 
-        template<typename... Args>
-        constexpr auto emplace_back(Args&&... args) -> reference {
-            pointer new_back = m_tail;
-            if (m_size != 0)
-                increment(new_back);
-
-            if (m_size == capacity()) {
-                altr::destroy(m_allocator, m_head);
-                increment(m_head);
-            }
-            else
-                ++m_size;
-
-            altr::construct(m_allocator, new_back, std::forward<Args>(args)...);
-            m_tail = new_back;
-            return *m_tail;
-        }
-
-        constexpr auto push_back(const_reference value) -> void {
-            emplace_back(value);
-        }
-
-        constexpr auto push_back(value_type&& value) -> void {
-            emplace_back(std::move(value));
-        }
-
-        constexpr auto pop_back() -> void {
-            MYL_ASSERT(!empty(), "Attempting to destroy an element of an empty ring buffer is undefined behavior");
-            altr::destroy(m_allocator, m_tail);
-            --m_size;
-            if (m_size != 0)
-                decrement(m_tail);
-        }
-
-        constexpr auto pop_back(size_type count) -> void { /// MYTODO: This could be improved
-            MYL_ASSERT(count <= m_size, "Popping more elements than the ring buffer contains is undefined behavior");
-            while (count != 0) {
-                pop_back();
-                --count;
-            }
-       }
-
-        template<typename... Args>
-        constexpr auto emplace_front(Args&&... args) -> reference {
-            pointer new_front = m_head;
-            if (m_size != 0)
-                decrement(new_front);
-
-            if (m_size == capacity()) {
+        constexpr auto clear() noexcept -> void {
+            while (m_size != 0) { // Destroys elements tail to head
                 altr::destroy(m_allocator, m_tail);
                 decrement(m_tail);
+                --m_size;
             }
-            else
-                ++m_size;
 
-            altr::construct(m_allocator, new_front, std::forward<Args>(args)...);
-            m_head = new_front;
-            return *m_head;
+            m_tail = m_head; // Loop sets m_tail to m_head decremented by 1
         }
 
-        constexpr auto push_front(const_reference value) -> void {
-            emplace_front(value);
+        constexpr auto fill(const_reference value) -> void {
+            clear();
+            for (pointer ptr = m_begin; ptr != m_end; ++ptr)
+                altr::construct(m_allocator, ptr, value);
+
+            m_head = m_begin;
+            m_tail = m_end - 1;
+            m_size = capacity();
         }
 
-        constexpr auto push_front(value_type&& value) -> void {
-            emplace_front(std::move(value));
-        }
+        constexpr auto fill_up(const_reference value) -> void {
+            pointer ptr = m_tail;
+            increment(ptr);
 
-        constexpr auto pop_front() -> void {
-            MYL_ASSERT(!empty(), "Attempting to destroy an element of an empty ring buffer is undefined behavior");
-            altr::destroy(m_allocator, m_head);
-            --m_size;
-            if (m_size != 0)
-                increment(m_head);
-        }
-
-        constexpr auto pop_front(size_type count) -> void { /// MYTODO: This could be improved
-            MYL_ASSERT(count <= m_size, "Popping more elements than the ring buffer contains is undefined behavior");
-            while (count != 0) {
-                pop_front();
-                --count;
+            while (ptr != m_head) {
+                altr::construct(m_allocator, ptr, value);
+                increment(ptr);
             }
-        }
 
-        constexpr auto resize(size_type new_size, const_reference value = value_type()) -> void {
-            if (new_size < m_size)
-                pop_back(m_size - new_size);
-            else if (new_size > capacity()) {
-                reallocate(new_size);
-                fill_up(value);
-            }
-            else if (new_size > m_size)
-                while (m_size != new_size) /// MYTODO: This could be improved
-                    emplace_back(value);
+            decrement(ptr);
+            m_tail = ptr;
+            m_size = capacity();
         }
 
         constexpr auto reserve(size_type new_capacity) -> void {
@@ -465,6 +459,20 @@ namespace myl {
         constexpr auto shrink_to_fit() -> void {
             if (capacity() > m_size)
                 reallocate(m_size);
+        }
+
+        constexpr auto resize(size_type new_size, const_reference value = value_type()) -> void {
+            if (new_size < m_size)
+                pop_back(m_size - new_size);
+            else if (new_size > capacity()) {
+                reallocate(new_size);
+                fill_up(value);
+            }
+            else if (new_size > m_size) {
+                reserve(new_size);
+                while (m_size != new_size) /// MYTODO: This could be improved
+                    emplace_back(value);
+            }
         }
 
         constexpr auto rotate(pointer new_head) -> void {
@@ -508,6 +516,8 @@ namespace myl {
             m_head = new_begin;
             m_tail = new_begin + m_size - 1; // This works because capacity = 0 was handled earlier
         }
+
+        ///constexpr auto swap(ring_buffer& other) noexcept(altr::propagate_on_container_swap::value || altr::is_always_equal::value) -> void;
     private:
         inline constexpr auto increment(pointer& ptr) const noexcept -> void {
             ptr == m_end - 1 ?
@@ -547,6 +557,22 @@ namespace myl {
             m_head = new_begin;
             m_tail = new_begin + (m_size == 0 ? 0 : m_size - 1);
         }
+
+        constexpr auto increment_circulator(pointer ptr, bool& has_looped) const -> void {
+            if (ptr == m_tail)
+                has_looped = true;
+            ptr == m_tail ? ptr = m_head : ++ptr;
+            if (ptr == m_end)
+                ptr = m_begin;
+        }
+
+        constexpr auto decrement_circulator(pointer ptr, bool& has_looped) const -> void {
+            if (ptr == m_head)
+                has_looped = true;
+            ptr == m_head ? ptr = m_tail : --ptr;
+            if (ptr == m_begin - 1)
+                ptr = m_end - 1;
+        }
     };
 
     template<typename T, typename A>
@@ -554,7 +580,26 @@ namespace myl {
         if (l.size() != r.size())
             return false;
 
-        /// compare elements
+        for (const auto lit = l.cbegin(), rit = r.cbegin(), lend = l.cend(), rend = r.cend(); lit != lend && rit != rend; ++lit, ++rit)
+            if (*lit != *rit)
+                return false;
         return true;
     }
+}
+
+namespace std {
+    ///template<typename T, typename A>
+    ///constexpr auto swap(myl::ring_buffer<T, A>& l, myl::ring_buffer<T, A>& r) noexcept(noexcept(l.swap(r))) -> void {
+    ///    l.swap.r();
+    ///}
+    
+    ///template<typename T, typename A, typename U>
+    ///constexpr auto erase(myl::ring_buffer<T, A>& buffer, const U& value) -> typename myl::ring_buffer<T, A>::size_type {
+    ///
+    ///}
+    
+    ///template<typename T, typename A, typename Pred>
+    ///constexpr auto erase_if(myl::ring_buffer<T, A>& buffer, Pred predicate) -> typename myl::ring_buffer<T, A>::size_type {
+    ///
+    ///}
 }
