@@ -38,3 +38,15 @@
 //#define MTL_EXTEND_FORMAT
 
 //////////////////////////////////////// Math Related Macros ////////////////////////////////////////
+
+/* MYL_FORCE_RIGHT_HANDED
+* When defined, handedness dependant functions use right math rather than left handed math.
+* [NOTE]: The left/right functions are still available with the _lh/_rh suffixes.
+*/
+//#define MYL_FORCE_RIGHT_HANDED
+
+/*
+* When defined, normalized device coordinate (NDC) dependant functions use an NDC of -1 to 1 rather than 0 to 1.
+* [NOTE]: The NDC -1 to 1/0 to 1 functions are still available with the _11/_01 suffixes.
+*/
+//#define MYL_FORCE_DEPTH_NEGATIVE_ONE_TO_ONE

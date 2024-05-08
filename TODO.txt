@@ -1,5 +1,7 @@
 Unit Tests:
 - memory.hpp
+- math/projection.hpp
+- math/transform.hpp
 - math/vec2.hpp - format
 - math/vec3.hpp - format
 - math/vec4.hpp - format
@@ -10,9 +12,7 @@ Features:
 - static_cyclic_buffer.hpp
 - static_vector.hpp
 - uuid.hpp
-- math/projection.hpp
 - math/quaternion.hpp
-- math/transform.hpp
 - threadpool.hpp
 - logging library
 - cpuid library

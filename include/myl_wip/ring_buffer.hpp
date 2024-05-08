@@ -402,7 +402,8 @@ namespace myl {
         constexpr auto assign(size_type count, const_reference value) -> void {
             clear();
             if (count > capacity()) {
-                m_begin = altr::deallocate(m_allocator, count);
+                altr::deallocate(m_allocator, count);
+                m_begin = altr::allocate(m_allocator, count);
                 m_end = m_begin + count;
             }
 
