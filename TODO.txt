@@ -7,7 +7,6 @@ Unit Tests:
 - math/vec4.hpp - format
 
 Features:
-- cyclic_buffer.hpp
 - random.hpp
 - static_cyclic_buffer.hpp
 - static_vector.hpp

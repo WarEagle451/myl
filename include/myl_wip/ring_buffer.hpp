@@ -83,6 +83,8 @@ namespace myl {
 /// std::erase_if
 /// <=>
 
+/// MYTODO: std::initializer_list<value_tyle> list vs template<value_type... Elements>
+
 namespace myl {
     template<typename T, typename Allocator = std::allocator<T>>
     class ring_buffer {
@@ -114,11 +116,11 @@ namespace myl {
 
         MYL_NO_DISCARD constexpr ring_buffer() = default;
 
-        ///MYL_NO_DISCARD constexpr ring_buffer(const ring_buffer& other) /// how does the allocatpr proagate?
+        ///MYL_NO_DISCARD constexpr ring_buffer(const ring_buffer& other); // Allocator propagation
 
         ///MYL_NO_DISCARD constexpr ring_buffer(const ring_buffer&, const allocator_type& allocator);
 
-        MYL_NO_DISCARD constexpr ring_buffer(ring_buffer&&) = default;
+        ///MYL_NO_DISCARD constexpr ring_buffer(ring_buffer&& other);
 
         ///MYL_NO_DISCARD constexpr ring_buffer(ring_buffer&&, const allocator_type& allocator);
 
@@ -145,6 +147,75 @@ namespace myl {
             clear();
             altr::deallocate(m_allocator, m_begin, capacity());
         }
+
+        constexpr auto operator=(const ring_buffer& other) -> ring_buffer& {
+            if (this == &other)
+                return *this;
+
+            clear();
+            if constexpr (altr::propagate_on_container_copy_assignment::value) {
+                if constexpr (!altr::is_always_equal::value) {
+                    altr::deallocate(m_allocator, m_begin, capacity());
+                    m_begin = nullptr;
+                    m_end = nullptr;
+                    m_head = nullptr;
+                    m_tail = nullptr;
+                    m_size = 0;
+                }
+
+                m_allocator = other.m_allocator;
+            }
+
+            reserve(other.m_size);
+            if (linear())
+                std::copy(other.m_head, other.m_tail + 1, m_begin);
+            else {
+                pointer next = std::copy(other.m_head, other.m_end, m_begin);
+                std::copy(other.m_begin, other.m_tail + 1, next);
+            }
+
+            return *this;
+        }
+
+        constexpr auto operator=(ring_buffer&& other) noexcept(altr::propagate_on_container_move_assignment::value || altr::is_always_equal::value) -> ring_buffer& {
+            if (this == &other)
+                return *this;
+
+            clear();
+            if constexpr (altr::propagate_on_container_move_assignment::value) {
+                altr::deallocate(m_allocator, m_begin, capacity());
+                m_allocator = std::move(other.m_allocator);
+            }
+            else if constexpr (!altr::is_always_equal::value) {
+                reserve(other.m_size);
+                if (linear())
+                    std::copy(other.m_head, other.m_tail + 1, m_begin);
+                else {
+                    pointer next = std::copy(other.m_head, other.m_end, m_begin);
+                    std::copy(other.m_begin, other.m_tail + 1, next);
+                }
+
+                return *this;
+            }
+            else
+                altr::deallocate(m_allocator, m_begin, capacity());
+
+            m_begin = other.m_begin;
+            m_end = other.m_end;
+            m_head = other.m_head;
+            m_tail = other.m_tail;
+            m_size = other.m_size;
+
+            other.m_begin = nullptr;
+            other.m_end = nullptr;
+            other.m_head = nullptr;
+            other.m_tail = nullptr;
+            other.m_size = 0;
+
+            return *this;
+        }
+
+        ///constexpr auto operator=(std::initializer_list<value_tyle> list) -> ring_buffer&;
 
         // Iterators
 
@@ -438,7 +509,7 @@ namespace myl {
             m_size = capacity();
         }
 
-        constexpr auto fill_up(const_reference value) -> void {
+        constexpr auto saturate(const_reference value) -> void {
             pointer ptr = m_tail;
             increment(ptr);
 
@@ -467,7 +538,7 @@ namespace myl {
                 pop_back(m_size - new_size);
             else if (new_size > capacity()) {
                 reallocate(new_size);
-                fill_up(value);
+                saturate(value);
             }
             else if (new_size > m_size) {
                 reserve(new_size);
@@ -506,10 +577,8 @@ namespace myl {
 
             size_type capacity = this->capacity();
             pointer new_begin = altr::allocate(m_allocator, capacity);
-
-            const size_type head_to_end_count = static_cast<size_type>(m_end - m_head);
-            std::memcpy(new_begin, m_head, sizeof(value_type) * head_to_end_count);
-            std::memcpy(new_begin + head_to_end_count, m_begin, sizeof(value_type) * static_cast<size_type>(m_tail - m_begin));
+            pointer next = std::uninitialized_move(m_head, m_end, new_begin);
+            std::uninitialized_move(m_begin, m_tail + 1, next);
 
             altr::deallocate(m_allocator, m_begin, capacity);
             m_begin = new_begin;
@@ -545,11 +614,10 @@ namespace myl {
             pointer new_begin = altr::allocate(m_allocator, new_capacity);
 
             if (linear())
-                std::memcpy(new_begin, m_head, sizeof(value_type) * m_size);
+                std::uninitialized_move(m_head, m_tail + 1, new_begin);
             else {
-                const size_type head_to_end_count = static_cast<size_type>(m_end - m_head);
-                std::memcpy(new_begin, m_head, sizeof(value_type) * head_to_end_count);
-                std::memcpy(new_begin + head_to_end_count, m_begin, sizeof(value_type) * static_cast<size_type>(m_tail - m_begin));
+                pointer next = std::uninitialized_move(m_head, m_end, new_begin);
+                std::uninitialized_move(m_begin, m_tail + 1, next);
             }
 
             altr::deallocate(m_allocator, m_begin, capacity());
@@ -576,6 +644,7 @@ namespace myl {
         }
     };
 
+    /// should this compare if they are aligned?
     template<typename T, typename A>
     MYL_NO_DISCARD constexpr auto operator==(const ring_buffer<T, A>& l, const ring_buffer<T, A>& r) -> bool {
         if (l.size() != r.size())

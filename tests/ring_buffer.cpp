@@ -9,6 +9,7 @@
 /// ooxx
 /// oooo
 /// xxxx
+/// 
 
 TEST_CASE("myl::ring_buffer", "[ring_buffer.hpp]") {
     SECTION("constructor") {
@@ -90,6 +91,17 @@ TEST_CASE("myl::ring_buffer", "[ring_buffer.hpp]") {
         ///    CHECK(a.empty());
         ///    CHECK_FALSE(a.full());
         ///}
+    }
+    SECTION("assignment") {
+        SECTION("assignment") {
+
+        }
+        SECTION("assignment") {
+
+        }
+        SECTION("assignment") {
+
+        }
     }
     SECTION("iterators") {
         SECTION("begin") {
@@ -207,7 +219,7 @@ TEST_CASE("myl::ring_buffer", "[ring_buffer.hpp]") {
     SECTION("fill") {
 
     }
-    SECTION("fill_up") {
+    SECTION("saturate") {
 
     }
     SECTION("assign") {
