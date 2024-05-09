@@ -2,40 +2,49 @@
 
 #include <catch2/catch_all.hpp>
 
-/// test cases: x = no element, o = element
-/// xoox
-/// xxoo
-/// oxxo
-/// ooxx
-/// oooo
-/// xxxx
-/// 
+using element_type = myl::u32;
+
+#define MYL_TEST_RB_OOOO myl::ring_buffer<element_type> oooo(4)
+
+#define MYL_TEST_RB_OOXX \
+myl::ring_buffer<element_type> ooxx(4);\
+ooxx.emplace_back(0);\
+ooxx.emplace_front(1);\
+ooxx.emplace_front(2);\
+ooxx.pop_back();
+
+#define MYL_TEST_RB_OXXO \
+myl::ring_buffer<element_type> oxxo(4);\
+oxxo.emplace_back(0);\
+oxxo.emplace_back(1);\
+oxxo.emplace_back(2);\
+oxxo.pop_front();
+
+#define MYL_TEST_RB_XXOO \
+myl::ring_buffer<element_type> xxoo(4);\
+xxoo.emplace_back(1);\
+xxoo.emplace_back(2);
+
+#define MYL_TEST_RB_XOOX \
+myl::ring_buffer<element_type> xoox(4);\
+xoox.emplace_back(1);\
+xoox.emplace_front(2);
+
+#define MYL_TEST_RB_XXXX \
+myl::ring_buffer<element_type> xxxx(4);\
+xxxx.emplace_back(1);\
+xxxx.emplace_back(2);\
+xxxx.emplace_back(3);\
+xxxx.emplace_back(4);
 
 TEST_CASE("myl::ring_buffer", "[ring_buffer.hpp]") {
     SECTION("constructor") {
         SECTION("default") {
-            myl::ring_buffer<myl::i32> a;
-            CHECK(a.size() == 0);
-            CHECK(a.capacity() == 0);
-            CHECK(a.offset() == 0);
-            CHECK(a.linear());
-            CHECK(a.empty());
-            CHECK(a.full());
+
         }
         SECTION("copy") {
             SECTION("copy") {
-                //myl::ring_buffer<myl::i32> a(3);
-                //a.emplace_back(1);
-                //a.emplace_back(2);
-                //auto b = a;
-                
-                //CHECK(b.size() == 2);
-                //CHECK(b.capacity() == 3);
-                //CHECK(b.offset() == 0);
-                //CHECK(b.linear());
-                //CHECK(b.empty());
-                //CHECK_FALSE(b.full());
-                //CHECK(b == a);
+
             }
             SECTION("allocator") {
 
@@ -52,140 +61,121 @@ TEST_CASE("myl::ring_buffer", "[ring_buffer.hpp]") {
         SECTION("allocator") {
 
         }
-        SECTION("allocator") {
+        SECTION("list") {
 
         }
-        ///SECTION("elements") {
-        ///    myl::ring_buffer<myl::i32> a;
-        ///    CHECK(a.size() == 0);
-        ///    CHECK(a.capacity() == 0);
-        ///    CHECK(a.offset() == 0);
-        ///    CHECK(a.linear());
-        ///    CHECK(a.empty());
-        ///    CHECK_FALSE(a.full());
-        ///}
         SECTION("capacity") {
-            myl::ring_buffer<myl::i32> a(10);
-            CHECK(a.size() == 0);
-            CHECK(a.capacity() == 10);
-            CHECK(a.offset() == 0);
-            CHECK(a.linear());
-            CHECK(a.empty());
-            CHECK_FALSE(a.full());
+
         }
-        ///SECTION("count") {
-        ///    myl::ring_buffer<myl::i32> a;
-        ///    CHECK(a.size() == 0);
-        ///    CHECK(a.capacity() == 0);
-        ///    CHECK(a.offset() == 0);
-        ///    CHECK(a.linear());
-        ///    CHECK(a.empty());
-        ///    CHECK_FALSE(a.full());
-        ///}
-        ///SECTION("iterator") {
-        ///    myl::ring_buffer<myl::i32> a;
-        ///    CHECK(a.size() == 0);
-        ///    CHECK(a.capacity() == 0);
-        ///    CHECK(a.offset() == 0);
-        ///    CHECK(a.linear());
-        ///    CHECK(a.empty());
-        ///    CHECK_FALSE(a.full());
-        ///}
+        SECTION("count") {
+
+        }
+        SECTION("iterator") {
+
+        }
     }
     SECTION("assignment") {
-        SECTION("assignment") {
+        SECTION("copy") {
 
         }
-        SECTION("assignment") {
+        SECTION("move") {
 
         }
-        SECTION("assignment") {
+        SECTION("list") {
 
         }
-    }
-    SECTION("iterators") {
-        SECTION("begin") {
-            SECTION("begin") {
-
-            }
-            SECTION("begin - const") {
-
-            }
-        }
-        SECTION("cbegin") {
-
-        }
-        SECTION("end") {
-            SECTION("end") {
-
-            }
-            SECTION("end - const") {
-
-            }
-        }
-        SECTION("cend") {
-
-        }
-        SECTION("rbegin") {
-            SECTION("rbegin") {
-
-            }
-            SECTION("rbegin - const") {
-
-            }
-        }
-        SECTION("crbegin") {
-
-        }
-        SECTION("rend") {
-            SECTION("rend") {
-
-            }
-            SECTION("rend - const") {
-
-            }
-        }
-        SECTION("crend") {
-
-        }
-    }
-    SECTION("get_allocator") {
-
-    }
-    SECTION("data") {
-        SECTION("data") {
-
-        }
-        SECTION("data - const") {
-
-        }
-    }
-    SECTION("max_size") {
-
     }
     SECTION("size") {
-
+        MYL_TEST_RB_OOOO;
+        CHECK(oooo.size() == 0);
+        MYL_TEST_RB_OOXX;
+        CHECK(ooxx.size() == 2);
+        MYL_TEST_RB_OXXO;
+        CHECK(oxxo.size() == 2);
+        MYL_TEST_RB_XXOO;
+        CHECK(xxoo.size() == 2);
+        MYL_TEST_RB_XOOX;
+        CHECK(xoox.size() == 2);
+        MYL_TEST_RB_XXXX;
+        CHECK(xxxx.size() == 4);
     }
     SECTION("capacity") {
-
+        myl::ring_buffer<element_type> a;
+        CHECK(a.capacity() == 0);
+        MYL_TEST_RB_OOOO;
+        CHECK(oooo.capacity() == 4);
+        MYL_TEST_RB_OOXX;
+        CHECK(ooxx.capacity() == 4);
+        MYL_TEST_RB_OXXO;
+        CHECK(oxxo.capacity() == 4);
+        MYL_TEST_RB_XXOO;
+        CHECK(xxoo.capacity() == 4);
+        MYL_TEST_RB_XOOX;
+        CHECK(xoox.capacity() == 4);
+        MYL_TEST_RB_XXXX;
+        CHECK(xxxx.capacity() == 4);
     }
     SECTION("offset") {
-
+        MYL_TEST_RB_OOOO;
+        CHECK(oooo.offset() == 0);
+        MYL_TEST_RB_OOXX;
+        CHECK(ooxx.offset() == 2);
+        MYL_TEST_RB_OXXO;
+        CHECK(oxxo.offset() == 1);
+        MYL_TEST_RB_XXOO;
+        CHECK(xxoo.offset() == 0);
+        MYL_TEST_RB_XOOX;
+        CHECK(xoox.offset() == 3);
+        MYL_TEST_RB_XXXX;
+        CHECK(xxxx.offset() == 0);
     }
     SECTION("linear") {
-
+        MYL_TEST_RB_OOOO;
+        CHECK(oooo.linear());
+        MYL_TEST_RB_OOXX;
+        CHECK(ooxx.linear());
+        MYL_TEST_RB_OXXO;
+        CHECK(oxxo.linear());
+        MYL_TEST_RB_XXOO;
+        CHECK(xxoo.linear());
+        MYL_TEST_RB_XOOX;
+        CHECK_FALSE(xoox.linear());
+        MYL_TEST_RB_XXXX;
+        CHECK(xxxx.linear());
     }
     SECTION("empty") {
-
+        MYL_TEST_RB_OOOO;
+        CHECK(oooo.empty());
+        MYL_TEST_RB_OOXX;
+        CHECK_FALSE(ooxx.empty());
+        MYL_TEST_RB_OXXO;
+        CHECK_FALSE(oxxo.empty());
+        MYL_TEST_RB_XXOO;
+        CHECK_FALSE(xxoo.empty());
+        MYL_TEST_RB_XOOX;
+        CHECK_FALSE(xoox.empty());
+        MYL_TEST_RB_XXXX;
+        CHECK_FALSE(xxxx.empty());
     }
     SECTION("full") {
-
+        MYL_TEST_RB_OOOO;
+        CHECK_FALSE(oooo.full());
+        MYL_TEST_RB_OOXX;
+        CHECK_FALSE(ooxx.full());
+        MYL_TEST_RB_OXXO;
+        CHECK_FALSE(oxxo.full());
+        MYL_TEST_RB_XXOO;
+        CHECK_FALSE(xxoo.full());
+        MYL_TEST_RB_XOOX;
+        CHECK_FALSE(xoox.full());
+        MYL_TEST_RB_XXXX;
+        CHECK(xxxx.full());
     }
     SECTION("front") {
         SECTION("front") {
 
         }
-        SECTION("front - const") {
+        SECTION("const") {
 
         }
     }
@@ -193,7 +183,7 @@ TEST_CASE("myl::ring_buffer", "[ring_buffer.hpp]") {
         SECTION("back") {
 
         }
-        SECTION("back - const") {
+        SECTION("const") {
 
         }
     }
@@ -201,15 +191,86 @@ TEST_CASE("myl::ring_buffer", "[ring_buffer.hpp]") {
         SECTION("at") {
 
         }
-        SECTION("at - const") {
+        SECTION("const") {
 
         }
     }
-    SECTION("operator[]") {
-        SECTION("operator[]") {
+    SECTION("[]") {
+        SECTION("[]") {
 
         }
-        SECTION("operator[] - const") {
+        SECTION("const") {
+
+        }
+    }
+    SECTION("emplace_front") {
+
+    }
+    SECTION("emplace_back") {
+
+    }
+    SECTION("push_front") {
+        SECTION("copy") {
+
+        }
+        SECTION("move") {
+
+        }
+    }
+    SECTION("push_back") {
+        SECTION("copy") {
+
+        }
+        SECTION("move") {
+
+        }
+    }
+    SECTION("pop_front") {
+        SECTION("single") {
+
+        }
+        SECTION("count") {
+
+        }
+    }
+    SECTION("pop_back") {
+        SECTION("single") {
+
+        }
+        SECTION("count") {
+
+        }
+    }
+    SECTION("insert") {
+        SECTION("copy") {
+
+        }
+        SECTION("move") {
+
+        }
+        SECTION("iterator") {
+
+        }
+        SECTION("list") {
+
+        }
+    }
+    SECTION("erase") {
+        SECTION("single") {
+
+        }
+        SECTION("range") {
+
+        }
+    }
+    SECTION("assign") {
+        SECTION("count") {
+
+        }
+        SECTION("iterator") {
+
+        }
+        SECTION("list") {
 
         }
     }
@@ -222,135 +283,17 @@ TEST_CASE("myl::ring_buffer", "[ring_buffer.hpp]") {
     SECTION("saturate") {
 
     }
-    SECTION("assign") {
-        SECTION("iterator") {
-
-        }
-        SECTION("count") {
-
-        }
-        SECTION("elements") {
-
-        }
-    }
-    SECTION("emplace_back") {
-        myl::ring_buffer<myl::i32> a(3);
-        a.emplace_back(1);
-        a.emplace_back(2);
-
-        CHECK(a.size() == 2);
-        CHECK(a.capacity() == 3);
-        CHECK(a.offset() == 0);
-        CHECK(a.linear());
-        CHECK_FALSE(a.empty());
-        CHECK_FALSE(a.full());
-        CHECK(a[0] == 1);
-        CHECK(a[1] == 2);
-
-        a.emplace_back(3);
-        a.emplace_back(4);
-        CHECK(a.size() == 3);
-        CHECK(a.capacity() == 3);
-        CHECK(a.offset() == 1);
-        CHECK_FALSE(a.linear());
-        CHECK_FALSE(a.empty());
-        CHECK(a.full());
-        CHECK(a[0] == 2);
-        CHECK(a[1] == 3);
-        CHECK(a[2] == 4);
-    }
-    SECTION("push_back") {
-        SECTION("copy") {
-
-        }
-        SECTION("move") {
-
-        }
-    }
-    SECTION("pop_back") {
-        SECTION("pop_back") {
-            myl::ring_buffer<myl::i32> a(2);
-            a.push_back(1);
-            a.push_back(2);
-
-            a.pop_back();
-            CHECK(a.size() == 1);
-            CHECK(a.capacity() == 2);
-            CHECK(a.offset() == 0);
-            CHECK(a.linear());
-            CHECK_FALSE(a.empty());
-            CHECK_FALSE(a.full());
-            CHECK(a.back() == 1);
-        }
-        SECTION("count") {
-            myl::ring_buffer<myl::i32> a(3);
-            a.push_back(1);
-            a.push_back(2);
-            a.push_back(3);
-
-            a.pop_back(2);
-            CHECK(a.size() == 1);
-            CHECK(a.capacity() == 3);
-            CHECK(a.offset() == 0);
-            CHECK(a.linear());
-            CHECK_FALSE(a.empty());
-            CHECK_FALSE(a.full());
-            CHECK(a.back() == 1);
-        }
-    }
-    SECTION("emplace_front") {
-
-    }
-    SECTION("push_front") {
-        SECTION("copy") {
-
-        }
-        SECTION("move") {
-
-        }
-    }
-    SECTION("pop_front") {
-        SECTION("pop_front") {
-            myl::ring_buffer<myl::i32> a(2);
-            a.push_back(1);
-            a.push_back(2);
-
-            a.pop_front();
-            CHECK(a.size() == 1);
-            CHECK(a.capacity() == 2);
-            CHECK(a.offset() == 1);
-            CHECK(a.linear());
-            CHECK_FALSE(a.empty());
-            CHECK_FALSE(a.full());
-            CHECK(a.back() == 2);
-        }
-        SECTION("count") {
-            myl::ring_buffer<myl::i32> a(3);
-            a.push_back(1);
-            a.push_back(2);
-            a.push_back(3);
-
-            a.pop_front(2);
-            CHECK(a.size() == 1);
-            CHECK(a.capacity() == 3);
-            CHECK(a.offset() == 2);
-            CHECK(a.linear());
-            CHECK_FALSE(a.empty());
-            CHECK_FALSE(a.full());
-            CHECK(a.back() == 3);
-        }
-    }
-    SECTION("resize") {
-
-    }
     SECTION("reserve") {
 
     }
     SECTION("shrink_to_fit") {
 
     }
+    SECTION("resize") {
+
+    }
     SECTION("rotate") {
-        SECTION("pointer") {
+        SECTION("position") {
 
         }
         SECTION("offset") {
@@ -358,9 +301,6 @@ TEST_CASE("myl::ring_buffer", "[ring_buffer.hpp]") {
         }
     }
     SECTION("align") {
-
-    }
-    SECTION("comparision") {
 
     }
 }

@@ -174,6 +174,7 @@ namespace myl {
                 std::copy(other.m_begin, other.m_tail + 1, next);
             }
 
+            m_size = other.m_size;
             return *this;
         }
 
@@ -224,7 +225,7 @@ namespace myl {
         }
 
         MYL_NO_DISCARD constexpr auto begin() const noexcept -> const_iterator {
-            return begin();
+            return iterator(m_head, this, empty());
         }
 
         MYL_NO_DISCARD constexpr auto cbegin() const noexcept -> const_iterator {
@@ -236,7 +237,7 @@ namespace myl {
         }
 
         MYL_NO_DISCARD constexpr auto end() const noexcept -> const_iterator {
-            return end();
+            return iterator(m_end, this, true);
         }
 
         MYL_NO_DISCARD constexpr auto cend() const noexcept -> const_iterator {
@@ -248,7 +249,7 @@ namespace myl {
         }
 
         MYL_NO_DISCARD constexpr auto rbegin() const noexcept -> const_reverse_iterator {
-            return rbegin();
+            return reverse_iterator(iterator(m_head, this, empty()));
         }
 
         MYL_NO_DISCARD constexpr auto crbegin() const noexcept -> const_reverse_iterator {
@@ -260,7 +261,7 @@ namespace myl {
         }
 
         MYL_NO_DISCARD constexpr auto rend() const noexcept -> const_reverse_iterator {
-            return rend();
+            return reverse_iterator(iterator(m_head, this, true));
         }
 
         MYL_NO_DISCARD constexpr auto crend() const noexcept -> const_reverse_iterator {
@@ -451,6 +452,22 @@ namespace myl {
 
         ///constexpr auto erase(const_iterator first, const_iterator last) -> iterator;
 
+        constexpr auto assign(size_type count, const_reference value) -> void {
+            clear();
+            if (count > capacity()) {
+                altr::deallocate(m_allocator, count);
+                m_begin = altr::allocate(m_allocator, count);
+                m_end = m_begin + count;
+            }
+
+            m_size = count;
+            for (pointer ptr = m_begin; count != 0; ++ptr, --count)
+                altr::construct(m_allocator, ptr, value);
+
+            m_head = m_begin;
+            m_tail = m_begin + m_size - 1;
+        }
+
         template<typename InputIt>
         constexpr auto assign(InputIt begin, InputIt end) -> void {
             clear();
@@ -468,22 +485,6 @@ namespace myl {
             m_head = m_begin;
             m_tail = m_begin + new_size - 1;
             m_size = new_size;
-        }
-
-        constexpr auto assign(size_type count, const_reference value) -> void {
-            clear();
-            if (count > capacity()) {
-                altr::deallocate(m_allocator, count);
-                m_begin = altr::allocate(m_allocator, count);
-                m_end = m_begin + count;
-            }
-
-            m_size = count;
-            for (pointer ptr = m_begin; count != 0; ++ptr, --count)
-                altr::construct(m_allocator, ptr, value);
-
-            m_head = m_begin;
-            m_tail = m_begin + m_size - 1;
         }
 
         ///template<value_type... Elements>
@@ -524,7 +525,14 @@ namespace myl {
         }
 
         constexpr auto reserve(size_type new_capacity) -> void {
-            if (new_capacity > capacity())
+            const size_type cap = capacity();
+            if (cap == 0) {
+                m_begin = altr::allocate(m_allocator, new_capacity);
+                m_end = m_begin + new_capacity;
+                m_head = m_begin;
+                m_tail = m_begin;
+            }
+            else if (new_capacity > cap)
                 reallocate(new_capacity);
         }
 
@@ -537,7 +545,7 @@ namespace myl {
             if (new_size < m_size)
                 pop_back(m_size - new_size);
             else if (new_size > capacity()) {
-                reallocate(new_size);
+                reserve(new_size);
                 saturate(value);
             }
             else if (new_size > m_size) {
@@ -547,7 +555,7 @@ namespace myl {
             }
         }
 
-        constexpr auto rotate(pointer new_head) -> void {
+        constexpr auto rotate(pointer new_head) -> void { /// MYTODO: Should be a iterator
             MYL_ASSERT(!out_of_bounds(new_head), "The ring buffer must contain the address of the new head");
             if (new_head == m_head)
                 return;
@@ -575,14 +583,14 @@ namespace myl {
                 return;
             }
 
-            size_type capacity = this->capacity();
-            pointer new_begin = altr::allocate(m_allocator, capacity);
+            size_type cap = capacity();
+            pointer new_begin = altr::allocate(m_allocator, cap);
             pointer next = std::uninitialized_move(m_head, m_end, new_begin);
             std::uninitialized_move(m_begin, m_tail + 1, next);
 
-            altr::deallocate(m_allocator, m_begin, capacity);
+            altr::deallocate(m_allocator, m_begin, cap);
             m_begin = new_begin;
-            m_end = new_begin + capacity;
+            m_end = new_begin + cap;
             m_head = new_begin;
             m_tail = new_begin + m_size - 1; // This works because capacity = 0 was handled earlier
         }
@@ -611,6 +619,7 @@ namespace myl {
 
         inline constexpr auto reallocate(size_type new_capacity) -> void {
             MYL_ASSERT(new_capacity != 0);
+            MYL_ASSERT(capacity() != 0);
             pointer new_begin = altr::allocate(m_allocator, new_capacity);
 
             if (linear())
@@ -650,7 +659,7 @@ namespace myl {
         if (l.size() != r.size())
             return false;
 
-        for (const auto lit = l.cbegin(), rit = r.cbegin(), lend = l.cend(), rend = r.cend(); lit != lend && rit != rend; ++lit, ++rit)
+        for (auto lit = l.cbegin(), rit = r.cbegin(), lend = l.cend(), rend = r.cend(); lit != lend && rit != rend; ++lit, ++rit)
             if (*lit != *rit)
                 return false;
         return true;
