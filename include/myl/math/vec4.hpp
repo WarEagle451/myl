@@ -149,7 +149,7 @@ namespace myl {
     }
 }
 
-#ifdef MTL_EXTEND_FORMAT
+#ifdef MYL_EXTEND_FORMAT
 #   include <format>
 
 /// MYTODO: Vec4 formatting of components
