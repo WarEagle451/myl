@@ -1,13 +1,14 @@
 #pragma once
 #include <myl/definitions.hpp>
 
+#include <algorithm>
 #include <limits>
 #include <memory>
 #include <stdexcept>
 #include <utility>
 
 namespace myl {
-    template<typename Container>
+    template<typename Container> /// MYTODO: Make all this bs internal, also redo and do proper, ptr and has looped = true
     class circulator {
     public:
         using iterator_concept  = std::random_access_iterator_tag;
@@ -23,7 +24,7 @@ namespace myl {
     public:
         MYL_NO_DISCARD constexpr circulator() noexcept = default;
 
-        MYL_NO_DISCARD constexpr circulator(pointer ptr, const Container* container, bool has_looped)
+        MYL_NO_DISCARD constexpr circulator(pointer ptr, const Container* container, bool has_looped) /// MYTODO: Remove Container
             : m_container{ container }
             , m_ptr{ ptr }
             , m_has_looped{ has_looped } {}
@@ -39,6 +40,10 @@ namespace myl {
         }
 
         MYL_NO_DISCARD constexpr auto operator->() -> pointer {
+            return m_ptr;
+        }
+
+        MYL_NO_DISCARD constexpr auto operator->() const -> pointer {
             return m_ptr;
         }
 
@@ -129,6 +134,19 @@ namespace myl {
         
         ///template<value_type... Elements>
         ///MYL_NO_DISCARD constexpr ring_buffer(Elements&&... elements); /// const allocator_type& allocator??
+
+        /// MYTEMP: ITS THIS CONSTRUCTOR OR THE ELEMENT ONE
+        MYL_NO_DISCARD constexpr ring_buffer(std::initializer_list<value_type> list, const allocator_type& allocator = allocator_type())
+            : m_allocator{ allocator } {
+            const size_type size = list.size();
+            m_begin = altr::allocate(m_allocator, size);
+            std::uninitialized_move(list.begin(), list.end(), m_begin); /// MYTODO: Should this be a copy???
+
+            m_end = m_begin + size;
+            m_head = m_begin;
+            m_tail = size == 0 ? m_begin : m_begin + size - 1;
+            m_size = size;
+        }
 
         MYL_NO_DISCARD constexpr explicit ring_buffer(size_type capacity, const allocator_type& allocator = allocator_type())
             : m_allocator{ allocator } {
@@ -448,7 +466,60 @@ namespace myl {
         ///template<value_type... Elements>
         ///constexpr auto insert(const_iterator position, Elements&&... elements) -> iterator;
         
-        ///constexpr auto erase(const_iterator position) -> iterator;
+        constexpr auto erase(const_iterator position) -> iterator {
+            MYL_ASSERT(!out_of_bounds(position.operator->()), "Iterator out of bounds and not part of this container");
+            if (m_size == 0)
+                return end();
+
+            MYL_ASSERT(position.operator->() != nullptr, "iterator must be dereferenceable");
+            altr::destroy(m_allocator, position.operator->());
+            --m_size;
+
+            if (position.operator->() == m_head) {
+                increment(m_head);
+                return begin();
+            }
+            else if (position.operator->() == m_tail) {
+                decrement(m_tail);
+                return end();
+            }
+            else { // Iterator is somewhere in the middle
+                /// Stitch the buffer back together
+                /// --HX0XXT-- /// Head -> pos | pos + 1 -> tail + 1
+                /// XXT----H0X /// Head -> pos | pos + 1 -> end | begin -> tail + 1
+                /// X0T----HXX /// Head -> end | begin -> pos | pos + 1 -> tail + 1
+
+                if (linear()) { /// --HX0XXT-- /// Head -> pos | pos + 1 -> tail + 1
+                    /// MYTODO: std::move_backward may me better if head -> pos is smaller than pos -> tail
+                    std::move(position.operator->() + 1, m_tail + 1, position.operator->());
+                    return position;
+                }
+                else {
+                    const size_type destroy_object_offset_from_head = std::distance(m_head, position.operator->());
+                    size_type cap = capacity();
+                    pointer new_begin = altr::allocate(m_allocator, cap);
+
+                    if (m_head < position.operator->()) { /// XXT----H0X /// Head -> pos | pos + 1 -> end | begin -> tail + 1
+                        pointer next1 = std::uninitialized_move(m_head, position.operator->(), new_begin);
+                        pointer next2 = std::uninitialized_move(position.operator->() + 1, m_end, next1);
+                        std::uninitialized_move(m_begin, m_tail + 1, next2);
+                    }
+                    else { /// X0T----HXX /// Head -> end | begin -> pos | pos + 1 -> tail + 1
+                        pointer next1 = std::uninitialized_move(m_head, m_end, new_begin);
+                        pointer next2 = std::uninitialized_move(m_begin, position.operator->(), next1);
+                        std::uninitialized_move(position.operator->() + 1, m_tail + 1, next2);
+                    }
+
+                    altr::deallocate(m_allocator, m_begin, cap);
+                    m_begin = new_begin;
+                    m_end = new_begin + cap;
+                    m_head = new_begin;
+                    m_tail = new_begin + m_size - 1;
+
+                    return iterator(m_head + destroy_object_offset_from_head, this, true);
+                }
+            }
+        }
 
         ///constexpr auto erase(const_iterator first, const_iterator last) -> iterator;
 
@@ -574,6 +645,8 @@ namespace myl {
         }
 
         constexpr auto align() -> void {
+            /// MYTODO: If it's possible to not reallocate don't
+
             if (m_head == m_begin)
                 return;
 

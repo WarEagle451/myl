@@ -1,7 +1,7 @@
 #include <myl_wip/ring_buffer.hpp>
 
 #include <catch2/catch_all.hpp>
-
+#include <iostream>
 using element_type = myl::u32;
 
 #define MYL_TEST_RB_OOOO myl::ring_buffer<element_type> oooo(4)
@@ -257,7 +257,36 @@ TEST_CASE("myl::ring_buffer", "[ring_buffer.hpp]") {
     }
     SECTION("erase") {
         SECTION("single") {
+            myl::ring_buffer<myl::u8> rb1{ 0, 0, 1, 2, 3, 4, 5, 6, 0, 0 };
+            rb1.pop_front(2);
+            rb1.pop_back(2);
 
+            rb1.erase(myl::ring_buffer<myl::u8>::iterator(rb1.begin().operator->() + 2, &rb1, false));
+            CHECK(rb1[0] == 1);
+            CHECK(rb1[1] == 2);
+            CHECK(rb1[2] == 4);
+            CHECK(rb1[3] == 5);
+            CHECK(rb1[4] == 6);
+
+            myl::ring_buffer<myl::u8> rb2{ 4, 5, 6, 0, 0, 0, 0, 1, 2, 3 };
+            rb2.rotate(3);
+            rb2.pop_front(4);
+            rb2.erase(myl::ring_buffer<myl::u8>::iterator(rb2.begin().operator->() + 1, &rb2, false));
+            CHECK(rb2[0] == 1);
+            CHECK(rb2[1] == 3);
+            CHECK(rb2[2] == 4);
+            CHECK(rb2[3] == 5);
+            CHECK(rb2[4] == 6);
+            
+            myl::ring_buffer<myl::u8> rb3{ 4, 5, 6, 0, 0, 0, 0, 1, 2, 3 };
+            rb3.rotate(3);
+            rb3.pop_front(4);
+            rb3.erase(myl::ring_buffer<myl::u8>::iterator(rb3.end().operator->() - 2, &rb3, false));
+            CHECK(rb3[0] == 1);
+            CHECK(rb3[1] == 2);
+            CHECK(rb3[2] == 3);
+            CHECK(rb3[3] == 4);
+            CHECK(rb3[4] == 6);
         }
         SECTION("range") {
 
