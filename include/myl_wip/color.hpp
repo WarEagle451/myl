@@ -143,7 +143,26 @@ namespace myl {
     }
 
     ///template<> MYL_NO_DISCARD constexpr auto color_cast<color::model::hsl, color::model::lab>(const f32vec3& color) -> f32vec3 { return color::hsl_to_lab(color); }
-    ///template<> MYL_NO_DISCARD constexpr auto color_cast<color::model::hsl, color::model::rgb>(const f32vec3& color) -> f32vec3 { return color::hsl_to_rgb(color); }
+
+    ///template<>
+    ///MYL_NO_DISCARD constexpr auto color_cast<color::model::hsl, color::model::rgb>(const f32vec3& color) -> f32vec3 {
+    ///    const f32 c = (1.f - std::abs(2.f * color[2] - 1.f)) * color[1];
+    ///    const f32 x = c * (1.f - std::abs(std::fmod((color[0] / 60.f), 2.f) - 1));
+    ///    const f32 m = color[2] - (c * .5f);
+    ///    
+    ///    f32vec3 rgb(m);
+    ///    if (color[0] < 60.f)       rgb += { c, x, 0 };
+    ///    else if (color[0] < 120.f) rgb += { x, c, 0 };
+    ///    else if (color[0] < 180.f) rgb += { 0, c, x };
+    ///    else if (color[0] < 240.f) rgb += { 0, x, c };
+    ///    else if (color[0] < 300.f) rgb += { x, 0, c };
+    ///    else if (color[0] < 360.f) rgb += { c, 0, x };
+    ///    else
+    ///        return f32vec3(1.f);
+    ///
+    ///    return rgb;
+    ///}
+
     ///template<> MYL_NO_DISCARD constexpr auto color_cast<color::model::hsl, color::model::rgba>(const f32vec3& color) -> f32vec4 { return color::hsl_to_rgba(color); }
 
     ///template<> MYL_NO_DISCARD constexpr auto color_cast<color::model::hsv, color::model::cmy>(const f32vec3& color) -> f32vec3 { return color::hsv_to_cmy(color); }
@@ -165,7 +184,25 @@ namespace myl {
     }
     
     ///template<> MYL_NO_DISCARD constexpr auto color_cast<color::model::hsv, color::model::lab>(const f32vec3& color) -> f32vec3 { return color::hsv_to_lab(color); }
-    ///template<> MYL_NO_DISCARD constexpr auto color_cast<color::model::hsv, color::model::rgb>(const f32vec3& color) -> f32vec3 { return color::hsv_to_rgb(color); }
+
+    template<> MYL_NO_DISCARD constexpr auto color_cast<color::model::hsv, color::model::rgb>(const f32vec3& color) -> f32vec3 {
+        const f32 c = color[2] * color[1];
+        const f32 x = c * (1.f - std::fabs(std::fmod(color[0] / 60.f, 2.f) - 1.f));
+        const f32 m = color[2] - c;
+
+        f32vec3 rgb(m);
+        if (color[0] < 60.f)       rgb += { c, x, 0.f };
+        else if (color[0] < 120.f) rgb += { x, c, 0.f };
+        else if (color[0] < 180.f) rgb += { 0.f, c, x };
+        else if (color[0] < 240.f) rgb += { 0.f, x, c };
+        else if (color[0] < 300.f) rgb += { x, 0.f, c };
+        else if (color[0] < 360.f) rgb += { c, 0.f, x };
+        else
+            return f32vec3(1.f);
+
+        return rgb;
+    }
+
     ///template<> MYL_NO_DISCARD constexpr auto color_cast<color::model::hsv, color::model::rgba>(const f32vec3& color) -> f32vec4 { return color::hsv_to_rgba(color); }
 
     ///template<> MYL_NO_DISCARD constexpr auto color_cast<color::model::lab, color::model::cmy>(const f32vec3& color) -> f32vec3 { return color::lab_to_cmy(color); }
@@ -311,7 +348,7 @@ namespace myl {
         ///MYL_NO_DISCARD constexpr auto hsv_to_cmyk(const f32vec3& color) -> f32vec4 { return color_cast<model::hsv, model::cmyk>(color); }
         MYL_NO_DISCARD constexpr auto hsv_to_hsl(const f32vec3& color) -> f32vec3 { return color_cast<model::hsv, model::hsl>(color); }
         ///MYL_NO_DISCARD constexpr auto hsv_to_lab(const f32vec3& color) -> f32vec3 { return color_cast<model::hsv, model::lab>(color); }
-        ///MYL_NO_DISCARD constexpr auto hsv_to_rgb(const f32vec3& color) -> f32vec3 { return color_cast<model::hsv, model::rgb>(color); }
+        MYL_NO_DISCARD constexpr auto hsv_to_rgb(const f32vec3& color) -> f32vec3 { return color_cast<model::hsv, model::rgb>(color); }
         ///MYL_NO_DISCARD constexpr auto hsv_to_rgba(const f32vec3& color) -> f32vec4 { return color_cast<model::hsv, model::rgba>(color); }
 
         ///MYL_NO_DISCARD constexpr auto lab_to_cmy(const f32vec3& color) -> f32vec3 { return color_cast<model::lab, model::cmy>(color); }
