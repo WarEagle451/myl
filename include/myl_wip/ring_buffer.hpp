@@ -18,7 +18,7 @@ namespace myl {
         using pointer           = value_type*;
         using reference         = value_type&;
     private:
-        const Container* m_container;
+        const Container* m_container; /// MYTODO: remove this
         pointer m_ptr          = nullptr;
         bool m_has_looped      = false;
     public:
@@ -251,11 +251,11 @@ namespace myl {
         }
 
         MYL_NO_DISCARD constexpr auto end() noexcept -> iterator {
-            return iterator(m_end, this, true);
+            return iterator(m_tail + 1, this, true);
         }
 
         MYL_NO_DISCARD constexpr auto end() const noexcept -> const_iterator {
-            return iterator(m_end, this, true);
+            return iterator(m_tail + 1, this, true);
         }
 
         MYL_NO_DISCARD constexpr auto cend() const noexcept -> const_iterator {
@@ -263,11 +263,11 @@ namespace myl {
         }
 
         MYL_NO_DISCARD constexpr auto rbegin() noexcept -> reverse_iterator {
-            return reverse_iterator(iterator(m_head, this, empty()));
+            return reverse_iterator(iterator(m_tail + 1, this, empty()));
         }
 
         MYL_NO_DISCARD constexpr auto rbegin() const noexcept -> const_reverse_iterator {
-            return reverse_iterator(iterator(m_head, this, empty()));
+            return reverse_iterator(iterator(m_tail + 1, this, empty()));
         }
 
         MYL_NO_DISCARD constexpr auto crbegin() const noexcept -> const_reverse_iterator {
@@ -574,7 +574,7 @@ namespace myl {
         constexpr auto fill(const_reference value) -> void {
             clear();
             for (pointer ptr = m_begin; ptr != m_end; ++ptr)
-                altr::construct(m_allocator, ptr, value);
+                altr::construct(m_allocator, ptr, value);*-++++-*
 
             m_head = m_begin;
             m_tail = m_end - 1;
@@ -582,7 +582,12 @@ namespace myl {
         }
 
         constexpr auto saturate(const_reference value) -> void {
+            if (full())
+                return;
+
             pointer ptr = m_tail;
+            if (empty())
+                altr::construct(m_allocator, ptr, value);
             increment(ptr);
 
             while (ptr != m_head) {
@@ -619,11 +624,8 @@ namespace myl {
                 reserve(new_size);
                 saturate(value);
             }
-            else if (new_size > m_size) {
-                reserve(new_size);
-                while (m_size != new_size) /// MYTODO: This could be improved
-                    emplace_back(value);
-            }
+            else if (new_size > m_size) // Previour check ensures capacity >= new_size
+                saturate(value);
         }
 
         constexpr auto rotate(pointer new_head) -> void { /// MYTODO: Should be a iterator
@@ -645,8 +647,6 @@ namespace myl {
         }
 
         constexpr auto align() -> void {
-            /// MYTODO: If it's possible to not reallocate don't
-
             if (m_head == m_begin)
                 return;
 
@@ -670,13 +670,13 @@ namespace myl {
 
         ///constexpr auto swap(ring_buffer& other) noexcept(altr::propagate_on_container_swap::value || altr::is_always_equal::value) -> void;
     private:
-        inline constexpr auto increment(pointer& ptr) const noexcept -> void {
+        inline constexpr auto increment(pointer& ptr) const noexcept -> void { /// Should be pointer of pointer to imply object is changed
             ptr == m_end - 1 ?
                 ptr = m_begin : // Loop from the last to first element of the array
                 ++ptr;
         }
 
-        inline constexpr auto decrement(pointer& ptr) const noexcept -> void {
+        inline constexpr auto decrement(pointer& ptr) const noexcept -> void { /// Should be pointer of pointer to imply object is changed
             ptr == m_begin ?
                 ptr = m_end - 1 : // Loop from the first to last element of the array
                 --ptr;
