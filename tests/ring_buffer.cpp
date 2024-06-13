@@ -219,7 +219,15 @@ TEST_CASE("myl::ring_buffer", "[ring_buffer.hpp]") {
     }
     SECTION("at") {
         SECTION("at") {
+            MYL_TEST_RB_OO21;
+            CHECK(ooxx.at(0) == 2);
+            CHECK(ooxx.at(1) == 1);
 
+            MYL_TEST_RB_1234;
+            CHECK(xxxx.at(0) == 1);
+            CHECK(xxxx.at(1) == 2);
+            CHECK(xxxx.at(2) == 3);
+            CHECK(xxxx.at(3) == 4);
         }
         SECTION("const") {
 
@@ -227,17 +235,37 @@ TEST_CASE("myl::ring_buffer", "[ring_buffer.hpp]") {
     }
     SECTION("[]") {
         SECTION("[]") {
+            MYL_TEST_RB_OO21;
+            CHECK(ooxx[0] == 2);
+            CHECK(ooxx[1] == 1);
 
+            MYL_TEST_RB_1234;
+            CHECK(xxxx[0] == 1);
+            CHECK(xxxx[1] == 2);
+            CHECK(xxxx[2] == 3);
+            CHECK(xxxx[3] == 4);
         }
         SECTION("const") {
 
         }
     }
     SECTION("emplace_front") {
-
+        myl::ring_buffer<myl::u8> rb(2);
+        rb.emplace_front(1);
+        rb.emplace_front(2);
+        rb.emplace_front(3);
+        MYL_TEST_RB_CHECK(rb, 2, 2, 0, true, false, true);
+        CHECK(rb.data()[0] == 3);
+        CHECK(rb.data()[1] == 2);
     }
     SECTION("emplace_back") {
-
+        myl::ring_buffer<myl::u8> rb(2);
+        rb.emplace_back(1);
+        rb.emplace_back(2);
+        rb.emplace_back(3);
+        MYL_TEST_RB_CHECK(rb, 2, 2, 1, false, false, true);
+        CHECK(rb.data()[0] == 3);
+        CHECK(rb.data()[1] == 2);
     }
     SECTION("push_front") {
         SECTION("copy") {
@@ -337,16 +365,70 @@ TEST_CASE("myl::ring_buffer", "[ring_buffer.hpp]") {
         }
     }
     SECTION("clear") {
+        MYL_TEST_RB_OO21;
+        ooxx.clear();
+        MYL_TEST_RB_CHECK(ooxx, 0, 4, 0, true, true, false);
 
+        MYL_TEST_RB_1234;
+        xxxx.clear();
+        MYL_TEST_RB_CHECK(xxxx, 0, 4, 0, true, true, false);
     }
     SECTION("fill") {
+        MYL_TEST_RB_OOOO;
+        oooo.fill(7);
+        MYL_TEST_RB_CHECK(oooo, 4, 4, 0, true, false, true);
+        CHECK(oooo.data()[0] == 7);
+        CHECK(oooo.data()[1] == 7);
+        CHECK(oooo.data()[2] == 7);
+        CHECK(oooo.data()[3] == 7);
 
+        MYL_TEST_RB_OO21;
+        ooxx.fill(5);
+        MYL_TEST_RB_CHECK(ooxx, 4, 4, 0, true, false, true);
+        CHECK(ooxx.data()[0] == 5);
+        CHECK(ooxx.data()[1] == 5);
+        CHECK(ooxx.data()[2] == 5);
+        CHECK(ooxx.data()[3] == 5);
     }
     SECTION("saturate") {
+        MYL_TEST_RB_OOOO;
+        oooo.saturate(7);
+        MYL_TEST_RB_CHECK(oooo, 4, 4, 0, true, false, true);
+        CHECK(oooo.data()[0] == 7);
+        CHECK(oooo.data()[1] == 7);
+        CHECK(oooo.data()[2] == 7);
+        CHECK(oooo.data()[3] == 7);
 
+        MYL_TEST_RB_OO21;
+        ooxx.saturate(5);
+        MYL_TEST_RB_CHECK(ooxx, 4, 4, 2, false, false, true);
+        CHECK(ooxx.data()[0] == 5);
+        CHECK(ooxx.data()[1] == 5);
+        CHECK(ooxx.data()[2] == 2);
+        CHECK(ooxx.data()[3] == 1);
+
+        MYL_TEST_RB_1234;
+        xxxx.saturate(5);
+        MYL_TEST_RB_CHECK(xxxx, 4, 4, 0, true, false, true);
+        CHECK(xxxx.data()[0] == 1);
+        CHECK(xxxx.data()[1] == 2);
+        CHECK(xxxx.data()[2] == 3);
+        CHECK(xxxx.data()[3] == 4);
     }
     SECTION("reserve") {
+        myl::ring_buffer<myl::u8> rb1;
+        rb1.reserve(8);
+        MYL_TEST_RB_CHECK(rb1, 0, 8, 0, true, true, false);
+        rb1.reserve(5);
+        MYL_TEST_RB_CHECK(rb1, 0, 8, 0, true, true, false);
 
+        myl::ring_buffer<myl::u8> rb2{ 0, 1, 2, 3 };
+        rb2.reserve(8);
+        MYL_TEST_RB_CHECK(rb2, 4, 8, 0, true, false, false);
+        CHECK(rb2.data()[0] == 0);
+        CHECK(rb2.data()[1] == 1);
+        CHECK(rb2.data()[2] == 2);
+        CHECK(rb2.data()[3] == 3);
     }
     SECTION("shrink_to_fit") {
 

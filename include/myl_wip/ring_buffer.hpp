@@ -568,13 +568,14 @@ namespace myl {
                 --m_size;
             }
 
-            m_tail = m_head; // Loop sets m_tail to m_head decremented by 1
+            m_head = m_begin; // Align buffer while it's cheap
+            m_tail = m_begin;
         }
 
         constexpr auto fill(const_reference value) -> void {
             clear();
             for (pointer ptr = m_begin; ptr != m_end; ++ptr)
-                altr::construct(m_allocator, ptr, value);*-++++-*
+                altr::construct(m_allocator, ptr, value);
 
             m_head = m_begin;
             m_tail = m_end - 1;
