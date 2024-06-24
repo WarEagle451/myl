@@ -47,6 +47,7 @@ set(MYL_TEST_SOURCES
     "math/vec4.cpp"
     "ring_buffer.cpp"
     "shaping.cpp"
+    "static_vector.cpp"
     "string.cpp"
     "type.cpp"
     "version.cpp"

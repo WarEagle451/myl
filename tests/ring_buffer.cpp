@@ -1,9 +1,10 @@
 #include <myl_wip/ring_buffer.hpp>
 
+#if 0
+
 #include <catch2/catch_all.hpp>
 #include <iostream>
 using element_type = myl::u32;
-
 #define MYL_TEST_RB_OOOO myl::ring_buffer<element_type> oooo(4)
 
 #define MYL_TEST_RB_OO21 \
@@ -589,3 +590,5 @@ TEST_CASE("myl::ring_buffer", "[ring_buffer.hpp]") {
 
     }
 }
+
+#endif

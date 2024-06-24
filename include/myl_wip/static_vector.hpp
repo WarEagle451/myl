@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <compare>
+#include <initializer_list> /// MYTODO: Maybe replace with a parameter pack
 #include <memory>
 #include <utility>
 
@@ -42,57 +43,52 @@ namespace myl {
             u32        m_dummy = 0;
             value_type m_begin[Capacity];
         };
-        pointer m_last = m_begin;
+        pointer m_end = m_begin;
 
         // Helpers
 
-        consteval const char* error_str_out_of_bounds       = "Element is out of bounds of the container!";
-        consteval const char* error_str_beyond_capacity     = "Container will be beyond capacity, increasing the size past capacity is illegal!";
-        consteval const char* error_str_not_enough_elements = "Container doesn't contain enough elements to pop!";
+        static consteval auto error_str_out_of_bounds() -> const char* { return "Element is out of bounds of the container!"; }
+        static consteval auto error_str_beyond_capacity() -> const char* { return "Container will be beyond capacity, increasing the size past capacity is illegal!"; }
+        static consteval auto error_str_not_enough_elements() -> const char* { return "Container doesn't contain enough elements to pop!"; }
     public:
         // Constructors, Destructor, Assignment
 
         MYL_NO_DISCARD constexpr static_vector() noexcept = default;
 
         MYL_NO_DISCARD constexpr static_vector(const static_vector& other) noexcept(std::is_nothrow_copy_constructible_v<value_type>)
-            : m_last{ std::uninitialized_copy(other.begin(), other.end(), m_begin) } {}
+            : m_end{ std::uninitialized_copy(other.begin(), other.end(), m_begin) } {}
 
         MYL_NO_DISCARD constexpr static_vector(static_vector&& other) noexcept(std::is_nothrow_move_constructible_v<value_type>)
-            : m_last{ std::uninitialized_move(other.begin(), other.end(), m_begin) } {}
+            : m_end{ std::uninitialized_move(other.m_begin, other.m_end, m_begin) } {}
 
         MYL_NO_DISCARD constexpr static_vector(size_type count, const value_type& value = value_type()) {
-            MYL_ASSERT(count <= Capacity, error_str_beyond_capacity);
+            MYL_ASSERT(count <= Capacity, error_str_beyond_capacity());
 #ifndef MYL_NO_EXCEPTIONS
             if (count > Capacity)
-                throw std::length_error(error_str_beyond_capacity);
+                throw std::length_error(error_str_beyond_capacity());
 #endif
-            m_last = std::uninitialized_fill_n(m_begin, count, value);
+            m_end = std::uninitialized_fill_n(m_begin, count, value);
         }
 
         template<std::input_iterator It>
         MYL_NO_DISCARD constexpr static_vector(It first, It last) {
-            MYL_ASSERT(static_cast<size_type>(std::distance(first, last) <= Capacity, error_str_beyond_capacity);
+            MYL_ASSERT(std::distance(first, last) <= static_cast<difference_type>(Capacity), error_str_beyond_capacity());
 #ifndef MYL_NO_EXCEPTIONS
-            if (static_cast<size_type>(std::distance(first, last) > Capacity)
-                throw std::length_error(error_str_beyond_capacity);
+            if (std::distance(first, last) <= static_cast<difference_type>(Capacity))
+                throw std::length_error(error_str_beyond_capacity());
 #endif
-            m_last = std::uninitialized_copy(first, last, m_begin);
+            m_end = std::uninitialized_copy(first, last, m_begin);
         }
 
-        ///MYL_NO_DISCARD constexpr static_vector(std::initializer_list<value_type> list);
+        MYL_NO_DISCARD constexpr static_vector(std::initializer_list<value_type> list)
+            : static_vector(list.begin(), list.end()) {}
 
         template<usize N>
-        MYL_NO_DISCARD constexpr static_vector(const static_vector<value_type, N>& other) noexcept(std::is_nothrow_copy_constructible_v<value_type>) requires(N < Capacity) {
-            MYL_ASSERT(N <= Capacity, error_str_beyond_capacity);
-#ifndef MYL_NO_EXCEPTIONS
-            if (N > Capacity)
-                throw std::length_error(error_str_beyond_capacity);
-#endif
-            m_last = std::uninitialized_copy(other.begin(), other.end(), m_begin);
-        }
+        MYL_NO_DISCARD constexpr static_vector(const static_vector<value_type, N>& other) noexcept(std::is_nothrow_copy_constructible_v<value_type>) requires(N < Capacity)
+            : m_end{ std::uninitialized_copy(other.begin(), other.end(), m_begin) } {}
 
         constexpr ~static_vector() {
-            std::destroy(m_begin, m_last);
+            std::destroy(m_begin, m_end);
         }
 
         constexpr auto operator=(const static_vector& other) noexcept(std::is_nothrow_copy_assignable_v<value_type>) -> static_vector& {
@@ -100,7 +96,7 @@ namespace myl {
                 return *this;
 
             std::copy(other.begin(), other.end(), m_begin);
-            m_last = m_begin + other.size();
+            m_end = m_begin + other.size();
             return *this;
         }
 
@@ -108,12 +104,21 @@ namespace myl {
             if (this == &other)
                 return *this;
 
-            std::move(other.begin(), other.end(), m_begin);
-            m_last = m_begin + other.size();
+            std::move(other.m_begin, other.m_end, m_begin);
+            m_end = m_begin + other.size();
             return *this;
         }
 
-        ///constexpr auto operator=(std::initializer_list<value_type> list) -> static_vector&;
+        constexpr auto operator=(std::initializer_list<value_type> list) -> static_vector& {
+            MYL_ASSERT(list.size() <= Capacity, error_str_beyond_capacity());
+#ifndef MYL_NO_EXCEPTIONS
+            if (list.size() > Capacity)
+                throw std::length_error(error_str_beyond_capacity());
+#endif
+            std::copy(list.begin(), list.end(), m_begin);
+            m_end = m_begin + list.size();
+            return *this;
+        }
 
         // Iterators
 
@@ -130,11 +135,11 @@ namespace myl {
         }
 
         MYL_NO_DISCARD constexpr auto end() noexcept -> iterator {
-            return iterator(m_last);
+            return iterator(m_end);
         }
 
         MYL_NO_DISCARD constexpr auto end() const noexcept -> const_iterator {
-            return const_iterator(m_last);
+            return const_iterator(m_end);
         }
 
         MYL_NO_DISCARD constexpr auto cend() const noexcept -> const_iterator {
@@ -146,7 +151,7 @@ namespace myl {
         }
 
         MYL_NO_DISCARD constexpr auto rbegin() const noexcept -> const_reverse_iterator {
-            return reverse_iterator(cend());
+            return const_reverse_iterator(cend());
         }
 
         MYL_NO_DISCARD constexpr auto crbegin() const noexcept -> const_reverse_iterator {
@@ -158,7 +163,7 @@ namespace myl {
         }
 
         MYL_NO_DISCARD constexpr auto rend() const noexcept -> const_reverse_iterator {
-            return reverse_iterator(cbegin());
+            return const_reverse_iterator(cbegin());
         }
 
         MYL_NO_DISCARD constexpr auto crend() const noexcept -> const_reverse_iterator {
@@ -175,24 +180,24 @@ namespace myl {
             return m_begin;
         }
 
-        MYL_NO_DISCARD constexpr auto max_size() noexcept -> difference_type { /// consteval?
+        MYL_NO_DISCARD consteval auto max_size() noexcept -> difference_type {
             return static_cast<difference_type>(Capacity);
         }
 
         MYL_NO_DISCARD constexpr auto size() const noexcept -> size_type {
-            return static_cast<size_type>(m_last - m_begin);
+            return static_cast<size_type>(m_end - m_begin);
         }
 
-        MYL_NO_DISCARD constexpr auto capacity() const noexcept -> size_type { /// consteval? if yes then use this over Capacity
+        MYL_NO_DISCARD consteval auto capacity() const noexcept -> size_type {
             return Capacity;
         }
 
         MYL_NO_DISCARD constexpr auto empty() const noexcept -> bool {
-            return m_begin == m_last;
+            return m_begin == m_end;
         }
 
         MYL_NO_DISCARD constexpr auto full() const noexcept -> bool {
-            return m_last == m_begin + Capacity;
+            return m_end == m_begin + Capacity;
         }
 
         // Access
@@ -209,39 +214,39 @@ namespace myl {
 
         MYL_NO_DISCARD constexpr auto back() -> reference {
             MYL_ASSERT(!empty(), "No back element exists!");
-            return *(m_last - 1);
+            return *(m_end - 1);
         }
 
         MYL_NO_DISCARD constexpr auto back() const -> const_reference {
             MYL_ASSERT(!empty(), "No back element exists!");
-            return *(m_last - 1);
+            return *(m_end - 1);
         }
 
         MYL_NO_DISCARD constexpr auto at(size_type index) -> reference {
-            MYL_ASSERT(index < size(), error_str_out_of_bounds);
+            MYL_ASSERT(index < size(), error_str_out_of_bounds());
 #ifndef MYL_NO_EXCEPTIONS
             if (index >= size())
-                throw std::out_of_range(error_str_out_of_bounds);
+                throw std::out_of_range(error_str_out_of_bounds());
 #endif
             return m_begin[index];
         }
 
         MYL_NO_DISCARD constexpr auto at(size_type index) const -> const_reference {
-            MYL_ASSERT(index < size(), error_str_out_of_bounds);
+            MYL_ASSERT(index < size(), error_str_out_of_bounds());
 #ifndef MYL_NO_EXCEPTIONS
             if (index >= size())
-                throw std::out_of_range(error_str_out_of_bounds);
+                throw std::out_of_range(error_str_out_of_bounds());
 #endif
             return m_begin[index];
         }
 
         MYL_NO_DISCARD constexpr auto operator[](size_type index) -> reference {
-            MYL_ASSERT(size() < index, error_str_out_of_bounds);
+            MYL_ASSERT(index < size(), error_str_out_of_bounds());
             return m_begin[index];
         }
 
         MYL_NO_DISCARD constexpr auto operator[](size_type index) const -> const_reference {
-            MYL_ASSERT(size() < index, error_str_out_of_bounds);
+            MYL_ASSERT(index < size(), error_str_out_of_bounds());
             return m_begin[index];
         }
 
@@ -249,36 +254,38 @@ namespace myl {
 
         template<typename... Args>
         constexpr auto emplace(const_iterator position, Args&&... args) -> iterator {
-            MYL_ASSERT(m_begin <= position.operator->() && position.operator->() <= m_last, error_str_out_of_bounds);
-            MYL_ASSERT(!full(), error_str_beyond_capacity);
+            pointer where = const_cast<pointer>(position.operator->());
+
+            MYL_ASSERT(m_begin <= where && where <= m_end, error_str_out_of_bounds());
+            MYL_ASSERT(!full(), error_str_beyond_capacity());
 #ifndef MYL_NO_EXCEPTIONS
-            if (m_begin > position.operator->() || position.operator->() > m_last)
-                throw std::out_of_range(error_str_out_of_bounds);
+            if (m_begin > where || where > m_end)
+                throw std::out_of_range(error_str_out_of_bounds());
 
             if (full())
-                throw std::length_error(error_str_beyond_capacity);
+                throw std::length_error(error_str_beyond_capacity());
 #endif
-            if (position.operator->() == m_last)
-                std::construct_at(m_last, std::forward<Args>(args)...);
+            if (where == m_end)
+                std::construct_at(m_end, std::forward<Args>(args)...);
             else {
                 value_type temp(std::forward<Args>(args)...); // Strong exception guarantee
-                std::move_backward(position.operator->(), m_last, m_last + 1);
-                *(position.operator->()) = std::move(temp);
+                std::move_backward(where, m_end, m_end + 1);
+                std::construct_at(where, std::move(temp));
             }
 
-            ++m_last;
+            ++m_end;
             return position;
         }
 
         template<typename... Args>
         constexpr auto emplace_back(Args&&... args) -> reference {
-            MYL_ASSERT(!full(), error_str_beyond_capacity);
+            MYL_ASSERT(!full(), error_str_beyond_capacity());
 #ifndef MYL_NO_EXCEPTIONS
             if (full())
-                throw std::length_error(error_str_beyond_capacity);
+                throw std::length_error(error_str_beyond_capacity());
 #endif
-            pointer out = std::construct_at(m_last, std::forward<Args>(args)...);
-            ++m_last;
+            pointer out = std::construct_at(m_end, std::forward<Args>(args)...);
+            ++m_end;
             return *out;
         }
 
@@ -291,23 +298,23 @@ namespace myl {
         }
 
         constexpr auto pop_back() -> void {
-            MYL_ASSERT(!empty(), error_str_not_enough_elements);
+            MYL_ASSERT(!empty(), error_str_not_enough_elements());
 #ifndef MYL_NO_EXCEPTIONS
             if (empty())
-                throw std::underflow_error(error_str_not_enough_elements);
+                throw std::underflow_error(error_str_not_enough_elements());
 #endif
-            std::destroy_at(m_last - 1);
-            --m_last;
+            std::destroy_at(m_end - 1);
+            --m_end;
         }
 
         constexpr auto pop_back(size_type count) -> void {
-            MYL_ASSERT(size() >= count, error_str_not_enough_elements);
+            MYL_ASSERT(size() >= count, error_str_not_enough_elements());
 #ifndef MYL_NO_EXCEPTIONS
             if (size() < count)
-                throw std::underflow_error(error_str_not_enough_elements);
+                throw std::underflow_error(error_str_not_enough_elements());
 #endif
-            std::destroy(m_last - count, m_last);
-            m_last -= count;
+            std::destroy(m_end - count, m_end);
+            m_end -= count;
         }
 
         constexpr auto insert(const_iterator position, const value_type& value) -> iterator {
@@ -323,49 +330,55 @@ namespace myl {
         ///template<std::input_iterator It>
         ///constexpr auto insert(const_iterator position, It first, It last) -> iterator;
 
-        ///constexpr auto insert(const_iterator position, std::initializer_list<value_type> list) -> iterator;
+        ///constexpr auto insert(const_iterator position, std::initializer_list<value_type> list) -> iterator {
+        ///    return insert(position, list.begin(), list.end());
+        ///}
 
         constexpr auto erase(const_iterator position) -> iterator {
-            MYL_ASSERT(m_begin <= position.operator->() && position.operator->() <= m_last, error_str_out_of_bounds);
-            std::destroy_at(position.operator->());
-            --m_last;
-            if (position.operator->() != m_last)
-                move_range(position.operator->(), position.operator->() + 1, m_last);
+            pointer where = const_cast<pointer>(position.operator->());
+
+            MYL_ASSERT(m_begin <= where && where < m_end, error_str_out_of_bounds());
+            std::destroy_at(where);
+            if (where != m_end)
+                std::move(where + 1, m_end, where);
+            --m_end;
             return position;
         }
 
         ///constexpr auto erase(const_iterator first, const_iterator last) -> iterator;
 
         constexpr auto assign(size_type count, const value_type& value) -> void {
-            MYL_ASSERT(count <= Capacity, error_str_beyond_capacity);
+            MYL_ASSERT(count <= Capacity, error_str_beyond_capacity());
 #ifndef MYL_NO_EXCEPTIONS
             if (count > Capacity)
-                throw std::length_error(error_str_beyond_capacity);
+                throw std::length_error(error_str_beyond_capacity());
 #endif
-            std::destroy(m_begin, m_last);
+            std::destroy(m_begin, m_end);
             std::uninitialized_fill(m_begin, m_begin + count, value);
-            m_last = m_begin;
+            m_end = m_begin + count;
         }
 
         ///template<std::input_iterator It>
         ///constexpr auto assign(It first, It last) -> void;
 
-        ///constexpr auto assign(std::initializer_list<value_type> list) -> void;
+        ///constexpr auto assign(std::initializer_list<value_type> list) -> void {
+        ///    assign(list.begin(), list.end());
+        ///}
 
         constexpr auto clear() noexcept -> void {
-            std::destroy(m_begin, m_last);
-            m_last = m_begin;
+            std::destroy(m_begin, m_end);
+            m_end = m_begin;
         }
 
-        constexpr auto fill(const value_type& value) noexcept -> void { /// Only if the constructors of value type are noexcept
-            std::destroy(m_begin, m_last);
+        constexpr auto fill(const value_type& value) -> void {
+            std::destroy(m_begin, m_end);
             std::uninitialized_fill(m_begin, m_begin + Capacity, value);
-            m_last = m_begin + Capacity;
+            m_end = m_begin + Capacity;
         }
 
-        constexpr auto saturate(const value_type& value) noexcept -> void { /// Only if the constructors of value type are noexcept
-            std::uninitialized_fill(m_last, m_begin + Capacity, value);
-            m_last = m_begin + Capacity;
+        constexpr auto saturate(const value_type& value) -> void {
+            std::uninitialized_fill(m_end, m_begin + Capacity, value);
+            m_end = m_begin + Capacity;
         }
 
         ///constexpr auto resize(size_type count) -> void;
@@ -380,7 +393,7 @@ namespace myl {
         if (l.size() != r.size())
             return false;
 
-        for (auto lit = l.begin(), rit = r.begin(); lit != l.end(); ++lit, ++rit)
+        for (auto lit = l.cbegin(), rit = r.cbegin(); lit != l.cend(); ++lit, ++rit)
             if (*lit != *rit)
                 return false;
         return true;
@@ -388,7 +401,7 @@ namespace myl {
 
     template<typename T, usize C>
     MYL_NO_DISCARD constexpr auto operator<=>(const static_vector<T, C>& l, const static_vector<T, C>& r) {
-        return std::lexicographical_compare_three_way(l.begin(), l.end(), r.begin(), r.end());
+        return std::lexicographical_compare_three_way(l.cbegin(), l.cend(), r.cbegin(), r.cend());
     }
 }
 
@@ -398,7 +411,7 @@ namespace std {
     ///    l.swap(r);
     ///}
 
-    template<typename T, usize C, typename U>
+    template<typename T, myl::usize C, typename U>
     constexpr auto erase(myl::static_vector<T, C>& v, const U& value) -> typename myl::static_vector<T, C>::size_type {
         typename myl::static_vector<T, C>::size_type old_size = v.size();
         for (auto it = v.rbegin(), end = v.rend(); it != end; ++it)
@@ -407,7 +420,7 @@ namespace std {
         return old_size - v.size();
     }
 
-    template<typename T, usize C, typename Pred>
+    template<typename T, myl::usize C, typename Pred>
     constexpr auto erase_if(myl::static_vector<T, C>& v, Pred predicate) -> typename myl::static_vector<T, C>::size_type {
         typename myl::static_vector<T, C>::size_type old_size = v.size();
         for (auto it = v.rbegin(), end = v.rend(); it != end; ++it)
