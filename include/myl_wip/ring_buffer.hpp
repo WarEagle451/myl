@@ -20,7 +20,7 @@ namespace myl {
     private:
         const Container* m_container; /// MYTODO: remove this
         pointer m_ptr          = nullptr;
-        bool m_has_looped      = false;
+        bool m_has_looped      = false; /// THIS IN CONSTUUCTOR SHOULD HAVE A DEFAULT
     public:
         MYL_NO_DISCARD constexpr circulator() noexcept = default;
 
@@ -466,7 +466,7 @@ namespace myl {
         ///template<value_type... Elements>
         ///constexpr auto insert(const_iterator position, Elements&&... elements) -> iterator;
         
-        constexpr auto erase(const_iterator position) -> iterator {
+        constexpr auto erase(const_iterator position) -> iterator { /// MYTODO: THIS SHOULD BE IMPROVED
             MYL_ASSERT(!out_of_bounds(position.operator->()), "Iterator out of bounds and not part of this container");
             if (m_size == 0)
                 return end();
@@ -618,6 +618,8 @@ namespace myl {
                 reallocate(m_size);
         }
 
+        /// RESIZE WITHOUT VALUE?
+
         constexpr auto resize(size_type new_size, const_reference value = value_type()) -> void {
             if (new_size < m_size)
                 pop_back(m_size - new_size);
@@ -625,8 +627,9 @@ namespace myl {
                 reserve(new_size);
                 saturate(value);
             }
-            else if (new_size > m_size) // Previour check ensures capacity >= new_size
-                saturate(value);
+            else if (new_size > m_size) // Previous check ensures capacity >= new_size
+                while (new_size != m_size)
+                    push_back(value);
         }
 
         constexpr auto rotate(pointer new_head) -> void { /// MYTODO: Should be a iterator
@@ -639,12 +642,50 @@ namespace myl {
             m_tail = m_begin + ((offset() + m_size) % m_size) - 1;
         }
 
-        constexpr auto rotate(difference_type offset) -> void {
+        constexpr auto rotate(difference_type offset) -> void { /// FIXING THIS WILL MESS UP OTHER TESTS
+            /// MYTODO: This may have to reallocate, as rotate OHTO by 1 would result in OTHO,
+            /// THIS IS NOT VALID
+            /// CANT ROTATE EMPRTY
             if (offset == 0 || m_size == offset % m_size)
                 return;
 
-            m_head = m_begin + ((this->offset() + offset - 1) % m_size) + 1;
-            m_tail = m_begin + ((this->offset() + m_size) % m_size) - 1;
+            if (full()) {
+                m_head = m_begin + ((this->offset() + offset - 1) % m_size) + 1;
+                m_tail = m_begin + ((this->offset() + m_size) % m_size) - 1; /// WTF, this is probably no good
+            }
+            else {
+                const size_type cap = capacity();
+                pointer new_begin = altr::allocate(m_allocator, cap);
+                pointer new_head = m_begin + ((this->offset() + offset - 1) % m_size) + 1;
+
+                bool need_thrid_copy = m_tail + 1 < new_head;
+                pointer next = std::uninitialized_move(new_head, need_thrid_copy ? m_end : m_tail + 1, new_begin);
+                if (need_thrid_copy)
+                    next = std::uninitialized_move(m_begin, m_tail + 1, next);
+                std::uninitialized_move(m_head, new_head > m_head ? new_head : m_end, next);
+
+                altr::deallocate(m_allocator, m_begin, cap);
+                m_begin = new_begin;
+                m_end = m_begin + cap;
+                m_head = m_begin;
+                m_tail = m_begin + m_size - 1;
+
+                //////offset = 2
+                ///    OOHABTO | OO HA BT O -> BT
+                ///    HABTOOO | HA BT  OOO -> BT
+                ///    BTOOOHA | BT OOO  HA -> BT
+                ///    TOOOHAB | T  OOO HAB -> BT
+                /// 
+                /// OHTO | O H T O -> THOO
+                /// 
+                ///        // copy 1 new_head to tail+1/end (which evercomes first)
+                ///
+                ///        /// confirm /m_end (which evercomes first) for copy 2
+                ///        // copy 2 head -> new_head/m_end (which evercomes first) = array_2 /// only work if new_head is greater than head
+                ///        // copy 3 if end in copy 1 : m_begin to tail + 1
+
+               
+            }
         }
 
         constexpr auto align() -> void {
@@ -738,6 +779,8 @@ namespace myl {
                 return false;
         return true;
     }
+
+    /// <=>
 }
 
 namespace std {

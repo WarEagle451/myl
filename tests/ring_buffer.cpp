@@ -269,34 +269,108 @@ TEST_CASE("myl::ring_buffer", "[ring_buffer.hpp]") {
     }
     SECTION("push_front") {
         SECTION("copy") {
+            myl::ring_buffer<myl::u8> rb(2);
+            decltype(rb)::value_type a{ 1 };
+            decltype(rb)::value_type b{ 2 };
+            decltype(rb)::value_type c{ 3 };
 
+            rb.push_front(a);
+            rb.push_front(b);
+            rb.push_front(c);
+
+            MYL_TEST_RB_CHECK(rb, 2, 2, 0, true, false, true);
+            CHECK(rb.data()[0] == 3);
+            CHECK(rb.data()[1] == 2);
         }
         SECTION("move") {
-
+            myl::ring_buffer<myl::u8> rb(2);
+            decltype(rb)::value_type a{ 1 };
+            decltype(rb)::value_type b{ 2 };
+            decltype(rb)::value_type c{ 3 };
+            
+            rb.push_front(std::move(a));
+            rb.push_front(std::move(b));
+            rb.push_front(std::move(c));
+            
+            MYL_TEST_RB_CHECK(rb, 2, 2, 0, true, false, true);
+            CHECK(rb.data()[0] == 3);
+            CHECK(rb.data()[1] == 2);
         }
     }
     SECTION("push_back") {
         SECTION("copy") {
-
+            myl::ring_buffer<myl::u8> rb(2);
+            decltype(rb)::value_type a{ 1 };
+            decltype(rb)::value_type b{ 2 };
+            decltype(rb)::value_type c{ 3 };
+            
+            rb.push_back(a);
+            rb.push_back(b);
+            rb.push_back(c);
+            
+            MYL_TEST_RB_CHECK(rb, 2, 2, 1, false, false, true);
+            CHECK(rb.data()[0] == 3);
+            CHECK(rb.data()[1] == 2);
         }
         SECTION("move") {
-
+            myl::ring_buffer<myl::u8> rb(2);
+            decltype(rb)::value_type a{ 1 };
+            decltype(rb)::value_type b{ 2 };
+            decltype(rb)::value_type c{ 3 };
+            
+            rb.push_back(std::move(a));
+            rb.push_back(std::move(b));
+            rb.push_back(std::move(c));
+            
+            MYL_TEST_RB_CHECK(rb, 2, 2, 1, false, false, true);
+            CHECK(rb.data()[0] == 3);
+            CHECK(rb.data()[1] == 2);
         }
     }
     SECTION("pop_front") {
         SECTION("single") {
+            MYL_TEST_RB_1OO2;
+            xoox.pop_front();
+            MYL_TEST_RB_CHECK(xoox, 1, 4, 0, true, false, false);
+            CHECK(xoox[0] == 1);
 
+            MYL_TEST_RB_O12O;
+            oxxo.pop_front();
+            MYL_TEST_RB_CHECK(oxxo, 1, 4, 2, true, false, false);
+            CHECK(oxxo[0] == 2);
         }
         SECTION("count") {
+            MYL_TEST_RB_1OO2;
+            xoox.pop_front(2);
+            MYL_TEST_RB_CHECK(xoox, 0, 4, 0, true, true, false);
 
+            MYL_TEST_RB_1234;
+            xxxx.pop_front(3);
+            MYL_TEST_RB_CHECK(xxxx, 1, 4, 3, true, false, false);
+            CHECK(xxxx[0] == 4);
         }
     }
     SECTION("pop_back") {
         SECTION("single") {
+            MYL_TEST_RB_1OO2;
+            xoox.pop_back();
+            MYL_TEST_RB_CHECK(xoox, 1, 4, 3, true, false, false);
+            CHECK(xoox[0] == 2);
 
+            MYL_TEST_RB_O12O;
+            oxxo.pop_back();
+            MYL_TEST_RB_CHECK(oxxo, 1, 4, 1, true, false, false);
+            CHECK(oxxo[0] == 1);
         }
         SECTION("count") {
-
+            MYL_TEST_RB_1OO2;
+            xoox.pop_back(2);
+            MYL_TEST_RB_CHECK(xoox, 0, 4, 3, true, true, false);
+            
+            MYL_TEST_RB_1234;
+            xxxx.pop_back(3);
+            MYL_TEST_RB_CHECK(xxxx, 1, 4, 0, true, false, false);
+            CHECK(xxxx[0] == 1);
         }
     }
     SECTION("insert") {
@@ -431,17 +505,84 @@ TEST_CASE("myl::ring_buffer", "[ring_buffer.hpp]") {
         CHECK(rb2.data()[3] == 3);
     }
     SECTION("shrink_to_fit") {
+        MYL_TEST_RB_1OO2;        
+        xoox.shrink_to_fit();
+        MYL_TEST_RB_CHECK(xoox, 2, 2, 0, true, false, true);
 
+        MYL_TEST_RB_1234;
+        xxxx.shrink_to_fit();
+        MYL_TEST_RB_CHECK(xxxx, 4, 4, 0, true, false, true);
     }
     SECTION("resize") {
+        MYL_TEST_RB_1OO2;
+        xoox.resize(2, 5); // Do nothing
+        MYL_TEST_RB_CHECK(xoox, 2, 4, 3, false, false, false);
+        xoox.resize(3, 5); // Push 1 element
+        MYL_TEST_RB_CHECK(xoox, 3, 4, 3, false, false, false);
 
+        MYL_TEST_RB_1234;
+        xxxx.resize(3, 5); // Remove 1 element
+        MYL_TEST_RB_CHECK(xxxx, 3, 4, 0, true, false, false);
+        xxxx.resize(5, 5); // Reallocate and push elements
+        MYL_TEST_RB_CHECK(xxxx, 5, 5, 0, true, false, true);
     }
     SECTION("rotate") {
         SECTION("position") {
 
         }
-        SECTION("offset") {
+        SECTION("offset") { /// MYTODO: CONFIRMS THIS WORKS WITH NEATIVE NUMBERS
+            /// TEST FOR
+            /// TOOH
+            /// OHTO
+            /// HTOO
+            /// OOHT
+            
+            // OOXXXXO
 
+            myl::ring_buffer<myl::u8> rb0{ 0, 0, 1, 2, 3, 4, 0 };
+            rb0.pop_front(2);
+            rb0.pop_back();
+            rb0.rotate(2);
+            MYL_TEST_RB_CHECK(rb0, 4, 7, 0, true, false, false);
+            CHECK(rb0[0] == 3);
+            CHECK(rb0[1] == 4);
+            CHECK(rb0[2] == 1);
+            CHECK(rb0[3] == 2);
+
+            // XXXXOOO
+
+            myl::ring_buffer<myl::u8> rb1{ 1, 2, 3, 4 };
+            rb1.reserve(7);
+            rb1.rotate(2);
+            MYL_TEST_RB_CHECK(rb1, 4, 7, 0, true, false, false);
+            CHECK(rb1[0] == 3);
+            CHECK(rb1[1] == 4);
+            CHECK(rb1[2] == 1);
+            CHECK(rb1[3] == 2);
+
+            // XXOOOXX
+
+            myl::ring_buffer<myl::u8> rb2{ 3, 4, 0, 0, 0, 1, 2 };
+            rb2.rotate(2); // Test for when full
+            rb2.pop_front(3);
+            rb2.rotate(2);
+            MYL_TEST_RB_CHECK(rb2, 4, 7, 0, true, false, false);
+            CHECK(rb2[0] == 3);
+            CHECK(rb2[1] == 4);
+            CHECK(rb2[2] == 1);
+            CHECK(rb2[3] == 2);
+
+            // XXOOOXX
+
+            myl::ring_buffer<myl::u8> rb3{ 4, 0, 0, 0, 1, 2, 3 };
+            rb3.rotate(1); // Test for when full
+            rb3.pop_front(3);
+            rb3.rotate(2);
+            MYL_TEST_RB_CHECK(rb3, 4, 7, 0, true, false, false);
+            CHECK(rb3[0] == 3);
+            CHECK(rb3[1] == 4);
+            CHECK(rb3[2] == 1);
+            CHECK(rb3[3] == 2);
         }
     }
     SECTION("align") {
