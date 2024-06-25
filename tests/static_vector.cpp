@@ -343,10 +343,21 @@ TEST_CASE("myl::static_vector", "[static_vector.hpp]") {
             CHECK(sv[1] == 5);
         }
         SECTION("iterator") {
-    
+            std::array<element_type, 3> a{ 1, 2, 3 };
+            myl::static_vector<element_type, 4> sv;
+            sv.assign(a.begin(), a.end());
+            MYL_TEST_SV_CHECK(sv, 3, 4, false, false);
+            CHECK(sv[0] == 1);
+            CHECK(sv[1] == 2);
+            CHECK(sv[2] == 3);
         }
         SECTION("list") {
-    
+            myl::static_vector<element_type, 4> sv;
+            sv.assign({ 1, 2, 3 });
+            MYL_TEST_SV_CHECK(sv, 3, 4, false, false);
+            CHECK(sv[0] == 1);
+            CHECK(sv[1] == 2);
+            CHECK(sv[2] == 3);
         }
     }
     SECTION("clear") {
@@ -401,7 +412,18 @@ TEST_CASE("myl::static_vector", "[static_vector.hpp]") {
         }
     }
     SECTION("swap") {
-    
+        myl::static_vector<element_type, 4> sv0{ 1, 2, 3 };
+        myl::static_vector<element_type, 4> sv1{ 4, 5 };
+        sv0.swap(sv1);
+
+        MYL_TEST_SV_CHECK(sv0, 2, 4, false, false);
+        CHECK(sv0[0] == 4);
+        CHECK(sv0[1] == 5);
+
+        MYL_TEST_SV_CHECK(sv1, 3, 4, false, false);
+        CHECK(sv1[0] == 1);
+        CHECK(sv1[1] == 2);
+        CHECK(sv1[2] == 3);
     }
     SECTION("==") {
         myl::static_vector<element_type, 3> sv0;
@@ -432,10 +454,26 @@ TEST_CASE("myl::static_vector", "[static_vector.hpp]") {
     
     }
     SECTION("std::swap") {
-    
+        myl::static_vector<element_type, 4> sv0{ 1, 2, 3 };
+        myl::static_vector<element_type, 4> sv1{ 4, 5 };
+        std::swap(sv1, sv0);
+
+        MYL_TEST_SV_CHECK(sv0, 2, 4, false, false);
+        CHECK(sv0[0] == 4);
+        CHECK(sv0[1] == 5);
+
+        MYL_TEST_SV_CHECK(sv1, 3, 4, false, false);
+        CHECK(sv1[0] == 1);
+        CHECK(sv1[1] == 2);
+        CHECK(sv1[2] == 3);
     }
     SECTION("std::erase") {
-    
+        ///myl::static_vector<element_type, 5> sv{ 1, 2, 1, 3, 1 };
+        ///std::erase(sv, 1);
+        ///
+        ///MYL_TEST_SV_CHECK(sv, 2, 5, false, false);
+        ///CHECK(sv[0] == 2);
+        ///CHECK(sv[1] == 3);
     }
     SECTION("std::erase_if") {
     

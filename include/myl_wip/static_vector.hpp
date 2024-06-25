@@ -11,6 +11,16 @@
 #   include <stdexcept>
 #endif
 
+/// MYTODO: Does;
+/// - std::copy
+/// - std::move (iterator)
+/// - uninitialized_copy
+/// - uninitialized_move
+/// - uninitialized_fill_n
+/// - move_backward
+/// - uninitialized_fill
+/// call destory on things?
+
 /// MYTodo: static_vector.hpp - Not yet
 /// - Consider removing initializer_list, replace with parameter packs. Would reduce unnecessary copy and move ctors
 ///     MYL_NO_DISCARD constexpr static_vector(std::convertible_to<value_type> auto&&... args) requires(sizeof...(args) <= Capacity);
@@ -354,16 +364,24 @@ namespace myl {
                 throw std::length_error(error_str_beyond_capacity());
 #endif
             std::destroy(m_begin, m_end);
-            std::uninitialized_fill(m_begin, m_begin + count, value);
-            m_end = m_begin + count;
+            m_end = std::uninitialized_fill_n(m_begin, count, value);
         }
 
-        ///template<std::input_iterator It>
-        ///constexpr auto assign(It first, It last) -> void;
+        template<std::input_iterator It>
+        constexpr auto assign(It first, It last) -> void {
+            const size_type count = std::distance(first, last);
+            MYL_ASSERT(count <= Capacity, error_str_beyond_capacity());
+#ifndef MYL_NO_EXCEPTIONS
+            if (count > Capacity)
+                throw std::length_error(error_str_beyond_capacity());
+#endif
+            std::destroy(m_begin, m_end);
+            m_end = std::uninitialized_copy(first, last, m_begin);
+        }
 
-        ///constexpr auto assign(std::initializer_list<value_type> list) -> void {
-        ///    assign(list.begin(), list.end());
-        ///}
+        constexpr auto assign(std::initializer_list<value_type> list) -> void {
+            assign(list.begin(), list.end());
+        }
 
         constexpr auto clear() noexcept -> void {
             std::destroy(m_begin, m_end);
@@ -385,7 +403,27 @@ namespace myl {
 
         ///constexpr auto resize(size_type count, const value_type& value) -> void;
 
-        ///constexpr auto swap(static_vector& other) noexcept(std::is_nothrow_swappable_v<value_type>) -> void;
+        constexpr auto swap(static_vector& other) noexcept(std::is_nothrow_swappable_v<value_type>) -> void {
+            /// MYTODO: one is full?, same size?, one is empty?, switch full with empty
+
+            const size_type a = size();
+            const size_type b = other.size();
+            const size_type min = a > b ? b : a;
+
+            for (size_type i = 0; i != min; ++i)
+                std::swap(m_begin[i], other.m_begin[i]);
+
+            if (min == a) {
+                std::move(other.m_begin + min, other.m_end, m_begin + min);
+                m_end = m_begin + b;
+                other.m_end = other.m_begin + min;
+            }
+            else {
+                std::move(m_begin + min, m_end, other.m_begin + min);
+                m_end = m_begin + min;
+                other.m_end = other.m_begin + a;
+            }
+        }
     };
 
     template<typename T, usize C>
@@ -406,17 +444,17 @@ namespace myl {
 }
 
 namespace std {
-    ///template<typename T, usize C>
-    ///constexpr auto swap(myl::static_vector<T, C>& l, myl::static_vector<T, C>& r) noexcept(noexcept(l.swap(r))) -> void {
-    ///    l.swap(r);
-    ///}
+    template<typename T, myl::usize C>
+    constexpr auto swap(myl::static_vector<T, C>& l, myl::static_vector<T, C>& r) noexcept(noexcept(l.swap(r))) -> void {
+        l.swap(r);
+    }
 
     template<typename T, myl::usize C, typename U>
     constexpr auto erase(myl::static_vector<T, C>& v, const U& value) -> typename myl::static_vector<T, C>::size_type {
         typename myl::static_vector<T, C>::size_type old_size = v.size();
         for (auto it = v.rbegin(), end = v.rend(); it != end; ++it)
             if (*it == value)
-                v.erase(it.operator->());
+                v.erase(it.base());
         return old_size - v.size();
     }
 
@@ -425,7 +463,7 @@ namespace std {
         typename myl::static_vector<T, C>::size_type old_size = v.size();
         for (auto it = v.rbegin(), end = v.rend(); it != end; ++it)
             if (predicate(*it))
-                v.erase(it.operator->());
+                v.erase(it.base());
         return old_size - v.size();
     }
 }
