@@ -4,8 +4,6 @@
 #include <iterator>
 #include <utility>
 
-/// DEFINE std::iterator_traits?
-
 /// MYTODO: Condense both iterator classes into one
 
 namespace myl {

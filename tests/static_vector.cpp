@@ -1,10 +1,10 @@
-#include <myl_wip/static_vector.hpp>
+#include <myl/static_vector.hpp>
 
 #include <catch2/catch_all.hpp>
 
 #include <array>
 
-/// MYTODO: TEST Iterators
+/// MYTODO: ENSURE THINGS THAT ARE SUPPOSE TO THROW DO THROW
 
 using element_type = myl::u8;
 
@@ -18,11 +18,13 @@ TEST_CASE("myl::static_vector", "[static_vector.hpp]") {
     SECTION("constructor") {
         SECTION("default") {
             myl::static_vector<element_type, 4> sv;
+
             MYL_TEST_SV_CHECK(sv, 0, 4, true, false);
         }
         SECTION("copy") {
             myl::static_vector<element_type, 4> sv0{ 1, 2, 3 };
             myl::static_vector<element_type, 4> sv1(sv0);
+
             MYL_TEST_SV_CHECK(sv0, 3, 4, false, false);
             CHECK(sv0[0] == 1);
             CHECK(sv0[1] == 2);
@@ -35,13 +37,16 @@ TEST_CASE("myl::static_vector", "[static_vector.hpp]") {
         SECTION("move") {
             myl::static_vector<element_type, 4> sv0{ 1, 2, 3 };
             myl::static_vector<element_type, 4> sv1(std::move(sv0));
-            MYL_TEST_SV_CHECK(sv0, 3, 4, false, false);
+
+            MYL_TEST_SV_CHECK(sv1, 3, 4, false, false);
             CHECK(sv1[0] == 1);
             CHECK(sv1[1] == 2);
             CHECK(sv1[2] == 3);
         }
         SECTION("count") {
-            myl::static_vector<element_type, 4> sv(3, 5);
+            element_type a{ 5 };
+            myl::static_vector<element_type, 4> sv(3, a);
+
             MYL_TEST_SV_CHECK(sv, 3, 4, false, false);
             CHECK(sv[0] == 5);
             CHECK(sv[1] == 5);
@@ -50,21 +55,25 @@ TEST_CASE("myl::static_vector", "[static_vector.hpp]") {
         SECTION("iterator") {
             std::array<element_type, 3> a{ 1, 2, 3 };
             myl::static_vector<element_type, 4> sv(a.begin(), a.end());
+
             MYL_TEST_SV_CHECK(sv, 3, 4, false, false);
             CHECK(sv[0] == 1);
             CHECK(sv[1] == 2);
             CHECK(sv[2] == 3);
         }
         SECTION("list") {
-            myl::static_vector<element_type, 4> sv{ 1, 2, 3 };
+            std::initializer_list<element_type> l{ 1, 2, 3 };
+            myl::static_vector<element_type, 4> sv(l);
+
             MYL_TEST_SV_CHECK(sv, 3, 4, false, false);
             CHECK(sv[0] == 1);
             CHECK(sv[1] == 2);
             CHECK(sv[2] == 3);
         }
-        SECTION("copy of lesser size") {
+        SECTION("copy of lesser capacity") {
             myl::static_vector<element_type, 3> sv0{ 1, 2 };
             myl::static_vector<element_type, 4> sv1(sv0);
+
             MYL_TEST_SV_CHECK(sv1, 2, 4, false, false);
             CHECK(sv1[0] == 1);
             CHECK(sv1[1] == 2);
@@ -75,21 +84,31 @@ TEST_CASE("myl::static_vector", "[static_vector.hpp]") {
             myl::static_vector<element_type, 4> sv0{ 1, 2, 3 };
             myl::static_vector<element_type, 4> sv1{ 4, 5 };
             sv0 = sv1;
+            
             MYL_TEST_SV_CHECK(sv0, 2, 4, false, false);
             CHECK(sv0[0] == 4);
             CHECK(sv0[1] == 5);
+            
+            MYL_TEST_SV_CHECK(sv1, 2, 4, false, false);
+            CHECK(sv1[0] == 4);
+            CHECK(sv1[1] == 5);
         }
         SECTION("move") {
             myl::static_vector<element_type, 4> sv0{ 1, 2, 3 };
             myl::static_vector<element_type, 4> sv1{ 4, 5 };
+
             sv0 = std::move(sv1);
+
             MYL_TEST_SV_CHECK(sv0, 2, 4, false, false);
             CHECK(sv0[0] == 4);
             CHECK(sv0[1] == 5);
         }
         SECTION("list") {
+            std::initializer_list<element_type> l{ 4, 5, 6, 7 };
             myl::static_vector<element_type, 4> sv{ 1, 2, 3 };
-            sv = { 4, 5, 6, 7 };
+
+            sv = l;
+
             MYL_TEST_SV_CHECK(sv, 4, 4, false, true);
             CHECK(sv[0] == 4);
             CHECK(sv[1] == 5);
@@ -106,14 +125,20 @@ TEST_CASE("myl::static_vector", "[static_vector.hpp]") {
     }
     SECTION("size") {
         myl::static_vector<element_type, 4> sv;
+        element_type a{ 1 };
+
         CHECK(sv.size() == 0);
-        sv.emplace_back(1);
+
+        sv.emplace_back(a);
         CHECK(sv.size() == 1);
-        sv.emplace_back(2);
+
+        sv.emplace_back(a);
         CHECK(sv.size() == 2);
-        sv.emplace_back(3);
+
+        sv.emplace_back(a);
         CHECK(sv.size() == 3);
-        sv.emplace_back(4);
+
+        sv.emplace_back(a);
         CHECK(sv.size() == 4);
     }
     SECTION("capacity") {
@@ -122,89 +147,129 @@ TEST_CASE("myl::static_vector", "[static_vector.hpp]") {
     }
     SECTION("empty") {
         myl::static_vector<element_type, 4> sv;
+        element_type a{ 1 };
+
         CHECK(sv.empty());
-        sv.emplace_back(1);
+
+        sv.emplace_back(a);
         CHECK_FALSE(sv.empty());
     }
     SECTION("full") {
         myl::static_vector<element_type, 4> sv;
+        element_type a{ 1 };
+
         CHECK_FALSE(sv.full());
-        sv.fill(1);
+
+        sv.fill(a);
+
         CHECK(sv.full());
     }
     SECTION("front") {
         SECTION("front") {
             myl::static_vector<element_type, 4> sv{ 1, 2, 3 };
-            CHECK(sv.front() == 1);
+            element_type a{ 1 };
+
+            CHECK(sv.front() == a);
         }
         SECTION("const") {
             const myl::static_vector<element_type, 4> sv{ 1, 2, 3 };
-            CHECK(sv.front() == 1);
+            element_type a{ 1 };
+
+            CHECK(sv.front() == a);
         }
     }
     SECTION("back") {
         SECTION("back") {
             myl::static_vector<element_type, 4> sv{ 1, 2, 3 };
-            CHECK(sv.back() == 3);
+            element_type a{ 3 };
+
+            CHECK(sv.back() == a);
         }
         SECTION("const") {
             const myl::static_vector<element_type, 4> sv{ 1, 2, 3 };
-            CHECK(sv.back() == 3);
+            element_type a{ 3 };
+
+            CHECK(sv.back() == a);
         }
     }
     SECTION("at") {
         SECTION("at") {
-            myl::static_vector<element_type, 4> sv{ 1, 2, 3 };
-            CHECK(sv.at(0) == 1);
-            CHECK(sv.at(1) == 2);
-            CHECK(sv.at(2) == 3);
+            element_type a{ 1 };
+            element_type b{ 2 };
+            element_type c{ 3 };
+            myl::static_vector<element_type, 4> sv{ a, b, c };
+
+            CHECK(sv.at(0) == a);
+            CHECK(sv.at(1) == b);
+            CHECK(sv.at(2) == c);
         }
         SECTION("const") {
-            const myl::static_vector<element_type, 4> sv{ 1, 2, 3 };
-            CHECK(sv.at(0) == 1);
-            CHECK(sv.at(1) == 2);
-            CHECK(sv.at(2) == 3);
+            const element_type a{ 1 };
+            const element_type b{ 2 };
+            const element_type c{ 3 };
+            const myl::static_vector<element_type, 4> sv{ a, b, c };
+
+            CHECK(sv.at(0) == a);
+            CHECK(sv.at(1) == b);
+            CHECK(sv.at(2) == c);
         }
     }
     SECTION("[]") {
         SECTION("[]") {
-            myl::static_vector<element_type, 4> sv{ 1, 2, 3 };
-            CHECK(sv[0] == 1);
-            CHECK(sv[1] == 2);
-            CHECK(sv[2] == 3);
+            element_type a{ 1 };
+            element_type b{ 2 };
+            element_type c{ 3 };
+            myl::static_vector<element_type, 4> sv{ a, b, c };
+
+            CHECK(sv[0] == a);
+            CHECK(sv[1] == b);
+            CHECK(sv[2] == c);
         }
         SECTION("const") {
-            const myl::static_vector<element_type, 4> sv{ 1, 2, 3 };
-            CHECK(sv[0] == 1);
-            CHECK(sv[1] == 2);
-            CHECK(sv[2] == 3);
+            const element_type a{ 1 };
+            const element_type b{ 2 };
+            const element_type c{ 3 };
+            const myl::static_vector<element_type, 4> sv{ a, b, c };
+
+            CHECK(sv[0] == a);
+            CHECK(sv[1] == b);
+            CHECK(sv[2] == c);
         }
     }
     SECTION("emplace") {
         myl::static_vector<element_type, 4> sv;
-        sv.emplace(sv.end(), 1);
-        sv.emplace(sv.begin(), element_type{ 2 });
+        element_type a{ 1 };
+        element_type b{ 2 };
+
+        sv.emplace(sv.end(), a);
+        sv.emplace(sv.begin(), std::move(b));
 
         auto e0 = sv.begin() + 1;
-        auto e1 = sv.emplace(e0, element_type{ 3 });
+        auto e1 = sv.emplace(e0, 3);
     
         MYL_TEST_SV_CHECK(sv, 3, 4, false, false);
         CHECK(sv[0] == 2);
         CHECK(sv[1] == 3);
-        CHECK(sv[2] == 1);
+        CHECK(sv[2] == a);
         CHECK(e0 == e1);
     }
     SECTION("emplace_back") {
         myl::static_vector<element_type, 4> sv;
-        sv.emplace_back(1);
+        element_type a{ 1 };
+        element_type b{ 2 };
+        element_type c{ 3 };
+
+        sv.emplace_back(a);
+
         MYL_TEST_SV_CHECK(sv, 1, 4, false, false);
         CHECK(sv[0] == 1);
     
-        sv.emplace_back(2);
-        sv.emplace_back(3);
+        sv.emplace_back(b);
+        sv.emplace_back(std::move(c));
         auto& e = sv.emplace_back(4);
+
         MYL_TEST_SV_CHECK(sv, 4, 4, false, true);
-        CHECK(sv[1] == 2);
+        CHECK(sv[1] == b);
         CHECK(sv[2] == 3);
         CHECK(sv[3] == 4);
         CHECK(e == 4);
@@ -218,16 +283,18 @@ TEST_CASE("myl::static_vector", "[static_vector.hpp]") {
             element_type d{ 4 };
     
             sv.push_back(a);
+
             MYL_TEST_SV_CHECK(sv, 1, 4, false, false);
-            CHECK(sv[0] == 1);
+            CHECK(sv[0] == a);
     
             sv.push_back(b);
             sv.push_back(c);
             sv.push_back(d);
+
             MYL_TEST_SV_CHECK(sv, 4, 4, false, true);
-            CHECK(sv[1] == 2);
-            CHECK(sv[2] == 3);
-            CHECK(sv[3] == 4);
+            CHECK(sv[1] == b);
+            CHECK(sv[2] == c);
+            CHECK(sv[3] == d);
         }
         SECTION("move") {
             myl::static_vector<element_type, 4> sv;
@@ -237,30 +304,38 @@ TEST_CASE("myl::static_vector", "[static_vector.hpp]") {
             element_type d{ 4 };
     
             sv.push_back(std::move(a));
+
             MYL_TEST_SV_CHECK(sv, 1, 4, false, false);
-            CHECK(sv[0] == 1);
+            CHECK(sv[0] == a);
     
             sv.push_back(std::move(b));
             sv.push_back(std::move(c));
             sv.push_back(std::move(d));
+
             MYL_TEST_SV_CHECK(sv, 4, 4, false, true);
-            CHECK(sv[1] == 2);
-            CHECK(sv[2] == 3);
-            CHECK(sv[3] == 4);
+            CHECK(sv[1] == b);
+            CHECK(sv[2] == c);
+            CHECK(sv[3] == d);
         }
     }
     SECTION("pop_back") {
         SECTION("single") {
             myl::static_vector<element_type, 4> sv{ 1, 2 };
+
             sv.pop_back();
+
             MYL_TEST_SV_CHECK(sv, 1, 4, false, false);
             CHECK(sv[0] == 1);
+
             sv.pop_back();
+
             MYL_TEST_SV_CHECK(sv, 0, 4, true, false);
         }
         SECTION("count") {
             myl::static_vector<element_type, 4> sv{ 1, 2, 3 };
+
             sv.pop_back(2);
+
             MYL_TEST_SV_CHECK(sv, 1, 4, false, false);
             CHECK(sv[0] == 1);
         }
@@ -303,13 +378,50 @@ TEST_CASE("myl::static_vector", "[static_vector.hpp]") {
             CHECK(i0 == i1);
         }
         SECTION("count") {
-            
+            myl::static_vector<element_type, 4> sv;
+
+            sv.insert(sv.end(), 2, 1);
+            MYL_TEST_SV_CHECK(sv, 2, 4, false, false);
+            CHECK(sv[0] == 1);
+            CHECK(sv[1] == 1);
+
+            sv.insert(sv.begin() + 1, 2, 2);
+            MYL_TEST_SV_CHECK(sv, 4, 4, false, true);
+            CHECK(sv[0] == 1);
+            CHECK(sv[1] == 2);
+            CHECK(sv[2] == 2);
+            CHECK(sv[3] == 1);
         }
         SECTION("iterator") {
-    
+            std::array<element_type, 2> a{ 1, 2 };
+            myl::static_vector<element_type, 4> sv;
+
+            sv.insert(sv.end(), a.begin(), a.end());
+            MYL_TEST_SV_CHECK(sv, 2, 4, false, false);
+            CHECK(sv[0] == 1);
+            CHECK(sv[1] == 2);
+
+            sv.insert(sv.begin(), a.rbegin(), a.rend());
+            MYL_TEST_SV_CHECK(sv, 4, 4, false, true);
+            CHECK(sv[0] == 2);
+            CHECK(sv[1] == 1);
+            CHECK(sv[2] == 1);
+            CHECK(sv[3] == 2);
         }
         SECTION("list") {
-    
+            myl::static_vector<element_type, 4> sv;
+
+            sv.insert(sv.end(), { 1, 2 });
+            MYL_TEST_SV_CHECK(sv, 2, 4, false, false);
+            CHECK(sv[0] == 1);
+            CHECK(sv[1] == 2);
+
+            sv.insert(sv.begin() + 1, { 3, 4 });
+            MYL_TEST_SV_CHECK(sv, 4, 4, false, true);
+            CHECK(sv[0] == 1);
+            CHECK(sv[1] == 3);
+            CHECK(sv[2] == 4);
+            CHECK(sv[3] == 2);
         }
     }
     SECTION("erase") {
@@ -328,10 +440,19 @@ TEST_CASE("myl::static_vector", "[static_vector.hpp]") {
     
             auto i2 = sv.erase(sv.begin());
             MYL_TEST_SV_CHECK(sv, 0, 4, true, false);
-            CHECK(i1 == sv.end());
+            CHECK(i2 == sv.end());
         }
         SECTION("iterator") {
-    
+            myl::static_vector<element_type, 4> sv{ 1, 2, 3, 4 };
+            auto i0 = sv.erase(sv.begin() + 1, sv.end() - 1);
+            MYL_TEST_SV_CHECK(sv, 2, 4, false, false);
+            CHECK(sv[0] == 1);
+            CHECK(sv[1] == 4);
+            CHECK(*i0 == 4);
+
+            auto i1 = sv.erase(sv.begin(), sv.end());
+            MYL_TEST_SV_CHECK(sv, 0, 4, true, false);
+            CHECK(i1 == sv.end());
         }
     }
     SECTION("assign") {
@@ -405,15 +526,36 @@ TEST_CASE("myl::static_vector", "[static_vector.hpp]") {
     }
     SECTION("resize") {
         SECTION("count") {
-    
+            myl::static_vector<element_type, 4> sv{ 1, 2 };
+            sv.resize(3);
+            MYL_TEST_SV_CHECK(sv, 3, 4, false, false);
+            CHECK(sv[0] == 1);
+            CHECK(sv[1] == 2);
+            CHECK(sv[2] == element_type{});
+
+            sv.resize(1);
+            MYL_TEST_SV_CHECK(sv, 1, 4, false, false);
+            CHECK(sv[0] == 1);
         }
         SECTION("count of value") {
-    
+            myl::static_vector<element_type, 4> sv{ 1, 2 };
+            sv.resize(3, element_type{ 5 });
+            MYL_TEST_SV_CHECK(sv, 3, 4, false, false);
+            CHECK(sv[0] == 1);
+            CHECK(sv[1] == 2);
+            CHECK(sv[2] == element_type{ 5 });
+
+            sv.resize(1, element_type{ 5 });
+            MYL_TEST_SV_CHECK(sv, 1, 4, false, false);
+            CHECK(sv[0] == 1);
         }
     }
     SECTION("swap") {
         myl::static_vector<element_type, 4> sv0{ 1, 2, 3 };
         myl::static_vector<element_type, 4> sv1{ 4, 5 };
+        myl::static_vector<element_type, 4> sv2{ 6, 7, 8, 9 };
+        myl::static_vector<element_type, 4> sv3;
+        myl::static_vector<element_type, 4> sv4{ 10, 11, 12, 13 };
         sv0.swap(sv1);
 
         MYL_TEST_SV_CHECK(sv0, 2, 4, false, false);
@@ -424,6 +566,29 @@ TEST_CASE("myl::static_vector", "[static_vector.hpp]") {
         CHECK(sv1[0] == 1);
         CHECK(sv1[1] == 2);
         CHECK(sv1[2] == 3);
+
+        sv2.swap(sv3);
+
+        MYL_TEST_SV_CHECK(sv2, 0, 4, true, false);
+        MYL_TEST_SV_CHECK(sv3, 4, 4, false, true);
+        CHECK(sv3[0] == 6);
+        CHECK(sv3[1] == 7);
+        CHECK(sv3[2] == 8);
+        CHECK(sv3[3] == 9);
+
+        sv4.swap(sv3);
+
+        MYL_TEST_SV_CHECK(sv3, 4, 4, false, true);
+        CHECK(sv3[0] == 10);
+        CHECK(sv3[1] == 11);
+        CHECK(sv3[2] == 12);
+        CHECK(sv3[3] == 13);
+
+        MYL_TEST_SV_CHECK(sv4, 4, 4, false, true);
+        CHECK(sv4[0] == 6);
+        CHECK(sv4[1] == 7);
+        CHECK(sv4[2] == 8);
+        CHECK(sv4[3] == 9);
     }
     SECTION("==") {
         myl::static_vector<element_type, 3> sv0;
@@ -451,7 +616,24 @@ TEST_CASE("myl::static_vector", "[static_vector.hpp]") {
         CHECK_FALSE(sv2 == sv4);
     }
     SECTION("<=>") {
-    
+        myl::static_vector<element_type, 4> sv0{ 1, 2, 4 };
+        myl::static_vector<element_type, 4> sv1{ 1, 3 };
+        myl::static_vector<element_type, 4> sv2{ 2, 1 };
+
+        CHECK_FALSE(sv0 < sv0);
+        CHECK(sv0 <= sv0);
+        CHECK_FALSE(sv0 > sv0);
+        CHECK(sv0 >= sv0);
+
+        CHECK(sv0 < sv1);
+        CHECK(sv0 <= sv1);
+        CHECK_FALSE(sv0 > sv1);
+        CHECK_FALSE(sv0 >= sv1);
+
+        CHECK_FALSE(sv2 < sv1);
+        CHECK_FALSE(sv2 <= sv1);
+        CHECK(sv2 > sv1);
+        CHECK(sv2 >= sv1);
     }
     SECTION("std::swap") {
         myl::static_vector<element_type, 4> sv0{ 1, 2, 3 };
@@ -468,14 +650,21 @@ TEST_CASE("myl::static_vector", "[static_vector.hpp]") {
         CHECK(sv1[2] == 3);
     }
     SECTION("std::erase") {
-        ///myl::static_vector<element_type, 5> sv{ 1, 2, 1, 3, 1 };
-        ///std::erase(sv, 1);
-        ///
-        ///MYL_TEST_SV_CHECK(sv, 2, 5, false, false);
-        ///CHECK(sv[0] == 2);
-        ///CHECK(sv[1] == 3);
+        myl::static_vector<element_type, 5> sv{ 1, 2, 1, 3, 1 };
+        auto erased = std::erase(sv, 1);
+        
+        MYL_TEST_SV_CHECK(sv, 2, 5, false, false);
+        CHECK(sv[0] == 2);
+        CHECK(sv[1] == 3);
+        CHECK(erased == 3);
     }
     SECTION("std::erase_if") {
-    
+        myl::static_vector<element_type, 5> sv{ 4, 2, 1, 3, 6 };
+        auto erased = std::erase_if(sv, [](element_type x) { return x > 2; });
+
+        MYL_TEST_SV_CHECK(sv, 2, 5, false, false);
+        CHECK(sv[0] == 2);
+        CHECK(sv[1] == 1);
+        CHECK(erased == 3);
     }
 }

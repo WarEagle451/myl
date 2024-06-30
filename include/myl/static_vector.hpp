@@ -1,9 +1,9 @@
 #pragma once
-#include <myl_wip/iterative.hpp>
+#include <myl/iterative.hpp>
 
 #include <algorithm>
 #include <compare>
-#include <initializer_list> /// MYTODO: Maybe replace with a parameter pack
+#include <initializer_list>
 #include <memory>
 #include <utility>
 
@@ -11,23 +11,12 @@
 #   include <stdexcept>
 #endif
 
-/// MYTODO: Does;
-/// - std::copy
-/// - std::move (iterator)
-/// - uninitialized_copy
-/// - uninitialized_move
-/// - uninitialized_fill_n
-/// - move_backward
-/// - uninitialized_fill
-/// call destory on things?
-
-/// MYTodo: static_vector.hpp - Not yet
+/// MYTodo: static_vector.hpp
 /// - Consider removing initializer_list, replace with parameter packs. Would reduce unnecessary copy and move ctors
 ///     MYL_NO_DISCARD constexpr static_vector(std::convertible_to<value_type> auto&&... args) requires(sizeof...(args) <= Capacity);
 ///     - m_begin{ args... }, causes unwanted default constructions
 ///     - Contructor where the first parameter in the pack is convertible to a int results in the (count, value) constructor being choosen
-/// - Conditionally noexcept for back(), ==, <=>, others
-/// - Specialization for pod types?
+/// - const_casts should not be needed
 
 namespace myl {
     template<typename T, usize Capacity>
@@ -50,7 +39,7 @@ namespace myl {
         // Members
 
         union { // Used to prevent the array object's constructors from running
-            u32        m_dummy = 0;
+            std::byte  m_dummy{ 0 };
             value_type m_begin[Capacity];
         };
         pointer m_end = m_begin;
@@ -102,7 +91,7 @@ namespace myl {
         }
 
         constexpr auto operator=(const static_vector& other) noexcept(std::is_nothrow_copy_assignable_v<value_type>) -> static_vector& {
-            if (this == &other)
+            if (this == std::addressof(other))
                 return *this;
 
             std::copy(other.begin(), other.end(), m_begin);
@@ -111,7 +100,7 @@ namespace myl {
         }
 
         constexpr auto operator=(static_vector&& other) noexcept(std::is_nothrow_move_assignable_v<value_type>) -> static_vector& {
-            if (this == &other)
+            if (this == std::addressof(other))
                 return *this;
 
             std::move(other.m_begin, other.m_end, m_begin);
@@ -157,11 +146,11 @@ namespace myl {
         }
 
         MYL_NO_DISCARD constexpr auto rbegin() noexcept -> reverse_iterator {
-            return reverse_iterator(end());
+            return std::make_reverse_iterator(end());
         }
 
         MYL_NO_DISCARD constexpr auto rbegin() const noexcept -> const_reverse_iterator {
-            return const_reverse_iterator(cend());
+            return std::make_reverse_iterator(cend());
         }
 
         MYL_NO_DISCARD constexpr auto crbegin() const noexcept -> const_reverse_iterator {
@@ -169,11 +158,11 @@ namespace myl {
         }
 
         MYL_NO_DISCARD constexpr auto rend() noexcept -> reverse_iterator {
-            return reverse_iterator(begin());
+            return std::make_reverse_iterator(begin());
         }
 
         MYL_NO_DISCARD constexpr auto rend() const noexcept -> const_reverse_iterator {
-            return const_reverse_iterator(cbegin());
+            return std::make_reverse_iterator(cbegin());
         }
 
         MYL_NO_DISCARD constexpr auto crend() const noexcept -> const_reverse_iterator {
@@ -335,14 +324,49 @@ namespace myl {
             return emplace(position, std::move(value));
         }
 
-        ///constexpr auto insert(const_iterator position, size_type count, const value_type& value) -> iterator;
+        constexpr auto insert(const_iterator position, size_type count, const value_type& value) -> iterator {
+            pointer where = const_cast<pointer>(position.operator->());
+            MYL_ASSERT(m_begin <= where && where <= m_end, error_str_out_of_bounds());
 
-        ///template<std::input_iterator It>
-        ///constexpr auto insert(const_iterator position, It first, It last) -> iterator;
+            MYL_ASSERT(count <= Capacity - size(), error_str_beyond_capacity());
+#ifndef MYL_NO_EXCEPTIONS
+            if (count > Capacity - size())
+                throw std::length_error(error_str_beyond_capacity());
+#endif
+            if (count == 0)
+                return position;
 
-        ///constexpr auto insert(const_iterator position, std::initializer_list<value_type> list) -> iterator {
-        ///    return insert(position, list.begin(), list.end());
-        ///}
+            if (where != m_end)
+                std::move_backward(where, m_end, m_end + count);
+            std::uninitialized_fill_n(where, count, value);
+            m_end += count;
+            return position;
+        }
+
+        template<std::input_iterator It>
+        constexpr auto insert(const_iterator position, It first, It last) -> iterator {
+            pointer where = const_cast<pointer>(position.operator->());
+            MYL_ASSERT(m_begin <= where && where <= m_end, error_str_out_of_bounds());
+
+            const size_type count = static_cast<size_type>(std::distance(first, last));
+            MYL_ASSERT(count <= Capacity - size(), error_str_beyond_capacity());
+#ifndef MYL_NO_EXCEPTIONS
+            if (count > Capacity - size())
+                throw std::length_error(error_str_beyond_capacity());
+#endif
+            if (first == last)
+                return position;
+
+            if (where != m_end)
+                std::move_backward(where, m_end, m_end + count);
+            std::uninitialized_copy(first, last, where);
+            m_end += count;
+            return position;
+        }
+
+        constexpr auto insert(const_iterator position, std::initializer_list<value_type> list) -> iterator {
+            return insert(position, list.begin(), list.end());
+        }
 
         constexpr auto erase(const_iterator position) -> iterator {
             pointer where = const_cast<pointer>(position.operator->());
@@ -355,7 +379,23 @@ namespace myl {
             return position;
         }
 
-        ///constexpr auto erase(const_iterator first, const_iterator last) -> iterator;
+        constexpr auto erase(const_iterator first, const_iterator last) -> iterator {
+            pointer first_ptr = const_cast<pointer>(first.operator->());
+            pointer last_ptr = const_cast<pointer>(last.operator->());
+            
+            MYL_ASSERT(m_begin <= first_ptr && first_ptr <= m_end, error_str_out_of_bounds());
+            MYL_ASSERT(m_begin <= last_ptr && last_ptr <= m_end, error_str_out_of_bounds());
+            
+            const size_type count = static_cast<size_type>(std::distance(first, last));
+            if (count == 0)
+                return last;
+
+            std::destroy(first, last);
+            if (last_ptr != m_end)
+                std::uninitialized_move(last_ptr, m_end, first_ptr);
+            m_end -= count;
+            return first; // Will be the new m_end or the value of what last + 1 was before calling erase
+        }
 
         constexpr auto assign(size_type count, const value_type& value) -> void {
             MYL_ASSERT(count <= Capacity, error_str_beyond_capacity());
@@ -399,13 +439,39 @@ namespace myl {
             m_end = m_begin + Capacity;
         }
 
-        ///constexpr auto resize(size_type count) -> void;
+        constexpr auto resize(size_type count) -> void {
+            MYL_ASSERT(count <= Capacity, error_str_beyond_capacity());
+#ifndef MYL_NO_EXCEPTIONS
+            if (count > Capacity)
+                throw std::length_error(error_str_beyond_capacity());
+#endif
+            const size_type s = size();
+            if (count < s)
+                erase(begin() + count, end());
+            else if (count > s) {
+                const size_type needed = count - s;
+                std::uninitialized_default_construct_n(m_end, needed);
+                m_end += needed;
+            }
+        }
 
-        ///constexpr auto resize(size_type count, const value_type& value) -> void;
+        constexpr auto resize(size_type count, const value_type& value) -> void {
+            MYL_ASSERT(count <= Capacity, error_str_beyond_capacity());
+#ifndef MYL_NO_EXCEPTIONS
+            if (count > Capacity)
+                throw std::length_error(error_str_beyond_capacity());
+#endif
+            const size_type s = size();
+            if (count < s)
+                erase(begin() + count, end());
+            else if (count > s) {
+                const size_type needed = count - s;
+                std::uninitialized_fill_n(m_end, needed, value);
+                m_end += needed;
+            }
+        }
 
         constexpr auto swap(static_vector& other) noexcept(std::is_nothrow_swappable_v<value_type>) -> void {
-            /// MYTODO: one is full?, same size?, one is empty?, switch full with empty
-
             const size_type a = size();
             const size_type b = other.size();
             const size_type min = a > b ? b : a;
@@ -454,7 +520,7 @@ namespace std {
         typename myl::static_vector<T, C>::size_type old_size = v.size();
         for (auto it = v.rbegin(), end = v.rend(); it != end; ++it)
             if (*it == value)
-                v.erase(it.base());
+                v.erase(it.base() - 1);
         return old_size - v.size();
     }
 
@@ -463,7 +529,7 @@ namespace std {
         typename myl::static_vector<T, C>::size_type old_size = v.size();
         for (auto it = v.rbegin(), end = v.rend(); it != end; ++it)
             if (predicate(*it))
-                v.erase(it.base());
+                v.erase(it.base() - 1);
         return old_size - v.size();
     }
 }
