@@ -83,7 +83,7 @@ namespace myl {
             return m_data[c];
         }
 
-#if __cpp_multidimensional_subscript
+#if defined(__cpp_multidimensional_subscript) && __cpp_multidimensional_subscript >= 202110L
         MYL_NO_DISCARD constexpr auto operator[][](usize c, usize r) -> value_type& {
             MYL_ASSERT(c < 4 && r < 3);
             return m_data[c][r];

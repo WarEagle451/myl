@@ -1,15 +1,18 @@
+#include <myl/definitions.hpp>
 #include <myl/macro.hpp>
 
 #include <catch2/catch_all.hpp>
 
+#include <cstring>
+
 TEST_CASE("MYL_STRINGIFY", "[macro.hpp]") {
-	int arg = 451;
-	CHECK(MYL_STRINGIFY(arg) == "arg");
+	MYL_MAYBE_UNUSED int arg = 451;
+	CHECK(std::strcmp(MYL_STRINGIFY(arg), "arg") == 0);
 }
 
 #define MYL_TEST_NUMBER 451
 TEST_CASE("MYL_ARG_STRINGIFY", "[macro.hpp]") {
-	CHECK(MYL_ARG_STRINGIFY(MYL_TEST_NUMBER) == "451");
+	CHECK(std::strcmp(MYL_ARG_STRINGIFY(MYL_TEST_NUMBER), "451") == 0);
 }
 
 TEST_CASE("MYL_ARG_DISCARD", "[macro.hpp]") {

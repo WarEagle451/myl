@@ -2,6 +2,8 @@
 
 #include <catch2/catch_all.hpp>
 
+#include <cstring>
+
 #define TEST_VERSION_MAJOR 1
 #define TEST_VERSION_MINOR 2
 #define TEST_VERSION_PATCH 3
@@ -13,5 +15,5 @@ TEST_CASE("version macros", "[version.hpp]") {
 	CHECK(MYL_VERSION_EXTRACT_MINOR(TEST_VERSION) == 2);
 	CHECK(MYL_VERSION_EXTRACT_PATCH(TEST_VERSION) == 3);
 	CHECK(TEST_VERSION == 0b00000001'00000010'00000000'00000011);
-	CHECK(TEST_VERSION_STRING == "1.2.3");
+	CHECK(std::strcmp(TEST_VERSION_STRING, "1.2.3") == 0);
 }

@@ -35,7 +35,7 @@ namespace myl {
             return *m_ptr;
         }
 
-        MYL_NO_DISCARD constexpr auto operator*() const -> const reference {
+        MYL_NO_DISCARD constexpr auto operator*() const -> reference {
             return *m_ptr;
         }
 

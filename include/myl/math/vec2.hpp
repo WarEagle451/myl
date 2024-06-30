@@ -64,8 +64,15 @@ namespace myl {
                 y == static_cast<value_type>(0));
         }
 
-        MYL_NO_DISCARD constexpr auto operator[](usize i) -> value_type& { return data[i]; }
-        MYL_NO_DISCARD constexpr auto operator[](usize i) const -> const value_type& { return data[i]; }
+        MYL_NO_DISCARD constexpr auto operator[](usize i) noexcept -> value_type& {
+            MYL_ASSERT(i < 2); 
+            return data[i];
+        }
+
+        MYL_NO_DISCARD constexpr auto operator[](usize i) const noexcept -> const value_type& {
+            MYL_ASSERT(i < 2);
+            return data[i];
+        }
 
         MYL_NO_DISCARD constexpr auto operator-() const -> vec { return vec{ -x, -y }; }
 

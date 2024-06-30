@@ -27,11 +27,11 @@ TEST_CASE("vec2", "[vec2.hpp]") {
             CHECK(a == myl::i8vec2{ 2, 2 });
         }
         SECTION("2 scalar copy") {
-            myl::i32 a = 2, b = 1;
+            myl::i8 a = 2, b = 1;
             CHECK(myl::i8vec2(a, b) == myl::i8vec2{ 2, 1 });
         }
         SECTION("2 scalar move") {
-            myl::i32 a = 2, b = 1;
+            myl::i8 a = 2, b = 1;
             CHECK(myl::i8vec2(std::move(a), std::move(b)) == myl::i8vec2{ 2, 1 });
         }
         SECTION("vec3") {
@@ -105,9 +105,9 @@ TEST_CASE("vec2", "[vec2.hpp]") {
         b /= 2;
         CHECK(b == myl::i32vec2{ 1, 2 });
 
-        b = b;
+        b = a;
         b %= 2;
-        CHECK(b == myl::i32vec2{ 1, 0 });
+        CHECK(b == myl::i32vec2{ 0, 0 });
     }
     SECTION("vec2 arithmetic") {
         myl::i32vec2 a{ 2, 4 };

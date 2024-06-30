@@ -12,10 +12,6 @@
 #endif
 
 /// MYTodo: static_vector.hpp
-/// - Consider removing initializer_list, replace with parameter packs. Would reduce unnecessary copy and move ctors
-///     MYL_NO_DISCARD constexpr static_vector(std::convertible_to<value_type> auto&&... args) requires(sizeof...(args) <= Capacity);
-///     - m_begin{ args... }, causes unwanted default constructions
-///     - Contructor where the first parameter in the pack is convertible to a int results in the (count, value) constructor being choosen
 /// - const_casts should not be needed
 
 namespace myl {

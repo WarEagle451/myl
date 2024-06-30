@@ -37,7 +37,7 @@ TEST_CASE("myl::host_to_network", "[bit.hpp]") {
 
 TEST_CASE("myl::network_to_host", "[bit.hpp]") {
 	myl::u32 input = 0xA5'E1'07'F2;
-	myl::u32 output = std::bit_cast<myl::u32, myl::i32>(
+	myl::i32 output = std::bit_cast<myl::i32, myl::u32>(
 		std::endian::native == std::endian::big ? 0xA5'E1'07'F2 : 0xF2'07'E1'A5);
 
 	CHECK(myl::network_to_host<myl::i32>(input) == output);
