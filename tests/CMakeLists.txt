@@ -26,7 +26,7 @@ gather(MYL_FILES ${MYL_INCLUDE_DIR} "*.hpp;*.cpp")
 set(MYL_TEST_SOURCES
     "algorithm.cpp"
     "bit.cpp"
-    "color.cpp"
+    "wip/color.cpp"
     "io.cpp"
     "macro.cpp"
     "math/mat_common.cpp"
@@ -45,7 +45,7 @@ set(MYL_TEST_SOURCES
     "math/vec2.cpp"
     "math/vec3.cpp"
     "math/vec4.cpp"
-    "ring_buffer.cpp"
+    "wip/ring_buffer.cpp"
     "shaping.cpp"
     "static_vector.cpp"
     "string.cpp"
