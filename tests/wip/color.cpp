@@ -2,9 +2,9 @@
 #include <myl_wip/color.hpp>
 
 /// MYTODO: Blend, Complement, Greyscale, Mix
-#if 0
 
 #include <catch2/catch_all.hpp>
+
 static myl::f32vec3 cmy{ .8f, .6f, .2f };
 static myl::f32vec4 cmyk{ .75f, .5f, 0.f, .2f };
 static myl::f32vec3 hsl{ 220, .60f, .50f };
@@ -16,7 +16,9 @@ static myl::f32vec4 rgba{ .2f, .4f, .8f, 1.f };
 static myl::u32 u32_rgb = 0x33'66'CC'00;
 static myl::u32 u32_rgba = 0x33'66'CC'FF;
 
-#define MYL_COLOR_CAST_TEST(c1, c2) {\
+/// MYTODO: Use catch2s build in float approimation
+
+#define MYL_TEST_COLOR_CAST(c1, c2) {\
     decltype(c2) result = myl::color_cast<myl::color::model::c1, myl::color::model::c2>(c1);\
     SECTION(#c1" == "#c2) {\
         for (auto i = 0; i != myl::component_count(c2); i++)\
@@ -26,62 +28,71 @@ static myl::u32 u32_rgba = 0x33'66'CC'FF;
     }\
 }
 
+#define MYL_TEST_COMPARE_COLOR(c1, c2) {\
+    SECTION(#c1" == "#c2) {\
+        for (auto i = 0; i != myl::component_count(c2); i++)\
+            if (!myl::approx(c1[i], c2[i]))\
+                FAIL_CHECK("Component " << i << " is not equal: " << c1[i] << " != " << c2[i]);\
+        SUCCEED(#c1" == "#c2);\
+    }\
+}
+
 TEST_CASE("myl::color_cast", "[color.hpp]") {
-    MYL_COLOR_CAST_TEST(cmy, cmy);
-    MYL_COLOR_CAST_TEST(cmy, cmyk);
-    //MYL_COLOR_CAST_TEST(cmy, hsl);
-    //MYL_COLOR_CAST_TEST(cmy, hsv);
-    //MYL_COLOR_CAST_TEST(cmy, lab);
-    MYL_COLOR_CAST_TEST(cmy, rgb);
-    MYL_COLOR_CAST_TEST(cmy, rgba);
+    MYL_TEST_COLOR_CAST(cmy, cmy);
+    MYL_TEST_COLOR_CAST(cmy, cmyk);
+    //MYL_TEST_COLOR_CAST(cmy, hsl);
+    //MYL_TEST_COLOR_CAST(cmy, hsv);
+    //MYL_TEST_COLOR_CAST(cmy, lab);
+    MYL_TEST_COLOR_CAST(cmy, rgb);
+    MYL_TEST_COLOR_CAST(cmy, rgba);
 
-    MYL_COLOR_CAST_TEST(cmyk, cmy);
-    MYL_COLOR_CAST_TEST(cmyk, cmyk);
-    //MYL_COLOR_CAST_TEST(cmyk, hsl);
-    //MYL_COLOR_CAST_TEST(cmyk, hsv);
-    //MYL_COLOR_CAST_TEST(cmyk, lab);
-    MYL_COLOR_CAST_TEST(cmyk, rgb);
-    MYL_COLOR_CAST_TEST(cmyk, rgba);
+    MYL_TEST_COLOR_CAST(cmyk, cmy);
+    MYL_TEST_COLOR_CAST(cmyk, cmyk);
+    //MYL_TEST_COLOR_CAST(cmyk, hsl);
+    //MYL_TEST_COLOR_CAST(cmyk, hsv);
+    //MYL_TEST_COLOR_CAST(cmyk, lab);
+    MYL_TEST_COLOR_CAST(cmyk, rgb);
+    MYL_TEST_COLOR_CAST(cmyk, rgba);
 
-    //MYL_COLOR_CAST_TEST(hsl, cmy);
-    //MYL_COLOR_CAST_TEST(hsl, cmyk);
-    MYL_COLOR_CAST_TEST(hsl, hsl);
-    MYL_COLOR_CAST_TEST(hsl, hsv);
-    //MYL_COLOR_CAST_TEST(hsl, lab);
-    //MYL_COLOR_CAST_TEST(hsl, rgb);
-    //MYL_COLOR_CAST_TEST(hsl, rgba);
+    //MYL_TEST_COLOR_CAST(hsl, cmy);
+    //MYL_TEST_COLOR_CAST(hsl, cmyk);
+    MYL_TEST_COLOR_CAST(hsl, hsl);
+    MYL_TEST_COLOR_CAST(hsl, hsv);
+    //MYL_TEST_COLOR_CAST(hsl, lab);
+    //MYL_TEST_COLOR_CAST(hsl, rgb);
+    //MYL_TEST_COLOR_CAST(hsl, rgba);
 
-    //MYL_COLOR_CAST_TEST(hsv, cmy);
-    //MYL_COLOR_CAST_TEST(hsv, cmyk);
-    MYL_COLOR_CAST_TEST(hsv, hsl);
-    MYL_COLOR_CAST_TEST(hsv, hsv);
-    //MYL_COLOR_CAST_TEST(hsv, lab);
-    //MYL_COLOR_CAST_TEST(hsv, rgb);
-    //MYL_COLOR_CAST_TEST(hsv, rgba);
+    //MYL_TEST_COLOR_CAST(hsv, cmy);
+    //MYL_TEST_COLOR_CAST(hsv, cmyk);
+    MYL_TEST_COLOR_CAST(hsv, hsl);
+    MYL_TEST_COLOR_CAST(hsv, hsv);
+    //MYL_TEST_COLOR_CAST(hsv, lab);
+    //MYL_TEST_COLOR_CAST(hsv, rgb);
+    //MYL_TEST_COLOR_CAST(hsv, rgba);
 
-    //MYL_COLOR_CAST_TEST(lab, cmy);
-    //MYL_COLOR_CAST_TEST(lab, cmyk);
-    //MYL_COLOR_CAST_TEST(lab, hsl);
-    //MYL_COLOR_CAST_TEST(lab, hsv);
-    MYL_COLOR_CAST_TEST(lab, lab);
-    //MYL_COLOR_CAST_TEST(lab, rgb);
-    //MYL_COLOR_CAST_TEST(lab, rgba);
+    //MYL_TEST_COLOR_CAST(lab, cmy);
+    //MYL_TEST_COLOR_CAST(lab, cmyk);
+    //MYL_TEST_COLOR_CAST(lab, hsl);
+    //MYL_TEST_COLOR_CAST(lab, hsv);
+    MYL_TEST_COLOR_CAST(lab, lab);
+    //MYL_TEST_COLOR_CAST(lab, rgb);
+    //MYL_TEST_COLOR_CAST(lab, rgba);
 
-    MYL_COLOR_CAST_TEST(rgb, cmy);
-    MYL_COLOR_CAST_TEST(rgb, cmyk);
-    MYL_COLOR_CAST_TEST(rgb, hsl);
-    MYL_COLOR_CAST_TEST(rgb, hsv);
-    //MYL_COLOR_CAST_TEST(rgb, lab);
-    MYL_COLOR_CAST_TEST(rgb, rgb);
-    MYL_COLOR_CAST_TEST(rgb, rgba);
+    MYL_TEST_COLOR_CAST(rgb, cmy);
+    MYL_TEST_COLOR_CAST(rgb, cmyk);
+    MYL_TEST_COLOR_CAST(rgb, hsl);
+    MYL_TEST_COLOR_CAST(rgb, hsv);
+    //MYL_TEST_COLOR_CAST(rgb, lab);
+    MYL_TEST_COLOR_CAST(rgb, rgb);
+    MYL_TEST_COLOR_CAST(rgb, rgba);
 
-    MYL_COLOR_CAST_TEST(rgba, cmy);
-    MYL_COLOR_CAST_TEST(rgba, cmyk);
-    MYL_COLOR_CAST_TEST(rgba, hsl);
-    MYL_COLOR_CAST_TEST(rgba, hsv);
-    //MYL_COLOR_CAST_TEST(rgba, lab);
-    MYL_COLOR_CAST_TEST(rgba, rgb);
-    MYL_COLOR_CAST_TEST(rgba, rgba);
+    MYL_TEST_COLOR_CAST(rgba, cmy);
+    MYL_TEST_COLOR_CAST(rgba, cmyk);
+    MYL_TEST_COLOR_CAST(rgba, hsl);
+    MYL_TEST_COLOR_CAST(rgba, hsv);
+    //MYL_TEST_COLOR_CAST(rgba, lab);
+    MYL_TEST_COLOR_CAST(rgba, rgb);
+    MYL_TEST_COLOR_CAST(rgba, rgba);
 }
 
 TEST_CASE("myl::rgb_to_u32", "[color.hpp]") {
@@ -93,11 +104,9 @@ TEST_CASE("myl::rgba_to_u32", "[color.hpp]") {
 }
 
 TEST_CASE("myl::u32_to_rgb", "[color.hpp]") {
-    CHECK(myl::color::u32_to_rgb(u32_rgb) == rgb);
+    MYL_TEST_COMPARE_COLOR(myl::color::u32_to_rgb(u32_rgb), rgb);
 }
 
 TEST_CASE("myl::u32_to_rgba", "[color.hpp]") {
-    CHECK(myl::color::u32_to_rgba(u32_rgba) == rgba);
+    MYL_TEST_COMPARE_COLOR(myl::color::u32_to_rgba(u32_rgba), rgba);
 }
-
-#endif

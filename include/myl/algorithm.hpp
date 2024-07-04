@@ -3,6 +3,7 @@
 #include <myl/type.hpp>
 
 #include <cmath>
+#include <iterator>
 #include <limits>
 
 #ifdef min // War on Microsoft's min macro
@@ -22,42 +23,42 @@ namespace myl {
     }
 
     template<typename T>
-    MYL_NO_DISCARD constexpr auto min(const T& a, const T& b) -> T {
+    MYL_NO_DISCARD constexpr auto min(const T& a, const T& b) -> const T& {
         return a < b ? a : b;
     }
 
     template<typename T, same_as<T>... Args>
-    MYL_NO_DISCARD constexpr auto min(const T& a, const T& b, const Args&... args) -> T {
+    MYL_NO_DISCARD constexpr auto min(const T& a, const T& b, const Args&... args) -> const T& {
         return min(min(a, b), args...);
     }
 
     template<typename T>
-    MYL_NO_DISCARD constexpr auto max(const T& a, const T& b) -> T {
+    MYL_NO_DISCARD constexpr auto max(const T& a, const T& b) -> const T& {
         return a > b ? a : b;
     }
 
     template<typename T, same_as<T>... Args>
-    MYL_NO_DISCARD constexpr auto max(const T& a, const T& b, const Args&... args) -> T {
+    MYL_NO_DISCARD constexpr auto max(const T& a, const T& b, const Args&... args) -> const T& {
         return max(max(a, b), args...);
     }
 
     template<typename T>
-    MYL_NO_DISCARD constexpr auto clamp(const T& v, const T& min, const T& max) -> T {
+    MYL_NO_DISCARD constexpr auto clamp(const T& v, const T& min, const T& max) -> const T& {
         return v < min ? min : v > max ? max : v;
     }
 
     template<typename T>
-    MYL_NO_DISCARD constexpr auto floor(const T& v, const T& floor) -> T {
+    MYL_NO_DISCARD constexpr auto floor(const T& v, const T& floor) -> const T& {
         return v > floor ? v : floor;
     }
 
     template<typename T>
-    MYL_NO_DISCARD constexpr auto ceil(const T& v, const T& ceil) -> T {
+    MYL_NO_DISCARD constexpr auto ceil(const T& v, const T& ceil) -> const T& {
         return v > ceil ? ceil : v;
     }
 
     template<typename T>
-    MYL_NO_DISCARD constexpr auto difference(const T& a, const T& b) -> T {
+    MYL_NO_DISCARD constexpr auto difference(const T& a, const T& b) -> const T& {
         return a > b ? a - b : b - a;
     }
 }

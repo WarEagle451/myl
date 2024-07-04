@@ -374,33 +374,33 @@ namespace myl {
 
         MYL_NO_DISCARD constexpr auto rgb_to_u32(const f32vec3& color) -> u32 {
             return
-                (static_cast<u32>(color.r * 255.f) << 24) |
-                (static_cast<u32>(color.g * 255.f) << 16) |
-                (static_cast<u32>(color.b * 255.f) << 8);
+                (static_cast<u32>(color.r * 255.f) << 24U) |
+                (static_cast<u32>(color.g * 255.f) << 16U) |
+                (static_cast<u32>(color.b * 255.f) << 8U);
         }
 
         MYL_NO_DISCARD constexpr auto rgba_to_u32(const f32vec4& color) -> u32 {
             return
-                (static_cast<u32>(color.r * 255.f) << 24) |
-                (static_cast<u32>(color.g * 255.f) << 16) |
-                (static_cast<u32>(color.b * 255.f) << 8) |
+                (static_cast<u32>(color.r * 255.f) << 24U) |
+                (static_cast<u32>(color.g * 255.f) << 16U) |
+                (static_cast<u32>(color.b * 255.f) << 8U) |
                 static_cast<u32>(color.a * 255.f);
         }
 
         MYL_NO_DISCARD constexpr auto u32_to_rgba(const u32 color) -> f32vec4 {
             return f32vec4{
-                static_cast<f32>(color & 0xFF00'0000) / 255.f,
-                static_cast<f32>(color & 0x00FF'0000) / 255.f,
-                static_cast<f32>(color & 0x0000'FF00) / 255.f,
-                static_cast<f32>(color & 0x0000'00FF) / 255.f
+                static_cast<f32>((color & 0xFF00'0000U) >> 24U) / 255.f,
+                static_cast<f32>((color & 0x00FF'0000U) >> 16U) / 255.f,
+                static_cast<f32>((color & 0x0000'FF00U) >> 8U) / 255.f,
+                static_cast<f32>(color & 0x0000'00FFU) / 255.f
             };
         }
 
         MYL_NO_DISCARD constexpr auto u32_to_rgb(const u32 color) -> f32vec3 {
             return f32vec3{
-                static_cast<f32>(color & 0xFF00'0000) / 255.f,
-                static_cast<f32>(color & 0x00FF'0000) / 255.f,
-                static_cast<f32>(color & 0x0000'FF00) / 255.f
+                static_cast<f32>((color & 0xFF00'0000U) >> 24U) / 255.f,
+                static_cast<f32>((color & 0x00FF'0000U) >> 16U) / 255.f,
+                static_cast<f32>((color & 0x0000'FF00U) >> 8U) / 255.f
             };
         }
 
