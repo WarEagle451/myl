@@ -3,22 +3,13 @@
 #include <myl/type.hpp>
 
 #include <cmath>
-#include <iterator>
 #include <limits>
-
-#ifdef min // War on Microsoft's min macro
-#   undef min
-#endif
-
-#ifdef max // War on Microsoft's max macro
-#   undef max
-#endif
 
 /// MYTODO: variadic functions should be able to take common types like int and float
 
 namespace myl {
     template<floating_point T>
-    MYL_NO_DISCARD constexpr auto approx(const T& a, const T& b) -> bool {
+    MYL_NO_DISCARD constexpr auto approx(const T& a, const T& b) -> bool { /// MYTODO: Improve this
         return b == std::nextafter(a, b);
     }
 
@@ -58,7 +49,7 @@ namespace myl {
     }
 
     template<typename T>
-    MYL_NO_DISCARD constexpr auto difference(const T& a, const T& b) -> const T& {
+    MYL_NO_DISCARD constexpr auto difference(const T& a, const T& b) -> T {
         return a > b ? a - b : b - a;
     }
 }
