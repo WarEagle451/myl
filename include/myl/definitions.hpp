@@ -1,5 +1,6 @@
 #pragma once
 #include <myl/config.hpp>
+#include <myl/platform.hpp>
 
 // Attributes
 
@@ -56,7 +57,11 @@
 #endif
 
 #if __has_cpp_attribute(no_unique_address)
-#   define MYL_NO_UNIQUE_ADDRESS [[no_unique_address]]
+#   ifdef _MSC_VER // [[no_unique_address]] is ignored by MSVC even in C++20
+#       define MYL_NO_UNIQUE_ADDRESS [[msvc::no_unique_address]]
+#   else
+#       define MYL_NO_UNIQUE_ADDRESS [[no_unique_address]]
+#   endif
 #else
 #   define MYL_NO_UNIQUE_ADDRESS
 #endif
@@ -73,7 +78,6 @@
 #   define MYL_DEBUG
 #endif
 
-#include <myl/platform.hpp>
 #if defined(MYL_COMPILER_MSVC)
 #   define MYL_DEBUG_BREAK __debugbreak() 
 #elif defined(MYL_COMPILER_CLANG)

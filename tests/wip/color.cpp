@@ -9,7 +9,6 @@ static myl::f32vec3 cmy{ .8f, .6f, .2f };
 static myl::f32vec4 cmyk{ .75f, .5f, 0.f, .2f };
 static myl::f32vec3 hsl{ 220, .60f, .50f };
 static myl::f32vec3 hsv{ 220, .75f, .80f };
-static myl::f32vec3 lab{ 45.03f, 18.71f, -57.85f };
 static myl::f32vec3 rgb{ .2f, .4f, .8f };
 static myl::f32vec4 rgba{ .2f, .4f, .8f, 1.f };
 
@@ -42,7 +41,6 @@ TEST_CASE("myl::color_cast", "[color.hpp]") {
     MYL_TEST_COLOR_CAST(cmy, cmyk);
     //MYL_TEST_COLOR_CAST(cmy, hsl);
     //MYL_TEST_COLOR_CAST(cmy, hsv);
-    //MYL_TEST_COLOR_CAST(cmy, lab);
     MYL_TEST_COLOR_CAST(cmy, rgb);
     MYL_TEST_COLOR_CAST(cmy, rgba);
 
@@ -50,7 +48,6 @@ TEST_CASE("myl::color_cast", "[color.hpp]") {
     MYL_TEST_COLOR_CAST(cmyk, cmyk);
     //MYL_TEST_COLOR_CAST(cmyk, hsl);
     //MYL_TEST_COLOR_CAST(cmyk, hsv);
-    //MYL_TEST_COLOR_CAST(cmyk, lab);
     MYL_TEST_COLOR_CAST(cmyk, rgb);
     MYL_TEST_COLOR_CAST(cmyk, rgba);
 
@@ -58,7 +55,6 @@ TEST_CASE("myl::color_cast", "[color.hpp]") {
     //MYL_TEST_COLOR_CAST(hsl, cmyk);
     MYL_TEST_COLOR_CAST(hsl, hsl);
     MYL_TEST_COLOR_CAST(hsl, hsv);
-    //MYL_TEST_COLOR_CAST(hsl, lab);
     //MYL_TEST_COLOR_CAST(hsl, rgb);
     //MYL_TEST_COLOR_CAST(hsl, rgba);
 
@@ -66,23 +62,13 @@ TEST_CASE("myl::color_cast", "[color.hpp]") {
     //MYL_TEST_COLOR_CAST(hsv, cmyk);
     MYL_TEST_COLOR_CAST(hsv, hsl);
     MYL_TEST_COLOR_CAST(hsv, hsv);
-    //MYL_TEST_COLOR_CAST(hsv, lab);
     //MYL_TEST_COLOR_CAST(hsv, rgb);
     //MYL_TEST_COLOR_CAST(hsv, rgba);
-
-    //MYL_TEST_COLOR_CAST(lab, cmy);
-    //MYL_TEST_COLOR_CAST(lab, cmyk);
-    //MYL_TEST_COLOR_CAST(lab, hsl);
-    //MYL_TEST_COLOR_CAST(lab, hsv);
-    MYL_TEST_COLOR_CAST(lab, lab);
-    //MYL_TEST_COLOR_CAST(lab, rgb);
-    //MYL_TEST_COLOR_CAST(lab, rgba);
 
     MYL_TEST_COLOR_CAST(rgb, cmy);
     MYL_TEST_COLOR_CAST(rgb, cmyk);
     MYL_TEST_COLOR_CAST(rgb, hsl);
     MYL_TEST_COLOR_CAST(rgb, hsv);
-    //MYL_TEST_COLOR_CAST(rgb, lab);
     MYL_TEST_COLOR_CAST(rgb, rgb);
     MYL_TEST_COLOR_CAST(rgb, rgba);
 
@@ -90,7 +76,6 @@ TEST_CASE("myl::color_cast", "[color.hpp]") {
     MYL_TEST_COLOR_CAST(rgba, cmyk);
     MYL_TEST_COLOR_CAST(rgba, hsl);
     MYL_TEST_COLOR_CAST(rgba, hsv);
-    //MYL_TEST_COLOR_CAST(rgba, lab);
     MYL_TEST_COLOR_CAST(rgba, rgb);
     MYL_TEST_COLOR_CAST(rgba, rgba);
 }

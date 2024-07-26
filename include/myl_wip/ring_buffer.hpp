@@ -110,7 +110,7 @@ namespace myl {
     private:
         friend iterator;
 
-        allocator_type m_allocator{};
+        std::conditional_t<std::is_empty_v<allocator_type>, MYL_NO_UNIQUE_ADDRESS allocator_type, allocator_type> m_allocator{};
         pointer m_begin  = nullptr;
         pointer m_end    = nullptr;
         pointer m_head   = nullptr;
