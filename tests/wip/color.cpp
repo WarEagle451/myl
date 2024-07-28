@@ -55,15 +55,15 @@ TEST_CASE("myl::color_cast", "[color.hpp]") {
     //MYL_TEST_COLOR_CAST(hsl, cmyk);
     MYL_TEST_COLOR_CAST(hsl, hsl);
     MYL_TEST_COLOR_CAST(hsl, hsv);
-    //MYL_TEST_COLOR_CAST(hsl, rgb);
-    //MYL_TEST_COLOR_CAST(hsl, rgba);
+    MYL_TEST_COLOR_CAST(hsl, rgb);
+    MYL_TEST_COLOR_CAST(hsl, rgba);
 
     //MYL_TEST_COLOR_CAST(hsv, cmy);
     //MYL_TEST_COLOR_CAST(hsv, cmyk);
     MYL_TEST_COLOR_CAST(hsv, hsl);
     MYL_TEST_COLOR_CAST(hsv, hsv);
-    //MYL_TEST_COLOR_CAST(hsv, rgb);
-    //MYL_TEST_COLOR_CAST(hsv, rgba);
+    MYL_TEST_COLOR_CAST(hsv, rgb);
+    MYL_TEST_COLOR_CAST(hsv, rgba);
 
     MYL_TEST_COLOR_CAST(rgb, cmy);
     MYL_TEST_COLOR_CAST(rgb, cmyk);
