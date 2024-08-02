@@ -9,7 +9,7 @@
 
 namespace myl {
     template<floating_point T>
-    MYL_NO_DISCARD constexpr auto approx(const T& a, const T& b) -> bool { /// MYTODO: Improve this
+    MYL_NO_DISCARD constexpr auto approx(const T& a, const T& b) -> bool { /// MYTODO: This doesn't always work, refer to color test
         return b == std::nextafter(a, b);
     }
 
