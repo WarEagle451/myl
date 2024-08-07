@@ -406,14 +406,7 @@ namespace myl {
 
     // Color Utility
     
-    /// MYTODO: Blend should take into account alpha, mix should not
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="bg"></param>
-    /// <param name="fg"></param>
-    /// <returns></returns>
+    /// MYTODO: Blend should take into account alpha, mix should not, or something like that
 
     template<color_model M>
     MYL_NO_DISCARD constexpr auto blend(const color_model_type<M>& bg, const color_model_type<M>& fg) -> color_model_type<M>;
@@ -441,6 +434,26 @@ namespace myl {
     ///template<> MYL_NO_DISCARD constexpr auto blend<color_model::hsla>(const f32vec4& bg, const f32vec4& fg) -> f32vec4;
     ///template<> MYL_NO_DISCARD constexpr auto blend<color_model::hsv>(const f32vec3& bg, const f32vec3& fg) -> f32vec3;
     ///template<> MYL_NO_DISCARD constexpr auto blend<color_model::hsva>(const f32vec4& bg, const f32vec4& fg) -> f32vec4;
+    
+    template<color_model M>
+    MYL_NO_DISCARD constexpr auto mix(const color_model_type<M>& c1, const color_model_type<M>& c2, f32 percentage) -> color_model_type<M>;
+
+    template<>
+    MYL_NO_DISCARD constexpr auto mix<color_model::rgb>(const f32vec3& c1, const f32vec3& c2, f32 percentage) -> f32vec3 {
+        return lerp(c1, c2, percentage);
+    }
+
+    template<>
+    MYL_NO_DISCARD constexpr auto mix<color_model::rgba>(const f32vec4& c1, const f32vec4& c2, f32 percentage) -> f32vec4 {
+        return lerp(c1, c2, percentage);
+    }
+
+    ///template<> MYL_NO_DISCARD constexpr auto mix<color_model::cmy>(const f32vec3& c1, const f32vec3& c2, f32 percentage) -> f32vec3;
+    ///template<> MYL_NO_DISCARD constexpr auto mix<color_model::cmyk>(const f32vec4& c1, const f32vec4& c2, f32 percentage) -> f32vec4;
+    ///template<> MYL_NO_DISCARD constexpr auto mix<color_model::hsl>(const f32vec3& c1, const f32vec3& c2, f32 percentage) -> f32vec3;
+    ///template<> MYL_NO_DISCARD constexpr auto mix<color_model::hsla>(const f32vec4& c1, const f32vec4& c2, f32 percentage) -> f32vec4;
+    ///template<> MYL_NO_DISCARD constexpr auto mix<color_model::hsv>(const f32vec3& c1, const f32vec3& c2, f32 percentage) -> f32vec3;
+    ///template<> MYL_NO_DISCARD constexpr auto mix<color_model::hsva>(const f32vec4& c1, const f32vec4& c2, f32 percentage) -> f32vec4;
 
     template<color_model M>
     MYL_NO_DISCARD constexpr auto complement(const color_model_type<M>& color) -> color_model_type<M>;
@@ -481,26 +494,6 @@ namespace myl {
     ///template<> MYL_NO_DISCARD constexpr auto grayscale<color_model::hsla>(const f32vec4& color) -> f32vec4;
     ///template<> MYL_NO_DISCARD constexpr auto grayscale<color_model::hsv>(const f32vec3& color) -> f32vec3;
     ///template<> MYL_NO_DISCARD constexpr auto grayscale<color_model::hsva>(const f32vec4& color) -> f32vec4;
-
-    template<color_model M>
-    MYL_NO_DISCARD constexpr auto mix(const color_model_type<M>& c1, const color_model_type<M>& c2, f32 percentage) -> color_model_type<M>;
-
-    template<>
-    MYL_NO_DISCARD constexpr auto mix<color_model::rgb>(const f32vec3& c1, const f32vec3& c2, f32 percentage) -> f32vec3 {
-        return lerp(c1, c2, percentage);
-    }
-
-    template<>
-    MYL_NO_DISCARD constexpr auto mix<color_model::rgba>(const f32vec4& c1, const f32vec4& c2, f32 percentage) -> f32vec4 {
-        return lerp(c1, c2, percentage);
-    }
-
-    ///template<> MYL_NO_DISCARD constexpr auto mix<color_model::cmy>(const f32vec3& c1, const f32vec3& c2, f32 percentage) -> f32vec3;
-    ///template<> MYL_NO_DISCARD constexpr auto mix<color_model::cmyk>(const f32vec4& c1, const f32vec4& c2, f32 percentage) -> f32vec4;
-    ///template<> MYL_NO_DISCARD constexpr auto mix<color_model::hsl>(const f32vec3& c1, const f32vec3& c2, f32 percentage) -> f32vec3;
-    ///template<> MYL_NO_DISCARD constexpr auto mix<color_model::hsla>(const f32vec4& c1, const f32vec4& c2, f32 percentage) -> f32vec4;
-    ///template<> MYL_NO_DISCARD constexpr auto mix<color_model::hsv>(const f32vec3& c1, const f32vec3& c2, f32 percentage) -> f32vec3;
-    ///template<> MYL_NO_DISCARD constexpr auto mix<color_model::hsva>(const f32vec4& c1, const f32vec4& c2, f32 percentage) -> f32vec4;
 
     namespace colors {
         template<color_model M> static auto blue    = color_cast<M, color_model::rgb>(myl::f32vec3{ 0.f, 0.f, 1.f });
