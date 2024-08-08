@@ -137,6 +137,14 @@ namespace myl {
             m_capacity = bytes;
         }
 
+        constexpr auto set(const void* data, size_type element_count, size_type element_offset = 0) -> void {
+            MYL_ASSERT(element_count + element_offset <= m_capacity, "Setting data will overflow the buffer!");
+            if (data == nullptr || element_count == 0)
+                return;
+
+            memcpy(m_data + element_offset, data, static_cast<size_t>(element_count));
+        }
+
         constexpr auto swap(buffer& other) noexcept(altr::propagate_on_container_swap::value || altr::is_always_equal::value) -> void {
             if (this == &other)
                 return;
