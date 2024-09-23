@@ -11,6 +11,7 @@
 /// reflection
 /// decompose with shear
 /// decompose with quaternions
+/// rotate on an axis eg. axis (1, 1, 0) and rotate by 90 degrees, like glm
 
 namespace myl {
     template<typename T>
