@@ -30,6 +30,7 @@ namespace myl {
             struct { value_type s, t; };
             struct { value_type u, v; };
             struct { value_type w, h; };
+            struct { value_type left, right; };
         };
 
         // Constructors / Destructor
