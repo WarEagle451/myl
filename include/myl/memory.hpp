@@ -6,8 +6,8 @@
 #include <utility>
 
 namespace myl {
-    template<typename Allocator = std::allocator<myl::u8>>
-    class buffer {
+    template<typename Block, typename Allocator = std::allocator<Block>>
+    class basic_buffer {
         using altr = std::allocator_traits<Allocator>;
     public:
         using allocator_type  = typename altr::allocator_type;
@@ -22,34 +22,34 @@ namespace myl {
     public:
         // Constructors, Destructor, Assignment
 
-        MYL_NO_DISCARD constexpr buffer() noexcept(noexcept(allocator_type()))
+        MYL_NO_DISCARD constexpr basic_buffer() noexcept(noexcept(allocator_type()))
             : m_allocator() {}
 
-        MYL_NO_DISCARD constexpr buffer(const allocator_type& allocator) noexcept
+        MYL_NO_DISCARD constexpr basic_buffer(const allocator_type& allocator) noexcept
             : m_allocator{ allocator } {}
 
-        MYL_NO_DISCARD constexpr buffer(const buffer& other) noexcept
+        MYL_NO_DISCARD constexpr basic_buffer(const basic_buffer& other) noexcept
             : m_allocator() {
             allocate(other.m_capacity);
-            memcpy(m_data, other.m_data, other.m_capacity);
+            std::memcpy(m_data, other.m_data, other.m_capacity);
         }
 
-        MYL_NO_DISCARD constexpr buffer(buffer&& other)
+        MYL_NO_DISCARD constexpr basic_buffer(basic_buffer&& other)
             : m_allocator{ std::move(other.m_allocator) }
             , m_data{ std::move(other.m_data) }
             , m_capacity{ std::move(other.m_capacity) } {}
 
-        MYL_NO_DISCARD constexpr explicit buffer(size_type bytes, const allocator_type& allocator = allocator_type())
+        MYL_NO_DISCARD constexpr explicit basic_buffer(size_type bytes, const allocator_type& allocator = allocator_type())
             : m_allocator{ allocator } {
             allocate(bytes);
         }
 
-        constexpr ~buffer() {
+        constexpr ~basic_buffer() {
             if (m_data)
                 deallocate();
         }
 
-        constexpr auto operator=(const buffer& other) -> buffer& {
+        constexpr auto operator=(const basic_buffer& other) -> basic_buffer& {
             if (this == &other)
                 return;
 
@@ -60,11 +60,11 @@ namespace myl {
                 m_allocator = other.m_allocator;
 
             allocate(other.m_capacity);
-            memcpy(m_data, other.m_data, other.m_capacity);
+            std::memcpy(m_data, other.m_data, other.m_capacity);
             return *this;
         }
 
-        constexpr auto operator=(buffer&& other) noexcept(altr::propagate_on_container_move_assignment::value || altr::is_always_equal::value) -> buffer& {
+        constexpr auto operator=(basic_buffer&& other) noexcept(altr::propagate_on_container_move_assignment::value || altr::is_always_equal::value) -> basic_buffer& {
             if (this == &other)
                 return;
             
@@ -137,15 +137,26 @@ namespace myl {
             m_capacity = bytes;
         }
 
-        constexpr auto set(const void* data, size_type element_count, size_type element_offset = 0) -> void {
+        constexpr auto set(const value_type& value, size_type offset) -> void {
+            MYL_ASSERT(offset < m_capacity, "Setting data will overflow the buffer!");
+            std::memset(m_data + offset, value, sizeof(value_type));
+        }
+
+        constexpr auto set(const void* data, size_type element_count, size_type element_offset) -> void {
             MYL_ASSERT(element_count + element_offset <= m_capacity, "Setting data will overflow the buffer!");
             if (data == nullptr || element_count == 0)
                 return;
 
-            memcpy(m_data + element_offset, data, static_cast<size_t>(element_count));
+            std::memcpy(m_data + element_offset, data, static_cast<size_t>(element_count));
         }
 
-        constexpr auto swap(buffer& other) noexcept(altr::propagate_on_container_swap::value || altr::is_always_equal::value) -> void {
+        constexpr auto zero() -> void {
+            if (m_capacity == 0)
+                return;
+            std::memset(m_data, 0, m_capacity);
+        }
+
+        constexpr auto swap(basic_buffer& other) noexcept(altr::propagate_on_container_swap::value || altr::is_always_equal::value) -> void {
             if (this == &other)
                 return;
 
@@ -164,7 +175,18 @@ namespace myl {
             other.m_data = t_data;
             other.m_capacity = t_capacity;
         }
-    };
+    };   
+
+    using i8buffer  = basic_buffer<myl::i8>;
+    using i16buffer = basic_buffer<myl::i16>;
+    using i32buffer = basic_buffer<myl::i32>;
+    using i64buffer = basic_buffer<myl::i64>;
+    using u8buffer  = basic_buffer<myl::u8>;
+    using u16buffer = basic_buffer<myl::u16>;
+    using u32buffer = basic_buffer<myl::u32>;
+    using u64buffer = basic_buffer<myl::u64>;
+
+    using buffer = u8buffer;
 
     template<typename T>
     class observer_ptr {
@@ -289,7 +311,7 @@ namespace myl {
 
 namespace std {
     template<typename T>
-    constexpr auto swap(myl::buffer<T>& l, myl::buffer<T>& r) noexcept(noexcept(l.swap(r))) -> void {
+    constexpr auto swap(myl::basic_buffer<T>& l, myl::basic_buffer<T>& r) noexcept(noexcept(l.swap(r))) -> void {
         l.swap(r);
     }
 

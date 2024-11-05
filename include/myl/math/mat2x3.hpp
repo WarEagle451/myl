@@ -62,7 +62,7 @@ namespace myl {
         // Operators
 
         constexpr auto operator=(const mat&) -> mat& = default;
-        constexpr auto operator=(const mat&&) -> mat& = default;
+        constexpr auto operator=(mat&&) -> mat& = default;
 
         MYL_NO_DISCARD constexpr auto operator==(const mat& r) const noexcept -> bool {
             return m_data[0] == r[0] && m_data[1] == r[1];
