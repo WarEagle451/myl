@@ -17,8 +17,8 @@ namespace myl {
         using const_pointer   = typename std::allocator_traits<allocator_type>::const_pointer;
     private:
         allocator_type m_allocator;
-        pointer m_data = nullptr;
-        size_type m_capacity = 0;
+        pointer        m_data = nullptr;
+        size_type      m_capacity = 0;
     public:
         // Constructors, Destructor, Assignment
 
@@ -89,6 +89,10 @@ namespace myl {
             return m_capacity;
         }
 
+        MYL_NO_DISCARD constexpr auto bytes() const noexcept -> size_type {
+            return m_capacity * sizeof(value_type);
+        }
+
         MYL_NO_DISCARD constexpr auto operator[](size_type index) -> value_type& {
             MYL_ASSERT(index < m_capacity, "'index' is greater than capacity");
             return m_data[index];
@@ -114,10 +118,10 @@ namespace myl {
 
         // Modifiers
 
-        constexpr auto allocate(size_type bytes) -> void {
+        constexpr auto allocate(size_type count) -> void {
             MYL_ASSERT(m_data == nullptr, "Data has already been allocated");
-            m_data = altr::allocate(m_allocator, bytes);
-            m_capacity = bytes;
+            m_data = altr::allocate(m_allocator, count);
+            m_capacity = count;
         }
 
         constexpr auto deallocate() -> void {
@@ -127,14 +131,14 @@ namespace myl {
             m_data = nullptr;
         }
 
-        constexpr auto reallocate(size_type bytes) -> void {
+        constexpr auto reallocate(size_type count) -> void {
             MYL_ASSERT(m_data != nullptr, "Data has not be allocated");
-            if (m_capacity == bytes)
+            if (m_capacity == count)
                 return;
 
             altr::deallocate(m_allocator, m_data, m_capacity);
-            m_data = altr::allocate(m_allocator, bytes);
-            m_capacity = bytes;
+            m_data = altr::allocate(m_allocator, count);
+            m_capacity = count;
         }
 
         constexpr auto set(const value_type& value, size_type offset) -> void {
