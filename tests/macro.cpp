@@ -24,6 +24,11 @@ TEST_CASE("MYL_ARG_CONCAT", "[macro.hpp]") {
 	CHECK(MYL_ARG_CONCAT(2, MYL_TEST_NUMBER) == 2451);
 }
 
+TEST_CASE("MYL_IF", "[macro.hpp]") {
+	CHECK(MYL_IF(0, false, true) == true);
+	CHECK(MYL_IF(1, true, false) == true);
+}
+
 TEST_CASE("MYL_BOOL", "[macro.hpp]") {
 	CHECK(MYL_BOOL(0) == 0);
 	CHECK(MYL_BOOL(1) == 1);
