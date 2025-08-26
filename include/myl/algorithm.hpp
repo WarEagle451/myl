@@ -52,4 +52,9 @@ namespace myl {
     MYL_NO_DISCARD constexpr auto difference(const T& a, const T& b) -> T {
         return a > b ? a - b : b - a;
     }
+
+    template<typename T>
+    MYL_NO_DISCARD constexpr auto sign(const T a) -> T {
+        return (static_cast<T>(0) < a) - (a < static_cast<T>(0));
+    }
 }

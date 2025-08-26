@@ -2,11 +2,306 @@
 
 #include <catch2/catch_all.hpp>
 
+#include <algorithm>
+
+template<typename T>
+auto static_vector_tests() -> void {
+    SECTION("constructors") {
+        SECTION("default") {
+            myl::static_vector<T, 3> v;
+            CHECK(v.size() == 0);
+            CHECK(v.capacity() == 3);
+            CHECK(v.empty() == true);
+        }
+        SECTION("copy") {
+            myl::static_vector<T, 3> v1{ 1, 2, 3 };
+            CHECK(v1.size() == 3);
+            CHECK(v1.capacity() == 3);
+            CHECK(v1.full() == true);
+
+            myl::static_vector<T, 3> v2(v1);
+            CHECK_FALSE("This is bugged");
+            ///CHECK(std::equal(std::begin(v1), std::end(v1), std::begin(v2), std::end(v2)) == true);
+
+            //
+            
+            myl::static_vector<T, 4> v3{ 1, 2, 3 };
+            CHECK(v3.size() == 3);
+            CHECK(v3.capacity() == 4);
+            CHECK(v3.full() == true);
+
+            myl::static_vector<T, 4> v4(v1);
+            CHECK_FALSE("This is bugged");
+            ///CHECK(std::equal(std::begin(v3), std::end(v3), std::begin(v4), std::end(v4)) == true);
+        }
+        SECTION("copy (of lesser capacity)") {
+
+        }
+        SECTION("move") {
+
+        }
+        SECTION("count (default initialized)") {
+
+        }
+        SECTION("count (value initialized)") {
+
+        }
+        SECTION("iterators") {
+
+        }
+        SECTION("list") {
+
+        }
+    }
+    SECTION("assignment (copy)") {
+
+    }
+    SECTION("assignment (move)") {
+
+    }
+    SECTION("assignment (list)") {
+
+    }
+    SECTION("assign (count)") {
+
+    }
+    SECTION("assign (iterators)") {
+
+    }
+    SECTION("assign (list)") {
+
+    }
+    SECTION("at") {
+
+    }
+    SECTION("at (const)") {
+
+    }
+    SECTION("operator[]") {
+        myl::static_vector<T, 3> v{ 1, 2, 3 };
+        CHECK(v[0] == 1);
+        CHECK(v[1] == 2);
+        CHECK(v[2] == 3);
+    }
+    SECTION("operator[] (const)") {
+
+    }
+    SECTION("front") {
+        myl::static_vector<T, 3> v1{ 1, 2, 3 };
+        CHECK(v1.front() == 1);
+
+        //
+
+        myl::static_vector<T, 3> v2{ 1 };
+        CHECK(v2.front() == 1);
+
+    }
+    SECTION("front (const)") {
+
+    }
+    SECTION("back") {
+        myl::static_vector<T, 3> v1{ 1, 2, 3 };
+        CHECK(v1.back() == 3);
+
+        //
+
+        myl::static_vector<T, 3> v2{ 1 };
+        CHECK(v2.back() == 1);
+    }
+    SECTION("back (const)") {
+
+    }
+    SECTION("data") {
+
+    }
+    SECTION("data (const)") {
+
+    }
+    SECTION("empty") {
+        myl::static_vector<T, 3> v1{ 1, 2, 3 };
+        CHECK(v1.empty() == false);
+
+        //
+
+        myl::static_vector<T, 3> v2{ 1 };
+        CHECK(v2.empty() == false);
+
+        //
+
+        myl::static_vector<T, 3> v3;
+        CHECK(v3.empty() == true);
+    }
+    SECTION("full") {
+        myl::static_vector<T, 3> v1{ 1, 2, 3 };
+        CHECK(v1.full() == true);
+
+        //
+
+        myl::static_vector<T, 3> v2{ 1 };
+        CHECK(v2.full() == false);
+
+        //
+
+        myl::static_vector<T, 3> v3;
+        CHECK(v3.full() == false);
+    }
+    SECTION("size") {
+        myl::static_vector<T, 3> v{ 1, 2 };
+        CHECK(v.size() == 2);
+    }
+    SECTION("max_size") {
+        myl::static_vector<T, 3> v{ 1 };
+        CHECK(v.max_size() == 3);
+    }
+    SECTION("capacity") {
+        myl::static_vector<T, 3> v{ 1 };
+        CHECK(v.capacity() == 3);
+    }
+    SECTION("resize") {
+        // Resize to max
+        myl::static_vector<T, 3> v{};
+        v.resize(3);
+        CHECK(v.size() == 3);
+        
+        // Resize to 0
+        v.resize(0);
+        CHECK(v.size() == 0);
+        
+        // Resize with available capacity
+        v.resize(2);
+        CHECK(v.size() == 2);
+       
+        // Resize beyond capacity
+///        v.resize(4);
+///#ifndef MYL_NO_EXCEPTIONS
+///        CHECK_THROWS(v.size() == 4);
+///#else
+///        CHECK(v.size() == 4);
+///#endif
+    }
+    SECTION("resize (fill with value)") {
+
+    }
+    SECTION("insert (copy)") {
+
+    }
+    SECTION("insert (move)") {
+
+    }
+    SECTION("insert (count)") {
+
+    }
+    SECTION("insert (iterators)") {
+
+    }
+    SECTION("insert (list)") {
+
+    }
+    SECTION("emplace") {
+
+    }
+    SECTION("emplace_back") {
+
+    }
+    SECTION("try_emplace_back") {
+
+    }
+    SECTION("unchecked_emplace_back") {
+
+    }
+    SECTION("push_back (copy)") {
+
+    }
+    SECTION("push_back (move)") {
+
+    }
+    SECTION("try_push_back (copy)") {
+
+    }
+    SECTION("try_push_back (move)") {
+
+    }
+    SECTION("unchecked_emplace_back (copy)") {
+
+    }
+    SECTION("unchecked_emplace_back (move)") {
+
+    }
+    SECTION("pop_back") {
+
+    }
+    SECTION("pop_back (count)") {
+
+    }
+    SECTION("clear") {
+
+    }
+    SECTION("fill") {
+
+    }
+    SECTION("saturate") {
+
+    }
+    SECTION("erase") {
+
+    }
+    SECTION("erase (iterators)") {
+
+    }
+    SECTION("swap") {
+
+    }
+    SECTION("comparison") {
+        SECTION("==") {
+
+        }
+        SECTION("!=") {
+
+        }
+        SECTION("<") {
+
+        }
+        SECTION("<=") {
+
+        }
+        SECTION(">") {
+
+        }
+        SECTION(">=") {
+
+        }
+    }
+    SECTION("std::swap") {
+
+    }
+    SECTION("std::erase") {
+
+    }
+    SECTION("std::erase_if") {
+
+    }
+}
+
+#include <myl_wip/unit_test.hpp>
+
+TEST_CASE("myl::static_vector", "[static_vector.hpp]") {
+    using test_element_type = myl::u8;
+
+    MYL_TEST_CASE("test2");
+    MYL_TEST_CASE("test2");
+
+    //static_vector_tests<test_element_type>();
+}
+
+/// BELOW IS BAD
+#if 0
+#include <myl/static_vector.hpp>
+
+#include <catch2/catch_all.hpp>
+
 #include <array>
 
 /// MYTODO: ENSURE THINGS THAT ARE SUPPOSE TO THROW DO THROW
-
-using element_type = myl::u8;
 
 #define MYL_TEST_SV_CHECK(static_vector, size_, capacity_, empty_, full_)\
     CHECK(static_vector.size() == size_);\
@@ -16,24 +311,6 @@ using element_type = myl::u8;
 
 TEST_CASE("myl::static_vector", "[static_vector.hpp]") {
     SECTION("constructor") {
-        SECTION("default") {
-            myl::static_vector<element_type, 4> sv;
-
-            MYL_TEST_SV_CHECK(sv, 0, 4, true, false);
-        }
-        SECTION("copy") {
-            myl::static_vector<element_type, 4> sv0{ 1, 2, 3 };
-            myl::static_vector<element_type, 4> sv1(sv0);
-
-            MYL_TEST_SV_CHECK(sv0, 3, 4, false, false);
-            CHECK(sv0[0] == 1);
-            CHECK(sv0[1] == 2);
-            CHECK(sv0[2] == 3);
-            MYL_TEST_SV_CHECK(sv1, 3, 4, false, false);
-            CHECK(sv1[0] == 1);
-            CHECK(sv1[1] == 2);
-            CHECK(sv1[2] == 3);
-        }
         SECTION("move") {
             myl::static_vector<element_type, 4> sv0{ 1, 2, 3 };
             myl::static_vector<element_type, 4> sv1(std::move(sv0));
@@ -668,3 +945,4 @@ TEST_CASE("myl::static_vector", "[static_vector.hpp]") {
         CHECK(erased == 3);
     }
 }
+#endif

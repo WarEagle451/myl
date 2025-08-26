@@ -139,6 +139,15 @@ namespace myl {
 			a.z * b.x - b.z * a.x,
 			a.x * b.y - b.x * a.y);
 	}
+
+    /// MYTOD: Check if the below code is correct, and implement down, left, right, forward, backward
+    /// Also, this maybe should be in a different file
+
+    template<typename T>
+    MYL_NO_DISCARD constexpr auto up(const vec3<T>& a, const vec3<T>& world_up_vector = vec3<T>(0, 1, 0)) -> vec3<T> {
+        const vec3<T> rv = normalize(cross(a, world_up_vector));
+        return normalize(cross(rv, a));
+    }
 }
 
 #ifdef MYL_EXTEND_FORMAT

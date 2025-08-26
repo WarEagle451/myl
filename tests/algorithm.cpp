@@ -40,3 +40,9 @@ TEST_CASE("myl::difference", "[algorithm.hpp]") {
 	CHECK(myl::difference(7, 3) == 4);
 	CHECK(myl::difference(2, 2) == 0);
 }
+
+TEST_CASE("myl::sign", "[algorithm.hpp]") {
+	CHECK(myl::sign(0) == 0);
+	CHECK(myl::sign(2) == 1);
+	CHECK(myl::sign(-2) == -1);
+}

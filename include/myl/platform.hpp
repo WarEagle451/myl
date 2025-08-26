@@ -57,6 +57,7 @@
 #endif
 
 // OS detection
+/// MYTODO: IMPROVE APPLE DETECTION
 
 #if defined(__ANDROID__)
 #   define MYL_OS_ANDROID __ANDROID__
@@ -89,6 +90,10 @@
 #   define MYL_OS_UNIX
 #elif defined(_WIN16) || defined(_WIN32) || defined(_WIN64) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
 #   define MYL_OS_WINDOWS
+#elif defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
+#   define MYL_OS_WINDOWS_UWP
+#elif defined(__ORBIS__) || defined(__PROSPERO__)
+#   define MYL_OS_PLAYSTATION
 #else
 #   warning "Unknown OS!"
 #   define MYL_OS_UNKNOWN
