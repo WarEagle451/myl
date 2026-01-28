@@ -6,15 +6,19 @@
 #include <string_view>
 #include <vector>
 
-/// Rewrite entire thing for final class
+/// MYTODO: Changes
+/// - Make it so when adding an arg you can put 'a' instead of '-a'. this is important so the user doesnt mess things up
+/// - Add the ability to extarct lists as arrays, vectors, etc
+
+/// POsitional args are ones without a short or long name, maybe
 
 /// MYTODO: fix the types choosen
 
 /// Inputs wanted
 // Long flag, --help
 // short flag, -h
-/// long option, --output file.txt
-/// long option equals, --output=file.txt
+// long option, --output file.txt
+// long option equals, --output=file.txt
 // combined short flags, -abc
 // short option, -o file.txt
 // short option equals -o file.txt
@@ -29,6 +33,10 @@
 /// enums
 
 /// change the type_value to something like converter, so the user can expand it if needed
+
+/// https://github.com/FlorianRappl/CmdParser
+/// https://www.dmulholl.com/docs/argspp/master/
+/// https://docs.python.org/3/library/argparse.html
 
 namespace myl {
     namespace details {
@@ -114,29 +122,33 @@ namespace myl {
             /// MYTODO: Maybe this should throw an error
             return details::type_value<T>::convert(details::type_value<T>::default_value());
         }
-
-        auto parse(int argc, char** argv) -> bool { /// CHANGED != to < veryify that works
+        auto parse(int argc, char** argv) -> bool {            
             for (int i = 1; i < argc; ++i) { // First arg is the path of the program
-                if ('-' == argv[i][0]) { // Handle flags, options
-                    const std::string_view svargv(argv[i]);
+                if ('-' == argv[i][0]) {
+                    // The argument is an option or flag
+                    const std::string_view sv_argv(argv[i]);                    
 
-                    const size_t equals_offset = svargv.find_first_of('=', 2);
-                    const std::string_view identifier_name(svargv.begin(), std::string_view::npos == equals_offset ? svargv.end() : svargv.begin() + equals_offset);
-                    option_entry* option = get_option(identifier_name);
+                    // Isolate the identifier from a potential value
+                    const size_t equals_offset = sv_argv.find_first_of('=', 2);
+                    const std::string_view identifier_name(sv_argv.begin(), std::string_view::npos == equals_offset ? sv_argv.end() : sv_argv.begin() + equals_offset);
+                    option_entry* entry = get_option(identifier_name);
 
-                    if (nullptr == option) {                        
-                        if ('-' != svargv[1] && svargv.size() > 2) {
-                            // Handle combined short flags
-
-                            for (int j = 1; j != svargv.size(); ++j) {
-                                option = get_option(std::string("-") + svargv[j]);
-                                if (nullptr == option) { /// Improve short flag error
-                                    failed_parse(std::string(std::string("-") + svargv[j]) + ": This option does not exist");
+                    if (nullptr == entry) {
+                        if ('-' != sv_argv[i] && sv_argv.size() > 2) { // Handle combined short flags                            
+                            for (myl::usize s = 1; s != sv_argv.size(); ++s) {
+                                // Isolate each short flag
+                                entry = get_option(std::string("-") + sv_argv[s]);
+                                if (nullptr == entry) { // Entry does not exist                                    
+                                    failed_parse(std::string(std::string("-") + sv_argv[s]) + ": This option does not exist 2");
+                                    return false;
+                                }
+                                else if (entry->seen) {                                    
+                                    failed_parse(std::string(std::string("-") + sv_argv[s]) + ": This option has already been seen");
                                     return false;
                                 }
 
-                                option->seen = true;
-                                option->data = "true"; // Flags can only be bools
+                                entry->seen = true;
+                                entry->data = "true"; // Flags can only be booleans
                             }
 
                             continue;
@@ -146,69 +158,73 @@ namespace myl {
                         return false;
                     }
 
-                    option->seen = true;
-                    
-                    if (0 == option->arg_count) {
-                        // Handle short and long flags
-                        option->data = "true";
+                    // Handle flags and options
+
+                    if (entry->seen) {
+                        failed_parse(std::string(sv_argv) + ": This option has already been seen");
+                        return false;
                     }
-                    else {                        
-                        // Handle options with values
-                        std::string list{ "" };
-                        
-                        // Check for args being defined with an '='
-                        const size_t param_offset = svargv.find_first_of('=', 2);
-                        if (std::string_view::npos == param_offset) {
-                            /// MYTODO: This could probs be improved
-                            // This section handles arguments when they're in the next argv(s)
-                            for (int expected_arg_count = option->arg_count; expected_arg_count != 0; --expected_arg_count) {
-                                ++i; // Skip the identifier
-                                if ('-' == argv[i][0]) { // Check that the new arg is a parameter
-                                    failed_parse(std::string(svargv) + ": is not followed by the expected amount of arguments (enter num)");
+
+                    entry->seen = true;                    
+                    if (0 == entry->arg_count) { // Handle flags                        
+                        entry->data = "true"; // Flags can only be booleans
+                    }
+                    else { // Handle options
+                        std::vector<std::string_view> values{};
+                        values.reserve(entry->arg_count);
+
+                        // Distinguish between the 2 supported formats for options with values; -a=1,2 vs -a 1 2                        
+                        size_t offset = sv_argv.find_first_of('=', 2); /// use equals_offset
+                        if (std::string_view::npos == offset) {
+                            // Format: -a 1 2
+                            ++i; // Skip over identifier (a)
+                            while (i < argc) {
+                                if ('-' == argv[i][0]) // Check if the new arg is an identifier
+                                    break;
+                            
+                                values.push_back(argv[i]);
+                                ++i;
+                            }
+                            --i; // Decrement, otherwise when the main loop (i) loops an arg will get skipped
+                        }
+                        else {
+                            // Format: -a=1,2
+                            while (offset < sv_argv.size()) {
+                                ++offset; // Skip over delimiters '=' or ','
+                                /// MYTODO: This will fail if ',' is in an input string or something like that
+                                size_t delimiter = sv_argv.find_first_of(',', offset);
+                                if (std::string_view::npos == delimiter)
+                                    delimiter = sv_argv.size();
+
+                                if (delimiter == offset) { // Empty value, syntax error
+                                    failed_parse(std::string(sv_argv) + ": Incorrect list syntax");
                                     return false;
                                 }
 
-                                if (!list.empty())
-                                    list += ",";
-                                list.append(argv[i]);
+                                values.push_back(sv_argv.substr(offset, delimiter - offset));
+                                offset += delimiter - offset;
                             }
                         }
-                        else {
-                            // This section handles arguments when they're in the same argv
-                            /// MYTODO: These should be verified to prevent security risks
-                            /// eg like arg count and syntax
-                            list.append(svargv.begin() + param_offset + 1, svargv.end());
-                            
-                            ///size_t offset = svargv.find_first_of('=', 2);
-                            ///while (std::string_view::npos != offset) {
-                            ///    ++offset;
-                            ///    const size_t next_offset = svargv.find_first_of(',', offset);
-                            ///    if (std::string_view::npos == next_offset) {
-                            ///        if (!list.empty())
-                            ///            list += ",";
-                            ///        list.append(svargv.begin() + offset, svargv.end());
-                            ///        break;
-                            ///    }
-                            ///
-                            ///    std::string_view arg(svargv.begin() + offset, svargv.begin() + next_offset);
-                            ///    std::cout << arg << std::endl;
-                            ///
-                            ///    offset = next_offset;
-                            ///}
+
+                        if (values.size() != entry->arg_count) {
+                            failed_parse(std::string(sv_argv) + ": Incorrect argument count provided");
+                            return false;
                         }
-                            
-                        /// Handle
-                        /// -h=1
-                        /// -h 1                        
-                        /// --help=1
-                        /// --help 1
-                    
-                        option->data = list;
+
+                        std::string data{ "" };
+                        for (auto& value : values) {
+                            if (!data.empty())
+                                data += ',';
+                            data.append(value);
+                        }
+
+                        entry->data = data;
                     }
+
                 }
                 else {
-                    /// It's a positional arg or
-                    /// a value to a key, which should have be handled above
+                    /// MYTODO:
+                    // The argument is either positional or an error
                 }
             }
 
@@ -244,13 +260,13 @@ namespace myl {
 
     private:
         static auto default_error_callback(const std::string& message) -> void {
-            std::cout << message << std::endl;
+            std::cerr << message << std::endl;
         }
 
         auto failed_parse(const std::string& error_message) -> void {
             (*m_error_callback)(error_message);
             for (auto& entry : m_options)
-                entry.seen = false;
+                entry.seen = false; // Marked as not seen to effectively ignore any input being accessed
         }
 
         constexpr auto get_option(std::string_view option_name) -> option_entry* {
