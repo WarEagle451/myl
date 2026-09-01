@@ -6,8 +6,8 @@
 #include <type_traits>
 
 namespace myl {
-    namespace details {
-        MYL_NO_DISCARD constexpr auto byteswap16_impl(u16 v) noexcept -> u16 {
+    namespace impl {
+        MYL_NO_DISCARD constexpr auto _byteswap16(u16 v) noexcept -> u16 {
 #ifdef MYL_INTRINSIC_BYTESWAP16
             if constexpr (!std::is_constant_evaluated())
                 return MYL_INTRINSIC_BYTESWAP16(v);
@@ -16,7 +16,7 @@ namespace myl {
                 return (v << 8) | (v >> 8);
         }
 
-        MYL_NO_DISCARD constexpr auto byteswap32_impl(u32 v) noexcept -> u32 {
+        MYL_NO_DISCARD constexpr auto _byteswap32(u32 v) noexcept -> u32 {
 #ifdef MYL_INTRINSIC_BYTESWAP32
             if constexpr (!std::is_constant_evaluated())
                 return MYL_INTRINSIC_BYTESWAP32(v);
@@ -27,7 +27,7 @@ namespace myl {
                     ((v >> 8) & 0x0000'FF00) | (v >> 24);
         }
 
-        MYL_NO_DISCARD constexpr auto byteswap64_impl(u64 v) noexcept -> u64 {
+        MYL_NO_DISCARD constexpr auto _byteswap64(u64 v) noexcept -> u64 {
 #ifdef MYL_INTRINSIC_BYTESWAP64
             if constexpr (!std::is_constant_evaluated())
                 return MYL_INTRINSIC_BYTESWAP64(v);
@@ -46,11 +46,11 @@ namespace myl {
         if constexpr (sizeof(T) == 1)
             return v;
         else if constexpr (sizeof(T) == 2)
-            return std::bit_cast<T, u16>(details::byteswap16_impl(std::bit_cast<u16, T>(v)));
+            return std::bit_cast<T, u16>(impl::_byteswap16(std::bit_cast<u16, T>(v)));
         else if constexpr (sizeof(T) == 4)
-            return std::bit_cast<T, u32>(details::byteswap32_impl(std::bit_cast<u32, T>(v)));
+            return std::bit_cast<T, u32>(impl::_byteswap32(std::bit_cast<u32, T>(v)));
         else if constexpr (sizeof(T) == 8)
-            return std::bit_cast<T, u64>(details::byteswap64_impl(std::bit_cast<u64, T>(v)));
+            return std::bit_cast<T, u64>(impl::_byteswap64(std::bit_cast<u64, T>(v)));
         else
             static_assert(false, "Unexpected byte size, must be 8 or less");
     }
