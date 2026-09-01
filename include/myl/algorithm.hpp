@@ -2,14 +2,52 @@
 #include <myl/definitions.hpp>
 #include <myl/type.hpp>
 
+#include <array>
 #include <cmath>
+#include <iterator>
 #include <limits>
 
-/// MYTODO: variadic functions should be able to take common types like int and float
-
 namespace myl {
+    template<std::input_iterator It>
+    MYL_NO_DISCARD constexpr auto median(It begin, It end) -> std::common_type_t<typename It::value_type, float> {
+        using output_t = std::common_type_t<typename It::value_type, float>;
+
+        if constexpr (std::contiguous_iterator<It>) {
+            MYL_ASSERT(begin < end, "Asserts when 'begin' comes after 'end', this is not valid with continous storage containers");            
+
+            const std::size_t container_size = end - begin;
+            if (container_size % 2 == 0) {
+                // Even
+                const It over_mid_point = begin + (container_size / 2);
+                return (static_cast<output_t>(*over_mid_point) + static_cast<output_t>(*(over_mid_point - 1))) / 2;
+            }
+            else // Odd
+                return *(begin + (container_size - 1) / 2);
+        }
+        else {
+            const std::size_t container_size = std::distance(begin, end);
+            if (container_size % 2 == 0) {
+                // Even
+                const It over_mid_point = std::next(begin, container_size / 2);
+                return (static_cast<output_t>(*over_mid_point) + static_cast<output_t>(*std::prev(over_mid_point))) / 2;
+            }
+            else // Odd
+                return *std::next(begin, (container_size - 1) / 2);
+        }
+    }
+
+    template<typename... Args>
+    MYL_NO_DISCARD constexpr auto median(Args&&... args) -> std::common_type_t<float, Args...> {
+        using value_type = std::common_type_t<float, Args...>;
+
+        constexpr std::size_t size = sizeof...(args);
+        const std::array<value_type, size> a{ std::forward<value_type>(args)... }; /// Is this undefined behaviour?
+        return median(a.begin(), a.end());
+    }
+
     template<floating_point T>
     MYL_NO_DISCARD constexpr auto approx(const T& a, const T& b) -> bool { /// MYTODO: This doesn't always work, refer to color test
+        /// tolerance is std::abs(a - b) < epsilon
         return b == std::nextafter(a, b);
     }
 
@@ -54,7 +92,7 @@ namespace myl {
     }
 
     template<typename T>
-    MYL_NO_DISCARD constexpr auto sign(const T a) -> T {
-        return (static_cast<T>(0) < a) - (a < static_cast<T>(0));
+    MYL_NO_DISCARD constexpr auto sign(const T v) -> T {
+        return (static_cast<T>(0) < v) - (v < static_cast<T>(0));
     }
 }

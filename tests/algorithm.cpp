@@ -2,6 +2,32 @@
 
 #include <catch2/catch_all.hpp>
 
+TEST_CASE("myl::median (iterator)", "[algorithm.hpp]") {
+	std::list<float> l1{ 1, 2, 3, 4 };
+	std::list<float> l2{ 1, 2, 3, 4, 5 };
+	std::array<float, 9> a1{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+	std::array<float, 10> a2{ 1, 2.1, 2.2, 2.3, 5.9, 6, 7, 8, 9, 10 };
+	l1.push_back(5);
+	l2.push_front(-1);
+
+	float v1 = myl::median(a1.begin(), a1.end());
+	float v2 = myl::median(a2.begin(), a2.end());
+	float v3 = myl::median(l1.begin(), l1.end());
+	float v4 = myl::median(l2.begin(), l2.end());
+
+	CHECK(myl::approx(v1, 5.f));
+	CHECK(myl::approx(v2, 5.95f));
+	CHECK(myl::approx(v3, 3.f));
+	CHECK(myl::approx(v4, 2.5f));
+}
+
+TEST_CASE("myl::median (variadic)", "[algorithm.hpp]") {
+	auto v1 = myl::median(1, 2, 3, 6, 7);
+	auto v2 = myl::median(1, 2, 4.5, 7.f, 9, 10);
+	CHECK(myl::approx(v1, 3.f));
+	CHECK(myl::approx(v2, 5.75));
+}
+
 TEST_CASE("myl::approx", "[algorithm.hpp]") {
 	CHECK(myl::approx(4.2f * 6.7f, 28.14f));
 }
