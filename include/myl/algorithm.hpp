@@ -12,9 +12,15 @@ namespace myl {
     MYL_NO_DISCARD constexpr auto median(It begin, It end) -> std::common_type_t<typename It::value_type, float> {
         using output_t = std::common_type_t<typename It::value_type, float>;
 
-        if constexpr (std::contiguous_iterator<It>) {
-            MYL_ASSERT(begin < end, "Asserts when 'begin' comes after 'end', this is not valid with continous storage containers");            
+        if (begin == end) // The median of an empty set is undefined, therefore return a quiet nan
+            return std::numeric_limits<output_t>::quiet_NaN();
 
+        if constexpr (std::contiguous_iterator<It>) {
+#ifdef MYL_DEBUG
+            MYL_ASSERT(begin < end, "Asserts when 'begin' comes after 'end', this is not valid with contiguous storage containers");
+            if (begin > end)
+                return std::numeric_limits<output_t>::signaling_NaN();
+#endif
             const std::size_t container_size = end - begin;
             if (container_size % 2 == 0) {
                 // Even
