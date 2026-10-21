@@ -236,6 +236,44 @@ namespace myl {
 
         ///constexpr auto operator=(std::initializer_list<value_tyle> list) -> ring_buffer&;
 
+        constexpr auto assign(size_type count, const_reference value) -> void {
+            clear();
+            if (count > capacity()) {
+                altr::deallocate(m_allocator, count);
+                m_begin = altr::allocate(m_allocator, count);
+                m_end = m_begin + count;
+            }
+
+            m_size = count;
+            for (pointer ptr = m_begin; count != 0; ++ptr, --count)
+                altr::construct(m_allocator, ptr, value);
+
+            m_head = m_begin;
+            m_tail = m_begin + m_size - 1;
+        }
+
+        template<typename InputIt>
+        constexpr auto assign(InputIt begin, InputIt end) -> void {
+            clear();
+
+            const size_type new_size = static_cast<size_type>(end - begin);
+            if (new_size > capacity()) {
+                altr::deallocate(m_allocator, m_begin, capacity());
+                m_begin = altr::allocate(m_allocator, new_size);
+                m_end = m_begin + new_size;
+            }
+
+            for (pointer ptr = m_begin; begin != end; ++ptr, ++begin)
+                altr::construct(m_allocator, ptr, *begin);
+
+            m_head = m_begin;
+            m_tail = m_begin + new_size - 1;
+            m_size = new_size;
+        }
+
+        ///template<value_type... Elements>
+        ///constexpr auto assign(Elements&&... elements) -> void;
+
         // Iterators
 
         MYL_NO_DISCARD constexpr auto begin() noexcept -> iterator {
@@ -300,7 +338,7 @@ namespace myl {
             return m_begin;
         }
 
-        MYL_NO_DISCARD constexpr auto max_size() noexcept -> difference_type {
+        MYL_NO_DISCARD constexpr auto max_size() const noexcept -> difference_type {
             return std::numeric_limits<difference_type>::max();
         }
 
@@ -521,45 +559,7 @@ namespace myl {
             }
         }
 
-        ///constexpr auto erase(const_iterator first, const_iterator last) -> iterator;
-
-        constexpr auto assign(size_type count, const_reference value) -> void {
-            clear();
-            if (count > capacity()) {
-                altr::deallocate(m_allocator, count);
-                m_begin = altr::allocate(m_allocator, count);
-                m_end = m_begin + count;
-            }
-
-            m_size = count;
-            for (pointer ptr = m_begin; count != 0; ++ptr, --count)
-                altr::construct(m_allocator, ptr, value);
-
-            m_head = m_begin;
-            m_tail = m_begin + m_size - 1;
-        }
-
-        template<typename InputIt>
-        constexpr auto assign(InputIt begin, InputIt end) -> void {
-            clear();
-
-            const size_type new_size = static_cast<size_type>(end - begin);
-            if (new_size > capacity()) {
-                altr::deallocate(m_allocator, m_begin, capacity());
-                m_begin = altr::allocate(m_allocator, new_size);
-                m_end = m_begin + new_size;
-            }
-
-            for (pointer ptr = m_begin; begin != end; ++ptr, ++begin)
-                altr::construct(m_allocator, ptr, *begin);
-
-            m_head = m_begin;
-            m_tail = m_begin + new_size - 1;
-            m_size = new_size;
-        }
-
-        ///template<value_type... Elements>
-        ///constexpr auto assign(Elements&&... elements) -> void;
+        ///constexpr auto erase(const_iterator first, const_iterator last) -> iterator;        
 
         constexpr auto clear() noexcept -> void {
             while (m_size != 0) { // Destroys elements tail to head
