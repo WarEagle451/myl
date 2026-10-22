@@ -37,8 +37,8 @@ namespace myl {
         using const_reference        = const value_type&;
         using pointer                = value_type*;
         using const_pointer          = const value_type*;
-        using iterator               = contiguous_iterator<value_type>;
-        using const_iterator         = contiguous_const_iterator<value_type>;
+        using iterator               = contiguous_iterator<value_type, false>;
+        using const_iterator         = contiguous_iterator<value_type, true>;
         using reverse_iterator       = std::reverse_iterator<iterator>;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
     private:
