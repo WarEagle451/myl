@@ -56,7 +56,7 @@ namespace myl {
 
         // Access
 
-        MYL_NO_DISCARD constexpr auto operator*() noexcept -> reference {
+        MYL_NO_DISCARD constexpr auto operator*() const -> reference {
             MYL_ASSERT(m_ptr != nullptr, "Can't dereference an invalid iterator");
             return *m_ptr;
         }
