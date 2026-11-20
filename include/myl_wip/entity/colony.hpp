@@ -216,9 +216,8 @@ namespace myl {
         // Members
         
         block* m_begin;
-        ///block* m_erased_blocks;/// implement and understand // List of blocks that are available for re-use
-        /// maybe change below to unused_begin
-        block* m_unused_blocks; // List of uninitiated blocks availble for use
+        ///block* m_erased_block_begin;/// implement and understand // List of blocks that are available for re-use
+        block* m_unused_block_begin; // List of uninitiated blocks availble for use
         size_type m_size;
         size_type m_capacity;
         colony_limits m_block_limits;
@@ -234,8 +233,8 @@ namespace myl {
 
         MYL_NO_DISCARD constexpr explicit colony(const allocator_type& allocator) noexcept
             : m_begin{ nullptr }
-            ///, m_erased_blocks{ nullptr }
-            , m_unused_blocks{ nullptr }
+            ///, m_erased_block_begin{ nullptr }
+            , m_unused_block_begin{ nullptr }
             , m_size{ 0 }
             , m_capacity{ 0 }
             , m_block_limits{ block_capacity_default_limits()}
@@ -247,8 +246,8 @@ namespace myl {
 
         MYL_NO_DISCARD constexpr colony(colony_limits block_limits, const allocator_type& allocator)
             : m_begin{ nullptr }
-            ///, m_erased_blocks{ nullptr }
-            , m_unused_blocks{ nullptr }
+            ///, m_erased_block_begin{ nullptr }
+            , m_unused_block_begin{ nullptr }
             , m_size{ 0 }
             , m_capacity{ 0 }
             , m_block_limits{ block_limits }
@@ -282,15 +281,15 @@ namespace myl {
                 m_begin = m_begin->next;
                 destroy_block_elements(current);
 
-                current->next = m_unused_blocks;
-                m_unused_blocks = current;
+                current->next = m_unused_block_begin;
+                m_unused_block_begin = current;
             }
 
             // Deallocate blocks
 
-            while (m_unused_blocks != nullptr) {
-                current = m_unused_blocks;
-                m_unused_blocks = m_unused_blocks->next;
+            while (m_unused_block_begin != nullptr) {
+                current = m_unused_block_begin;
+                m_unused_block_begin = m_unused_block_begin->next;
 
                 block_altr::destroy(m_block_allocator, current);
                 block_altr::deallocate(m_block_allocator, current, 1);
@@ -355,7 +354,7 @@ namespace myl {
         ///static constexpr auto is_within_hard_limits() noexcept -> bool;
         
         MYL_NO_DISCARD constexpr auto empty() const noexcept -> bool {
-            return m_size == 0;
+            return m_size == 0; /// if m_last is added use m_begin == m_last
         }
 
         // Element Access
@@ -367,18 +366,60 @@ namespace myl {
 
         template<typename... Args>
         constexpr auto emplace(Args&&... args) -> iterator {
-            return;
+            // 1. Attempt to re-use any previously erased element memory locations
+            // 2. Attempt to insert in the block with remaining capacity
+            // 3. Attempt to re-use any unused blocks
+            // 4. Create a new block
+
+            if (m_erased_block_begin != nullptr) { // 1. Attempt to re-use any previously erased element memory locations
+                /// Figure out erasure block stuff
+                return iterator(); /// Confirm constructor
+            }
+            else if (m_last->size != m_last->capacity) { // 2. Attempt to insert in the block with remaining capacity
+                // m_last guaranteed to have continuously constructed elements due to the check in the previous if statement
+                /// keep track of a end pointer for the last block to make this stuff easier maybe
+
+
+
+                return iterator(); /// Confirm constructor
+            }
+            else {
+                block* next_block = nullptr;
+                if (m_unused_block_begin != nullptr) { // 3. Attempt to re-use any unused blocks
+                    altr::construct(m_element_allocator, m_unused_block_begin->data, std::forward<Args>(args)...);
+                    next_block = m_unused_block_begin;
+                    m_unused_block_begin = m_unused_block_begin->next;
+                    next_block->next = nullptr;
+                }
+                else { // 4. Create a new block
+                    next_block = create_block(m_block_limits.min); /// use the formula to calc the next bloxk size instead of min
+                    altr::construct(m_element_allocator, next_block->data, std::forward<Args>(args)...);
+                }
+        
+                ++m_size;
+
+                if (m_begin == m_last) { /// if add m_last replace with empty()
+                    m_begin = next_block;
+                    next_block->prev = nullptr;
+                }
+                else {
+                    m_last->next = next_block; /// put the block at the back because appartently that is what youre suposed to do
+                    next_block->prev = m_last;
+                }
+
+                return iterator(next_block->data); /// Confirm constructor
+            }            
         }
         
         ///template<typename... Args> constexpr auto emplace_hint(const_iterator hint, Args&&... args) -> iterator;
          
-        ///constexpr auto insert(const value_type& value) -> iterator {
-        ///    return emplace(value);
-        ///}
-        ///
-        ///constexpr auto insert(value_type&& value) -> iterator {
-        ///    return emplace(std::move(value));
-        ///}
+        constexpr auto insert(const value_type& value) -> iterator {
+            return emplace(value);
+        }
+        
+        constexpr auto insert(value_type&& value) -> iterator {
+            return emplace(std::move(value));
+        }
 
         ///constexpr auto insert(const_iterator hint, const value_type& value) -> iterator;
         ///constexpr auto insert(const_iterator hint, value_type&& value) -> iterator;
@@ -404,11 +445,11 @@ namespace myl {
             }
             
             if (m_begin->next != nullptr) { // Only move blocks past the first block when there is more than 1 block
-                current_block->next = m_unused_blocks; // Link up the previously destroyed blocks to the unused blocks
-                m_unused_blocks = m_begin->next;
+                current_block->next = m_unused_block_begin; // Link up the previously destroyed blocks to the unused blocks
+                m_unused_block_begin = m_begin->next;
                 // Decouple the m_begin and m_begin->next blocks
                 m_begin->next = nullptr;
-                m_unused_blocks->prev = nullptr;
+                m_unused_block_begin->prev = nullptr;
             }
 
             m_size = 0;
@@ -433,6 +474,8 @@ namespace myl {
             else if (remainder < m_block_limits.min)
                 remainder = m_block_limits.min;
 
+            /// All these blocks should be allocated in 1 go
+
             // Create the remainder block
             block* current_block = create_block(remainder);
             block* new_unused_block_head = current_block;
@@ -445,8 +488,8 @@ namespace myl {
             }
 
             // Prepend to any existing unused blocks
-            current_block->next = m_unused_blocks;
-            m_unused_blocks = new_unused_block_head;
+            current_block->next = m_unused_block_begin;
+            m_unused_block_begin = new_unused_block_head;
        }
 
 
