@@ -199,17 +199,15 @@ namespace myl {
             block& operator=(const block&) = delete;
             block& operator=(block&&) = delete;
 
-            MYL_NO_DISCARD constexpr block(allocator_type alloc, size_type cap)
+            MYL_NO_DISCARD constexpr block(pointer element_data, size_type cap)
                 : next{ nullptr }
                 , prev{ nullptr }
-                , data{ altr::allocate(alloc, cap) }
+                , data{ element_data }
                 , size{ 0 }
                 , capacity{ cap }
                 , skipfield_head{ 0 } {}
 
-            ///constexpr ~block() {
-            ///
-            ///}
+            constexpr ~block() = default;
         };
 
         using block_allocator_type = altr::rebind_alloc<block>;
@@ -218,7 +216,8 @@ namespace myl {
         // Members
         
         block* m_begin;
-        block* m_erased_blocks;/// implement and understand // List of blocks that are available for re-use
+        ///block* m_erased_blocks;/// implement and understand // List of blocks that are available for re-use
+        /// maybe change below to unused_begin
         block* m_unused_blocks; // List of uninitiated blocks availble for use
         size_type m_size;
         size_type m_capacity;
@@ -235,7 +234,7 @@ namespace myl {
 
         MYL_NO_DISCARD constexpr explicit colony(const allocator_type& allocator) noexcept
             : m_begin{ nullptr }
-            , m_erased_blocks{ nullptr }
+            ///, m_erased_blocks{ nullptr }
             , m_unused_blocks{ nullptr }
             , m_size{ 0 }
             , m_capacity{ 0 }
@@ -248,7 +247,7 @@ namespace myl {
 
         MYL_NO_DISCARD constexpr colony(colony_limits block_limits, const allocator_type& allocator)
             : m_begin{ nullptr }
-            , m_erased_blocks{ nullptr }
+            ///, m_erased_blocks{ nullptr }
             , m_unused_blocks{ nullptr }
             , m_size{ 0 }
             , m_capacity{ 0 }
@@ -274,7 +273,29 @@ namespace myl {
 
         //MYL_NO_DISCARD constexpr colony(std::initializer_list<value_type> list, colony_limits block_limits, const allocator_type& allocator = allocator_type());
 
-        ///constexpr auto ~colony();
+        constexpr auto ~colony() {
+            // Destroy elements
+
+            block* current;
+            while (m_begin != nullptr) {
+                current = m_begin;
+                m_begin = m_begin->next;
+                destroy_block_elements(current);
+
+                current->next = m_unused_blocks;
+                m_unused_blocks = current;
+            }
+
+            // Deallocate blocks
+
+            while (m_unused_blocks != nullptr) {
+                current = m_unused_blocks;
+                m_unused_blocks = m_unused_blocks->next;
+
+                block_altr::destroy(m_block_allocator, current);
+                block_altr::deallocate(m_block_allocator, current, 1);
+            }
+        }
         
         ///constexpr auto operator=(const colony& other) -> colony&;
         ///constexpr auto operator=(colony&& other) noexcept(/*See description*/) -> colony&;
@@ -344,9 +365,10 @@ namespace myl {
 
         // Modifiers
 
-        ///template<typename... Args> constexpr auto emplace(Args&&... args) -> iterator {
-        ///
-        ///}
+        template<typename... Args>
+        constexpr auto emplace(Args&&... args) -> iterator {
+            return;
+        }
         
         ///template<typename... Args> constexpr auto emplace_hint(const_iterator hint, Args&&... args) -> iterator;
          
@@ -412,12 +434,12 @@ namespace myl {
                 remainder = m_block_limits.min;
 
             // Create the remainder block
-            block* current_block = allocate_new_block(remainder);
+            block* current_block = create_block(remainder);
             block* new_unused_block_head = current_block;
 
             // Create the maxed capacity blocks
             while (reserve_block_count != 0) {
-                current_block->next = allocate_new_block(m_block_limits.max);
+                current_block->next = create_block(m_block_limits.max);
                 current_block = current_block->next;
                 --reserve_block_count;
             }
@@ -446,16 +468,30 @@ namespace myl {
         ///template<typename T_, typename Allocator_, typename U = T_> friend constexpr auto erase(colony<T_, Allocator_>& c, const U& value) -> typename colony<T_, Allocator_>::size_type;      
         ///template<typename T_, typename Allocator_, typename Predicate> friend constexpr auto erase_if(colony<T_, Allocator_>& c, Predicate predicate) -> typename colony<T_, Allocator_>::size_type;      
     private:
-        MYL_NO_DISCARD constexpr auto allocate_new_block(size_type capacity) -> block* {
+        constexpr auto destroy_block_elements(block* block) -> void {
+            for (size_type i = 0; block->size != 0; ++i)
+                if (true) { /// MYTODO: Check if Element is not part of the already destroyed elements
+                    altr::destroy(m_element_allocator, block->data + i);
+                    --block->size;
+                }
+        }
+
+        MYL_NO_DISCARD constexpr auto create_block(size_type capacity) -> block* {
             const block* new_block = block_altr::allocate(m_block_allocator, 1);
-            block_altr::construct(m_block_allocator, new_block, m_element_allocator, capacity);
+            const pointer new_data_block = altr::allocate(m_element_allocator, capacity);
+            block_altr::construct(m_block_allocator, new_block, new_data_block, capacity);
             m_capacity += capacity;
 
             return new_block;
         }
 
-        constexpr auto destroy_block_elements(block* block) -> void {
+        constexpr auto destroy_block(block* block) -> void {
+            destroy_block_elements(block);
+            altr::deallocate(m_element_allocator, block->data, block->capacity);
+            m_capacity -= block->capacity;
 
+            block_altr::destroy(m_block_allocator, block);
+            block_altr::deallocate(m_block_allocator, block, 1);
         }
     };
 }
